@@ -127,6 +127,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 )
                 session.refinement = RefinementContext(
                     style: settings.refinementStyle,
+                    persona: settings.refinementPersona,
+                    personaAdaptation: settings.personaAdaptation,
                     locale: settings.effectiveLocale,
                     vocabulary: settings.vocabulary,
                     destination: destination

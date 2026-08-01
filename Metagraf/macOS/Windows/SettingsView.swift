@@ -23,6 +23,9 @@ struct SettingsView: View {
             Tab("Formatting", systemImage: "text.badge.checkmark") {
                 FormattingSettings(settings: settings)
             }
+            Tab("Personas", systemImage: "person.crop.circle") {
+                PersonasSettings(settings: settings)
+            }
             Tab("Vocabulary", systemImage: "character.book.closed") {
                 VocabularySettings(settings: settings)
             }

@@ -22,6 +22,8 @@ struct SettingsStoreTests {
         first.retentionDays = 7
         first.refinementStyle = .intelligent
         first.usesNearbyAppContext = true
+        first.refinementPersona = .programmer
+        first.personaAdaptation = .strongAdaptation
         first.vocabulary = [VocabularyEntry(term: "Metagraf", misheard: ["meta graph"])]
 
         let second = SettingsStore(defaults: defaults)
@@ -30,6 +32,8 @@ struct SettingsStoreTests {
         #expect(second.retentionDays == 7)
         #expect(second.refinementStyle == .intelligent)
         #expect(second.usesNearbyAppContext)
+        #expect(second.refinementPersona == .programmer)
+        #expect(second.personaAdaptation == .strongAdaptation)
         #expect(second.vocabulary.map(\.term) == ["Metagraf"])
         #expect(second.vocabulary.first?.misheard == ["meta graph"])
     }
@@ -39,6 +43,8 @@ struct SettingsStoreTests {
         let settings = SettingsStore(defaults: makeDefaults())
         #expect(settings.refinementStyle == .cleanup)
         #expect(!settings.usesNearbyAppContext)
+        #expect(settings.refinementPersona == .none)
+        #expect(settings.personaAdaptation == .contextualPolish)
     }
 
     @Test("An empty language setting follows the system")

@@ -5,6 +5,78 @@ import Testing
 
 @Suite("Refinement styles")
 struct RefinementStyleTests {
+    @Test("Persona values have stable Codable identities")
+    func personaIdentities() throws {
+        for persona in RefinementPersona.allCases {
+            let data = try JSONEncoder().encode(persona)
+            #expect(try JSONDecoder().decode(RefinementPersona.self, from: data) == persona)
+        }
+        for adaptation in PersonaAdaptation.allCases {
+            let data = try JSONEncoder().encode(adaptation)
+            #expect(try JSONDecoder().decode(PersonaAdaptation.self, from: data) == adaptation)
+        }
+    }
+
+    @Test("No persona preserves the existing instructions regardless of adaptation")
+    func noPersonaDoesNotChangeInstructions() {
+        let refiner = AppleIntelligenceRefiner()
+        let defaultInstructions = refiner.instructions(for: RefinementContext(style: .cleanup))
+        let inactiveInstructions = refiner.instructions(
+            for: RefinementContext(
+                style: .cleanup,
+                persona: .none,
+                personaAdaptation: .strongAdaptation
+            )
+        )
+
+        #expect(defaultInstructions == inactiveInstructions)
+        #expect(!defaultInstructions.contains("Persona:"))
+        #expect(!defaultInstructions.contains("Adaptation:"))
+    }
+
+    @Test("Every active persona adds its trusted guidance")
+    func personaGuidance() {
+        let refiner = AppleIntelligenceRefiner()
+        let expectedTerms: [RefinementPersona: String] = [
+            .general: "broadly appropriate",
+            .programmer: "technical terminology",
+            .professionalWriter: "professional and non-fiction",
+            .novelAuthor: "voice-aware narrative",
+            .studentAcademic: "academically appropriate",
+        ]
+
+        for (persona, term) in expectedTerms {
+            let instructions = refiner.instructions(
+                for: RefinementContext(style: .email, persona: persona)
+            )
+            #expect(instructions.contains("selected style controls the output format"))
+            #expect(instructions.contains("Persona:"))
+            #expect(instructions.contains(term))
+        }
+    }
+
+    @Test("Every adaptation level adds its trusted guidance")
+    func adaptationGuidance() {
+        let refiner = AppleIntelligenceRefiner()
+        let expectedTerms: [PersonaAdaptation: String] = [
+            .minimalCorrection: "Only correct transcription errors",
+            .contextualPolish: "Improve phrasing",
+            .strongAdaptation: "rewrite substantially",
+        ]
+
+        for (adaptation, term) in expectedTerms {
+            let instructions = refiner.instructions(
+                for: RefinementContext(
+                    style: .notes,
+                    persona: .programmer,
+                    personaAdaptation: adaptation
+                )
+            )
+            #expect(instructions.contains("Adaptation:"))
+            #expect(instructions.contains(term))
+        }
+    }
+
     @Test("Every non-raw style needs a language model")
     func languageModelIsNeededForEveryRefinement() {
         #expect(!RefinementStyle.raw.needsLanguageModel)
@@ -185,7 +257,14 @@ struct RefinerRegistryTests {
         let registry = RefinerRegistry(modelRefiners: [
             StubRefiner(availability: .available) { _ in "rewritten" }
         ])
-        let result = await registry.refine("um hello", context: RefinementContext(style: .raw))
+        let result = await registry.refine(
+            "um hello",
+            context: RefinementContext(
+                style: .raw,
+                persona: .novelAuthor,
+                personaAdaptation: .strongAdaptation
+            )
+        )
         #expect(result == "um hello")
     }
 

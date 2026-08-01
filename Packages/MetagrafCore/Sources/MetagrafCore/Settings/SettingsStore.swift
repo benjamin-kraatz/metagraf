@@ -66,6 +66,16 @@ public final class SettingsStore {
         didSet { write(usesNearbyAppContext, .usesNearbyAppContext) }
     }
 
+    /// The perspective used to guide terminology and voice during refinement.
+    public var refinementPersona: RefinementPersona {
+        didSet { write(refinementPersona.rawValue, .refinementPersona) }
+    }
+
+    /// How freely an active persona may reshape the speaker's wording.
+    public var personaAdaptation: PersonaAdaptation {
+        didSet { write(personaAdaptation.rawValue, .personaAdaptation) }
+    }
+
     // MARK: - Appearance
 
     /// Whether the pill stays visible when nothing is happening.
@@ -114,6 +124,10 @@ public final class SettingsStore {
         refinementStyle = defaults.string(forKey: Key.refinementStyle.rawValue)
             .flatMap(RefinementStyle.init(rawValue:)) ?? .cleanup
         usesNearbyAppContext = defaults.object(forKey: Key.usesNearbyAppContext.rawValue) as? Bool ?? false
+        refinementPersona = defaults.string(forKey: Key.refinementPersona.rawValue)
+            .flatMap(RefinementPersona.init(rawValue:)) ?? .none
+        personaAdaptation = defaults.string(forKey: Key.personaAdaptation.rawValue)
+            .flatMap(PersonaAdaptation.init(rawValue:)) ?? .contextualPolish
         showPillWhenIdle = defaults.object(forKey: Key.showPillWhenIdle.rawValue) as? Bool ?? true
         pillPlacement = defaults.string(forKey: Key.pillPlacement.rawValue)
             .flatMap(PillPlacement.init(rawValue:)) ?? .bottomCenter
@@ -158,6 +172,8 @@ public final class SettingsStore {
         case model = "dictation.model"
         case refinementStyle = "refinement.style"
         case usesNearbyAppContext = "refinement.usesNearbyAppContext"
+        case refinementPersona = "refinement.persona"
+        case personaAdaptation = "refinement.personaAdaptation"
         case showPillWhenIdle = "appearance.showPillWhenIdle"
         case pillPlacement = "appearance.pillPlacement"
         case playsSounds = "appearance.playsSounds"

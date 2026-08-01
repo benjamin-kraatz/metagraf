@@ -154,6 +154,8 @@ public enum RefinementContextLimit {
 /// Everything a refiner needs to know about the text it is given.
 public struct RefinementContext: Sendable {
     public var style: RefinementStyle
+    public var persona: RefinementPersona
+    public var personaAdaptation: PersonaAdaptation
     public var locale: Locale
     public var vocabulary: [VocabularyEntry]
     public var destination: RefinementDestinationContext
@@ -170,6 +172,8 @@ public struct RefinementContext: Sendable {
 
     public init(
         style: RefinementStyle,
+        persona: RefinementPersona = .none,
+        personaAdaptation: PersonaAdaptation = .contextualPolish,
         locale: Locale = .current,
         vocabulary: [VocabularyEntry] = [],
         targetApplication: String? = nil,
@@ -177,6 +181,8 @@ public struct RefinementContext: Sendable {
         destination: RefinementDestinationContext? = nil
     ) {
         self.style = style
+        self.persona = persona
+        self.personaAdaptation = personaAdaptation
         self.locale = locale
         self.vocabulary = vocabulary
         var resolvedDestination = destination ?? RefinementDestinationContext()

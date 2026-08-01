@@ -76,7 +76,11 @@ public struct AppleIntelligenceRefiner: TextRefiner, Sendable {
 
         switch context.style {
         case .raw, .cleanup:
-            lines.append("Remove filler words, fix punctuation and capitalisation, and nothing else.")
+            if context.persona == .none {
+                lines.append("Remove filler words, fix punctuation and capitalisation, and nothing else.")
+            } else {
+                lines.append("Remove filler words and fix punctuation and capitalisation before applying the persona guidance.")
+            }
         case .email:
             lines.append("Lay the text out as a short email body. Keep the speaker's tone.")
         case .message:
@@ -90,6 +94,14 @@ public struct AppleIntelligenceRefiner: TextRefiner, Sendable {
             lines.append(
                 "Use destination context only to match tone, continuity, terminology, and formatting. Never copy unrelated context into the result."
             )
+        }
+
+        if let personaInstruction = context.persona.instruction {
+            lines.append(
+                "The selected style controls the output format. The persona controls terminology and voice without overriding that format."
+            )
+            lines.append("Persona: \(personaInstruction)")
+            lines.append("Adaptation: \(context.personaAdaptation.instruction)")
         }
 
         return lines.joined(separator: "\n")

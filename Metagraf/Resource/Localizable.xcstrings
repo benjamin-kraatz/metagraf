@@ -168,6 +168,16 @@
         }
       }
     },
+    "Adaptation" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anpassungsstärke"
+          }
+        }
+      }
+    },
     "Add" : {
       "localizations" : {
         "de" : {
@@ -393,6 +403,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zu knappen Notizen statt ganzen Sätzen verdichten."
+          }
+        }
+      }
+    },
+    "Contextual polish" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontextbezogene Überarbeitung"
           }
         }
       }
@@ -854,6 +875,17 @@
         }
       }
     },
+    "Improve phrasing, terminology, and formatting while preserving meaning and certainty." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formulierungen, Terminologie und Formatierung verbessern, ohne Bedeutung und Gewissheit zu verändern."
+          }
+        }
+      }
+    },
     "Insert the transcript untouched." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -916,6 +948,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pill im Leerlauf sichtbar lassen"
+          }
+        }
+      }
+    },
+    "Keep the selected formatting style’s existing behaviour." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das bestehende Verhalten des ausgewählten Formatierungsstils beibehalten."
           }
         }
       }
@@ -1108,6 +1151,17 @@
         }
       }
     },
+    "Minimal correction" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minimale Korrektur"
+          }
+        }
+      }
+    },
     "Models" : {
       "localizations" : {
         "de" : {
@@ -1124,6 +1178,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Einrichtung nötig"
+          }
+        }
+      }
+    },
+    "No persona" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Persona"
           }
         }
       }
@@ -1166,6 +1231,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Noch nichts diktiert"
+          }
+        }
+      }
+    },
+    "Novel author" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Romanautor:in"
+          }
+        }
+      }
+    },
+    "Only correct transcription, grammar, and domain terminology." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Transkriptions-, Grammatik- und Fachbegriffsfehler korrigieren."
           }
         }
       }
@@ -1228,6 +1315,36 @@
         }
       }
     },
+    "Persona" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Persona"
+          }
+        }
+      }
+    },
+    "Personas" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personas"
+          }
+        }
+      }
+    },
+    "Personas enhance every formatting style except “Exactly as spoken”. Refinement requires Apple Intelligence and is performed entirely on-device." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personas erweitern jeden Formatierungsstil außer „Genau wie gesprochen“. Die Überarbeitung erfordert Apple Intelligence und erfolgt vollständig auf dem Gerät."
+          }
+        }
+      }
+    },
     "Play a cue when dictation starts and ends" : {
       "localizations" : {
         "de" : {
@@ -1248,12 +1365,45 @@
         }
       }
     },
+    "Prefer correct technical terminology and concise engineering communication." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Korrekte Fachbegriffe und eine prägnante technische Ausdrucksweise bevorzugen."
+          }
+        }
+      }
+    },
     "Privacy" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Datenschutz"
+          }
+        }
+      }
+    },
+    "Professional writer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Professionelle:r Autor:in"
+          }
+        }
+      }
+    },
+    "Programmer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Programmierer:in"
           }
         }
       }
@@ -1290,6 +1440,17 @@
     },
     "Returns the most recent thing you dictated." : {
 
+    },
+    "Rewrite more substantially for the persona while retaining the speaker’s meaning." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für die Persona deutlicher umformulieren und dabei die Bedeutung der sprechenden Person beibehalten."
+          }
+        }
+      }
     },
     "Right ⇧" : {
       "localizations" : {
@@ -1337,6 +1498,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Transkripte suchen"
+          }
+        }
+      }
+    },
+    "Select a persona to choose how strongly it shapes the wording." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle eine Persona aus, um festzulegen, wie stark sie die Wortwahl beeinflusst."
           }
         }
       }
@@ -1429,6 +1600,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Statistiken"
+          }
+        }
+      }
+    },
+    "Strength" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stärke"
+          }
+        }
+      }
+    },
+    "Strong adaptation" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starke Anpassung"
+          }
+        }
+      }
+    },
+    "Student / academic" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Student:in / Akademiker:in"
           }
         }
       }
@@ -1657,12 +1860,56 @@
     "Turn on Full Access" : {
 
     },
+    "Use clear, natural wording that fits a broad range of contexts." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klare, natürliche Formulierungen verwenden, die für viele Kontexte geeignet sind."
+          }
+        }
+      }
+    },
+    "Use clear, structured, academically appropriate wording." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klare, strukturierte und akademisch angemessene Formulierungen verwenden."
+          }
+        }
+      }
+    },
+    "Use expressive, voice-aware narrative prose without inventing story details." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausdrucksstarke, stimmige Erzählprosa verwenden, ohne Details der Geschichte zu erfinden."
+          }
+        }
+      }
+    },
     "Use nearby app context" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kontext aus der App verwenden"
+          }
+        }
+      }
+    },
+    "Use polished, precise prose suited to professional and non-fiction writing." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausgefeilte, präzise Prosa verwenden, die sich für professionelle Texte und Sachtexte eignet."
           }
         }
       }
@@ -1778,6 +2025,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wörter"
+          }
+        }
+      }
+    },
+    "Write as a" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schreiben als"
           }
         }
       }
