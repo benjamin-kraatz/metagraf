@@ -57,6 +57,7 @@ public final class AudioCaptureEngine {
     /// format. The returned stream finishes when `stop()` is called.
     public func start(convertingTo target: AVAudioFormat?) throws -> AsyncStream<CapturedAudio> {
         if isCapturing { stop() }
+        try activateAudioSession()
 
         let input = engine.inputNode
         let inputFormat = input.outputFormat(forBus: 0)
@@ -126,6 +127,26 @@ public final class AudioCaptureEngine {
 
         // Stay warm so the next utterance starts without rebuilding the graph.
         engine.prepare()
+        deactivateAudioSession()
+    }
+
+    /// iOS requires an active, recording-capable audio session before the input
+    /// node produces anything; macOS has no equivalent step.
+    private func activateAudioSession() throws {
+        #if os(iOS)
+        let session = AVAudioSession.sharedInstance()
+        // `.measurement` turns off the system's own signal processing, which is
+        // tuned for calls and works against speech recognition.
+        try session.setCategory(.record, mode: .measurement, options: [.allowBluetooth])
+        try session.setActive(true)
+        #endif
+    }
+
+    private func deactivateAudioSession() {
+        #if os(iOS)
+        // Handing the session back lets whatever was playing before resume.
+        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        #endif
     }
 }
 

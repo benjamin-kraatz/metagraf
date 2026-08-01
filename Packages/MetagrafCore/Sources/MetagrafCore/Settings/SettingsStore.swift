@@ -8,7 +8,17 @@ import OSLog
 @MainActor
 @Observable
 public final class SettingsStore {
-    public static let shared = SettingsStore()
+    public static let shared: SettingsStore = {
+        #if os(iOS)
+        // The keyboard extension is a separate process, so the app group is the
+        // only place it and the app can both read. macOS deliberately stays on
+        // the standard domain: it has no extensions to share with, and moving
+        // it would strand settings the user already has.
+        SettingsStore(defaults: UserDefaults(suiteName: Metagraf.appGroupIdentifier) ?? .standard)
+        #else
+        SettingsStore()
+        #endif
+    }()
 
     private let defaults: UserDefaults
     private let logger = Logger(subsystem: Metagraf.bundleIdentifier, category: "Settings")

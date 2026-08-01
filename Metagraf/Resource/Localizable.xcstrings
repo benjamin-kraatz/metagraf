@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "·" : {
       "localizations" : {
         "de" : {
@@ -184,6 +187,9 @@
           }
         }
       }
+    },
+    "Add the keyboard" : {
+
     },
     "Also heard as" : {
       "localizations" : {
@@ -428,6 +434,9 @@
         }
       }
     },
+    "Copied to the clipboard" : {
+
+    },
     "Copies the transcript so you can paste it yourself." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -470,6 +479,15 @@
         }
       }
     },
+    "Copying…" : {
+
+    },
+    "Currently dictating in %@." : {
+
+    },
+    "Dictate" : {
+
+    },
     "Dictate in" : {
       "localizations" : {
         "de" : {
@@ -479,6 +497,9 @@
           }
         }
       }
+    },
+    "Dictate straight into any app without switching to Metagraf." : {
+
     },
     "Dictation" : {
       "localizations" : {
@@ -603,6 +624,9 @@
           }
         }
       }
+    },
+    "Everything is transcribed on this iPhone and nothing is uploaded." : {
+
     },
     "Everything is transcribed on this Mac and nothing is uploaded. History is only for your own reference." : {
       "localizations" : {
@@ -798,6 +822,9 @@
         }
       }
     },
+    "Hold to record, release to transcribe" : {
+
+    },
     "Hotkey" : {
       "localizations" : {
         "de" : {
@@ -860,6 +887,9 @@
         }
       }
     },
+    "iOS only lets a keyboard reach the microphone and your settings with Full Access granted. Metagraf still transcribes entirely on this iPhone — nothing is sent anywhere." : {
+
+    },
     "Keep it short and conversational." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -890,6 +920,9 @@
           }
         }
       }
+    },
+    "Keyboard" : {
+
     },
     "Language" : {
       "localizations" : {
@@ -950,6 +983,9 @@
           }
         }
       }
+    },
+    "Listening — let go when you’re done." : {
+
     },
     "Listening…" : {
       "localizations" : {
@@ -1135,6 +1171,9 @@
         }
       }
     },
+    "Open Settings" : {
+
+    },
     "Open System Settings" : {
       "localizations" : {
         "de" : {
@@ -1287,6 +1326,15 @@
         }
       }
     },
+    "Set up the keyboard" : {
+
+    },
+    "Settings" : {
+
+    },
+    "Settings → General → Keyboard → Keyboards → Add New Keyboard → Metagraf." : {
+
+    },
     "Settings…" : {
       "localizations" : {
         "de" : {
@@ -1377,6 +1425,12 @@
         }
       }
     },
+    "Tap and hold to dictate. Your words never leave this iPhone." : {
+
+    },
+    "Tap Metagraf in that list and enable Allow Full Access." : {
+
+    },
     "Tap twice quickly to keep dictation running hands-free; press once more to finish. Escape cancels." : {
       "localizations" : {
         "de" : {
@@ -1396,6 +1450,9 @@
           }
         }
       }
+    },
+    "That didn’t work" : {
+
     },
     "The %@ model could not be loaded." : {
       "extractionState" : "stale",
@@ -1575,6 +1632,9 @@
           }
         }
       }
+    },
+    "Turn on Full Access" : {
+
     },
     "Use nearby app context" : {
       "localizations" : {
