@@ -23,12 +23,20 @@ struct PersonasSettings: View {
             }
 
             Section("Adaptation") {
-                Picker("Strength", selection: $settings.personaAdaptation) {
-                    ForEach(PersonaAdaptation.allCases) { adaptation in
-                        Text(LocalizedStringKey(adaptation.displayName)).tag(adaptation)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Strength")
+
+                    Slider(value: adaptationValue, in: 0...2, step: 1) {
+                        Text("Strength")
+                    }
+                    .labelsHidden()
+
+                    HStack(alignment: .top, spacing: 0) {
+                        adaptationLabel(.minimalCorrection, alignment: .leading)
+                        adaptationLabel(.contextualPolish, alignment: .center)
+                        adaptationLabel(.strongAdaptation, alignment: .trailing)
                     }
                 }
-                .pickerStyle(.segmented)
                 .disabled(settings.refinementPersona == .none)
 
                 Text(adaptationExplanation)
@@ -57,6 +65,38 @@ struct PersonasSettings: View {
             "Select a persona to choose how strongly it shapes the wording."
         } else {
             LocalizedStringKey(settings.personaAdaptation.explanation)
+        }
+    }
+
+    private var adaptationValue: Binding<Double> {
+        Binding(
+            get: {
+                let index = PersonaAdaptation.allCases.firstIndex(of: settings.personaAdaptation) ?? 1
+                return Double(index)
+            },
+            set: { value in
+                let index = min(max(Int(value.rounded()), 0), PersonaAdaptation.allCases.count - 1)
+                settings.personaAdaptation = PersonaAdaptation.allCases[index]
+            }
+        )
+    }
+
+    private func adaptationLabel(
+        _ adaptation: PersonaAdaptation,
+        alignment: Alignment
+    ) -> some View {
+        Text(LocalizedStringKey(adaptation.displayName))
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(textAlignment(for: alignment))
+            .frame(maxWidth: .infinity, alignment: alignment)
+    }
+
+    private func textAlignment(for alignment: Alignment) -> TextAlignment {
+        switch alignment {
+        case .leading: .leading
+        case .trailing: .trailing
+        default: .center
         }
     }
 }
