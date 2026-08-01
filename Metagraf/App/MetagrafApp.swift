@@ -57,9 +57,20 @@ struct MetagrafApp: App {
         }
     }
     #else
+    @State private var controller = DictationController()
+
     var body: some Scene {
         WindowGroup {
-            MainWindow()
+            if let history = controller.history {
+                RootView(controller: controller)
+                    .modelContainer(history.container)
+            } else {
+                ContentUnavailableView(
+                    "History is unavailable",
+                    systemImage: "exclamationmark.triangle",
+                    description: Text("Dictation still works; only the transcript log could not be opened.")
+                )
+            }
         }
     }
     #endif
