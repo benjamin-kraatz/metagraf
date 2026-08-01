@@ -3,10 +3,14 @@ import SwiftUI
 
 @main
 struct MetagrafApp: App {
+    #if os(macOS)
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+
     var body: some Scene {
-        #if os(macOS)
-        MenuBarExtra("Metagraf", systemImage: "waveform") {
-            MenuBarContent()
+        MenuBarExtra {
+            MenuBarContent(session: appDelegate.session)
+        } label: {
+            MenuBarIcon(session: appDelegate.session)
         }
         .menuBarExtraStyle(.window)
 
@@ -18,12 +22,14 @@ struct MetagrafApp: App {
         Settings {
             SettingsView()
         }
-        #else
+    }
+    #else
+    var body: some Scene {
         WindowGroup {
             MainWindow()
         }
-        #endif
     }
+    #endif
 }
 
 /// Identifiers for the app's windows, so `openWindow` calls stay typo-proof.
