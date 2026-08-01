@@ -1,10 +1,64 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "·" : {
+
+    },
+    "· %lld GB RAM suggested" : {
+
+    },
+    "^[%lld word](inflect: true)" : {
+
+    },
+    "0.1s" : {
+
+    },
+    "1s" : {
+
+    },
+    "7 days" : {
+
+    },
+    "30 days" : {
+
+    },
+    "90 days" : {
+
+    },
+    "Add" : {
+
+    },
+    "Add a name or term Metagraf keeps getting wrong" : {
+
+    },
+    "Also heard as" : {
+
+    },
+    "Apple Intelligence" : {
+
+    },
+    "Available on this Mac" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Checking availability…" : {
+
+    },
+    "Clean up runs entirely on rules and never needs a model. The other styles ask Apple Intelligence to rewrite the text on this device, and fall back to the cleaned-up version if it is unavailable or takes too long." : {
+
+    },
     "Continue anyway" : {
 
     },
+    "Copy" : {
+
+    },
     "Copy again" : {
+
+    },
+    "Dictate in" : {
 
     },
     "Dictation" : {
@@ -13,16 +67,43 @@
     "Dictation stays off until permissions are granted." : {
 
     },
-    "General" : {
+    "Dictation still works; only the transcript log could not be opened." : {
 
     },
-    "General settings arrive in M3." : {
+    "Don’t keep any" : {
+
+    },
+    "Download" : {
+
+    },
+    "Downloaded models use %@." : {
+
+    },
+    "Everything is transcribed on this Mac and nothing is uploaded. History is only for your own reference." : {
+
+    },
+    "Follow system language" : {
+
+    },
+    "Forever" : {
+
+    },
+    "Formatting" : {
+
+    },
+    "General" : {
 
     },
     "Grant" : {
 
     },
+    "Granted" : {
+
+    },
     "History" : {
+
+    },
+    "History is unavailable" : {
 
     },
     "Hold %@ anywhere on your Mac, say what you want written, and let go. Everything is transcribed on this device." : {
@@ -31,13 +112,40 @@
     "Hold %@ anywhere to dictate." : {
 
     },
-    "Hold the dictation hotkey anywhere to start talking." : {
+    "Hold the dictation key anywhere and start talking." : {
 
     },
-    "Hotkey and audio settings arrive in M3." : {
+    "Hold to dictate" : {
+
+    },
+    "Hotkey" : {
+
+    },
+    "Ignore holds shorter than" : {
+
+    },
+    "Insert with" : {
+
+    },
+    "Keep the pill visible when idle" : {
+
+    },
+    "Keep transcripts for" : {
+
+    },
+    "Language" : {
+
+    },
+    "Languages with a download badge are already on this Mac. Others are fetched the first time you use them. Currently dictating in %@." : {
 
     },
     "Last transcript" : {
+
+    },
+    "Launch Metagraf at login" : {
+
+    },
+    "Looking up available languages…" : {
 
     },
     "Metagraf" : {
@@ -46,7 +154,31 @@
     "Metagraf can't dictate until both are granted." : {
 
     },
+    "Metagraf lives in the menu bar and has no Dock icon." : {
+
+    },
     "Models" : {
+
+    },
+    "No statistics yet" : {
+
+    },
+    "Nothing dictated yet" : {
+
+    },
+    "Open System Settings" : {
+
+    },
+    "Permissions" : {
+
+    },
+    "Privacy" : {
+
+    },
+    "Remove" : {
+
+    },
+    "Search transcripts" : {
 
     },
     "Setup isn’t finished" : {
@@ -58,10 +190,37 @@
     "Statistics" : {
 
     },
+    "Style" : {
+
+    },
+    "Tap twice quickly to keep dictation running hands-free; press once more to finish. Escape cancels." : {
+
+    },
+    "Term" : {
+
+    },
+    "The pill" : {
+
+    },
+    "These words are fed to the speech model so it favours them over similar-sounding ones." : {
+
+    },
+    "They appear once you have dictated something." : {
+
+    },
     "Vocabulary" : {
 
     },
     "Welcome to Metagraf" : {
+
+    },
+    "When off, the pill appears only while you are dictating." : {
+
+    },
+    "Where text goes" : {
+
+    },
+    "Write it as" : {
 
     },
     "You're all set" : {

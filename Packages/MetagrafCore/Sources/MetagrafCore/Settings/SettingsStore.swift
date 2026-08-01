@@ -57,6 +57,15 @@ public final class SettingsStore {
         didSet { write(showPillWhenIdle, .showPillWhenIdle) }
     }
 
+    public var pillPlacement: PillPlacement {
+        didSet { write(pillPlacement.rawValue, .pillPlacement) }
+    }
+
+    /// Whether short cues play when dictation starts and finishes.
+    public var playsSounds: Bool {
+        didSet { write(playsSounds, .playsSounds) }
+    }
+
     public var launchAtLogin: Bool {
         didSet { write(launchAtLogin, .launchAtLogin) }
     }
@@ -89,6 +98,9 @@ public final class SettingsStore {
         refinementStyle = defaults.string(forKey: Key.refinementStyle.rawValue)
             .flatMap(RefinementStyle.init(rawValue:)) ?? .cleanup
         showPillWhenIdle = defaults.object(forKey: Key.showPillWhenIdle.rawValue) as? Bool ?? true
+        pillPlacement = defaults.string(forKey: Key.pillPlacement.rawValue)
+            .flatMap(PillPlacement.init(rawValue:)) ?? .bottomCenter
+        playsSounds = defaults.object(forKey: Key.playsSounds.rawValue) as? Bool ?? true
         launchAtLogin = defaults.object(forKey: Key.launchAtLogin.rawValue) as? Bool ?? false
         retentionDays = defaults.object(forKey: Key.retentionDays.rawValue) as? Int ?? 30
 
@@ -129,6 +141,8 @@ public final class SettingsStore {
         case model = "dictation.model"
         case refinementStyle = "refinement.style"
         case showPillWhenIdle = "appearance.showPillWhenIdle"
+        case pillPlacement = "appearance.pillPlacement"
+        case playsSounds = "appearance.playsSounds"
         case launchAtLogin = "general.launchAtLogin"
         case retentionDays = "history.retentionDays"
         case vocabulary = "vocabulary.entries"

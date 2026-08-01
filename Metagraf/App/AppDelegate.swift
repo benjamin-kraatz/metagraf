@@ -16,6 +16,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let logger = Logger(subsystem: Metagraf.bundleIdentifier, category: "App")
     private let hotKeys = HotKeyMonitor()
     private let inserter = TextInserter()
+    private let feedback = FeedbackPlayer()
     private var pill: PillWindowController?
 
     /// Which app was frontmost when recording began, and when it began.
@@ -44,6 +45,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let pill = PillWindowController(session: session, settings: settings)
         pill.show()
         self.pill = pill
+
+        // The user can turn the login item off in System Settings without the
+        // app knowing, so trust the system rather than the stored preference.
+        settings.launchAtLogin = LaunchAtLogin.isEnabled
 
         session.prewarm()
         startHotKeys()
@@ -111,6 +116,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 )
             }
 
+            // The hotkey is a bare modifier with no visible press, so the cue is
+            // the only confirmation that dictation actually started.
+            switch activation {
+            case .began: feedback.play(.started)
+            case .completed: feedback.play(.finished)
+            case .cancelled, .aborted: feedback.play(.cancelled)
+            }
+
             Task {
                 switch activation {
                 case .began:
@@ -133,6 +146,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// Pushes the user's preferences into the pieces that hold their own copy.
     func applySettings() {
+        feedback.isEnabled = settings.playsSounds
+        pill?.reposition()
+
         hotKeys.binding = ModifierKey(rawValue: settings.hotKey) ?? .rightOption
         hotKeys.machine.minimumHold = settings.minimumHold
         hotKeys.machine.doubleTapWindow = settings.doubleTapWindow

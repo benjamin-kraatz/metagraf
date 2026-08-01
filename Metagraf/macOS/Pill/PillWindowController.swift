@@ -11,13 +11,15 @@ final class PillWindowController {
     /// window ever having to resize.
     private static let canvasSize = NSSize(width: 620, height: 90)
 
-    /// Gap between the pill and the bottom of the screen's visible area.
-    private static let bottomInset: CGFloat = 26
+    /// Gap between the pill and the edge of the screen's visible area.
+    private static let edgeInset: CGFloat = 26
 
     private let panel: PillPanel
+    private let settings: SettingsStore
     private var screenObserver: (any NSObjectProtocol)?
 
     init(session: DictationSession, settings: SettingsStore) {
+        self.settings = settings
         panel = PillPanel(contentRect: NSRect(origin: .zero, size: Self.canvasSize))
 
         let host = NSHostingView(
@@ -50,15 +52,23 @@ final class PillWindowController {
         panel.orderOut(nil)
     }
 
-    /// Centers the pill along the bottom of the active screen.
+    /// Parks the pill at the chosen anchor of the active screen.
     func reposition() {
         guard let screen = activeScreen() else { return }
         let visible = screen.visibleFrame
-        let origin = NSPoint(
-            x: visible.midX - Self.canvasSize.width / 2,
-            y: visible.minY + Self.bottomInset
-        )
-        panel.setFrame(NSRect(origin: origin, size: Self.canvasSize), display: false)
+        let size = Self.canvasSize
+
+        let x: CGFloat = switch settings.pillPlacement {
+        case .bottomCenter, .topCenter: visible.midX - size.width / 2
+        case .bottomLeading: visible.minX + Self.edgeInset
+        case .bottomTrailing: visible.maxX - size.width - Self.edgeInset
+        }
+
+        let y: CGFloat = settings.pillPlacement.isTop
+            ? visible.maxY - size.height - Self.edgeInset
+            : visible.minY + Self.edgeInset
+
+        panel.setFrame(NSRect(origin: NSPoint(x: x, y: y), size: size), display: false)
     }
 
     /// The screen the user is currently working on, which is the one holding

@@ -53,7 +53,27 @@ private struct GeneralSettings: View {
 
             Section("The pill") {
                 Toggle("Keep the pill visible when idle", isOn: $settings.showPillWhenIdle)
-                Text("When off, the pill appears only while you are dictating.")
+
+                Picker("Position", selection: $settings.pillPlacement) {
+                    ForEach(PillPlacement.allCases) { placement in
+                        Text(placement.displayName).tag(placement)
+                    }
+                }
+
+                Text(
+                    """
+                    The pill floats above every app and ignores clicks, so it \
+                    never gets in the way of what is underneath it.
+                    """
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Section("Sound") {
+                Toggle("Play a cue when dictation starts and ends", isOn: $settings.playsSounds)
+                Text("Useful because the dictation key has no visible press of its own.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
