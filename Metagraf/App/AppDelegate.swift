@@ -1,5 +1,6 @@
 #if os(macOS)
 import AppKit
+import Darwin
 import MetagrafCore
 import OSLog
 
@@ -19,6 +20,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let focusedContextReader = FocusedContextReader()
     private let feedback = FeedbackPlayer()
     private var pill: PillWindowController?
+    private var instanceLockFileDescriptor: Int32 = -1
 
     /// Which app was frontmost when recording began, and when it began.
     /// Captured up front because by the time the transcript is ready the user
@@ -31,6 +33,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var activeModelID = ModelCatalog.default.id
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        guard acquireInstanceLock() else {
+            logger.notice("Another Metagraf instance is already running; exiting duplicate process")
+            NSApp.terminate(nil)
+            return
+        }
+
         do {
             let history = try HistoryStore(inMemory: false)
             history.prune(retentionDays: settings.retentionDays)
@@ -61,6 +69,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         hotKeys.stop()
+        releaseInstanceLock()
     }
 
     // MARK: - Delivery
@@ -186,6 +195,41 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }
+    }
+
+    // MARK: - Single instance
+
+    /// Only one process may own the global hotkey. A kernel-backed file lock is
+    /// released automatically if the process crashes, unlike a sentinel file.
+    private func acquireInstanceLock() -> Bool {
+        guard instanceLockFileDescriptor == -1 else { return true }
+
+        let lockURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("\(Metagraf.bundleIdentifier).instance.lock")
+        let descriptor = Darwin.open(
+            lockURL.path,
+            O_CREAT | O_RDWR,
+            S_IRUSR | S_IWUSR
+        )
+        guard descriptor >= 0 else {
+            logger.error("Could not create the single-instance lock")
+            return false
+        }
+
+        guard Darwin.lockf(descriptor, F_TLOCK, 0) == 0 else {
+            Darwin.close(descriptor)
+            return false
+        }
+
+        instanceLockFileDescriptor = descriptor
+        return true
+    }
+
+    private func releaseInstanceLock() {
+        guard instanceLockFileDescriptor >= 0 else { return }
+        _ = Darwin.lockf(instanceLockFileDescriptor, F_ULOCK, 0)
+        Darwin.close(instanceLockFileDescriptor)
+        instanceLockFileDescriptor = -1
     }
 }
 
