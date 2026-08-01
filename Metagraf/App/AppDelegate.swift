@@ -103,6 +103,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     locale: settings.effectiveLocale,
                     contextualStrings: settings.contextualStrings
                 )
+                session.refinement = RefinementContext(
+                    style: settings.refinementStyle,
+                    locale: settings.effectiveLocale,
+                    vocabulary: settings.vocabulary,
+                    targetApplication: target?.localizedName
+                )
             }
 
             Task {

@@ -19,6 +19,9 @@ struct SettingsView: View {
             Tab("Models", systemImage: "cube") {
                 ModelsSettings(settings: settings, models: models)
             }
+            Tab("Formatting", systemImage: "text.badge.checkmark") {
+                FormattingSettings(settings: settings)
+            }
             Tab("Vocabulary", systemImage: "character.book.closed") {
                 VocabularySettings(settings: settings)
             }

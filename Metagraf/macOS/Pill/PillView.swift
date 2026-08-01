@@ -57,7 +57,7 @@ struct PillView: View {
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(.secondary)
 
-        case .preparing, .transcribing, .inserting:
+        case .preparing, .transcribing, .refining, .inserting:
             ProgressView()
                 .controlSize(.small)
                 .scaleEffect(0.7)
@@ -101,6 +101,9 @@ struct PillView: View {
                 elapsed
             }
             .frame(width: 320)
+
+        case .refining:
+            label("Tidying up…")
 
         case .inserting:
             label("Inserting…")

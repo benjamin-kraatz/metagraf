@@ -24,7 +24,7 @@ struct MenuBarIcon: View {
     private var symbol: String {
         switch session.phase {
         case .idle: "waveform"
-        case .preparing, .transcribing, .inserting: "waveform.badge.magnifyingglass"
+        case .preparing, .transcribing, .refining, .inserting: "waveform.badge.magnifyingglass"
         case .recording: "waveform.badge.mic"
         case .failed: "waveform.badge.exclamationmark"
         }

@@ -111,6 +111,7 @@ struct MenuBarContent: View {
         case .preparing: "Getting ready…"
         case .recording: "Listening"
         case .transcribing: "Transcribing…"
+        case .refining: "Tidying up…"
         case .inserting: "Inserting…"
         case .failed(let message): message
         }

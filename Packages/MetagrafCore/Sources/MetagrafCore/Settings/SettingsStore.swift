@@ -45,6 +45,11 @@ public final class SettingsStore {
         didSet { write(modelID, .model) }
     }
 
+    /// How transcripts are tidied before insertion.
+    public var refinementStyle: RefinementStyle {
+        didSet { write(refinementStyle.rawValue, .refinementStyle) }
+    }
+
     // MARK: - Appearance
 
     /// Whether the pill stays visible when nothing is happening.
@@ -81,6 +86,8 @@ public final class SettingsStore {
         insertion = defaults.string(forKey: Key.insertion.rawValue)
             .flatMap(InsertionStrategy.init(rawValue:)) ?? .paste
         modelID = defaults.string(forKey: Key.model.rawValue) ?? ModelCatalog.default.id
+        refinementStyle = defaults.string(forKey: Key.refinementStyle.rawValue)
+            .flatMap(RefinementStyle.init(rawValue:)) ?? .cleanup
         showPillWhenIdle = defaults.object(forKey: Key.showPillWhenIdle.rawValue) as? Bool ?? true
         launchAtLogin = defaults.object(forKey: Key.launchAtLogin.rawValue) as? Bool ?? false
         retentionDays = defaults.object(forKey: Key.retentionDays.rawValue) as? Int ?? 30
@@ -120,6 +127,7 @@ public final class SettingsStore {
         case doubleTapWindow = "dictation.doubleTapWindow"
         case insertion = "dictation.insertion"
         case model = "dictation.model"
+        case refinementStyle = "refinement.style"
         case showPillWhenIdle = "appearance.showPillWhenIdle"
         case launchAtLogin = "general.launchAtLogin"
         case retentionDays = "history.retentionDays"

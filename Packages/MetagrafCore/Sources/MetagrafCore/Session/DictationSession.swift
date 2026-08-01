@@ -15,13 +15,14 @@ public final class DictationSession {
         case preparing
         case recording
         case transcribing
+        case refining
         case inserting
         case failed(String)
 
         public var isBusy: Bool {
             switch self {
             case .idle, .failed: false
-            case .preparing, .recording, .transcribing, .inserting: true
+            case .preparing, .recording, .transcribing, .refining, .inserting: true
             }
         }
     }
@@ -34,14 +35,24 @@ public final class DictationSession {
     /// Normalized microphone loudness, 0…1.
     public private(set) var level: Float = 0
 
-    /// The most recent completed transcript.
+    /// The most recent completed transcript, after refinement.
     public private(set) var lastTranscript = ""
+
+    /// What the engine heard before refinement, kept so a bad rewrite can be
+    /// compared against the original.
+    public private(set) var lastRawTranscript = ""
 
     /// When the current recording began, for the pill's elapsed-time readout.
     public private(set) var recordingStartedAt: Date?
 
     /// Locale and vocabulary for the next utterance.
     public var configuration: EngineConfiguration
+
+    /// How the transcript should be tidied before delivery.
+    public var refinement: RefinementContext = RefinementContext(style: .cleanup)
+
+    /// The refinement chain. Replaceable so tests can bypass the language model.
+    public var refiners = RefinerRegistry()
 
     /// Delivers each finished transcript, typically by inserting it into the
     /// frontmost application. Throwing surfaces the reason in the pill, which
@@ -156,18 +167,24 @@ public final class DictationSession {
         pumpTask = nil
 
         do {
-            let transcript = try await engine.finish()
+            let heard = try await engine.finish()
             updatesTask?.cancel()
             updatesTask = nil
 
-            lastTranscript = transcript
-            liveText = transcript
+            lastRawTranscript = heard
 
-            guard !transcript.isEmpty else {
+            guard !heard.isEmpty else {
                 logger.debug("Utterance produced no text")
+                liveText = ""
                 phase = .idle
                 return
             }
+
+            phase = .refining
+            let transcript = await refiners.refine(heard, context: refinement)
+
+            lastTranscript = transcript
+            liveText = transcript
 
             phase = .inserting
             try await deliver?(transcript)
