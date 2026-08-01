@@ -26,7 +26,7 @@ struct PersonasSettings: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Strength")
 
-                    Slider(value: adaptationValue, in: 0...2, step: 1) {
+                    Slider(value: adaptationValue, in: adaptationRange, step: 1) {
                         Text("Strength")
                     }
                     .labelsHidden()
@@ -34,7 +34,8 @@ struct PersonasSettings: View {
                     HStack(alignment: .top, spacing: 0) {
                         adaptationLabel(.minimalCorrection, alignment: .leading)
                         adaptationLabel(.contextualPolish, alignment: .center)
-                        adaptationLabel(.strongAdaptation, alignment: .trailing)
+                        adaptationLabel(.strongAdaptation, alignment: .center)
+                        adaptationLabel(.prompting, alignment: .trailing)
                     }
                 }
                 .disabled(settings.refinementPersona == .none)
@@ -43,6 +44,23 @@ struct PersonasSettings: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
+
+                if settings.usesPromptingRefinement {
+                    Divider()
+
+                    Toggle("Use nearby app context", isOn: $settings.usesNearbyAppContext)
+                    Text(
+                        """
+                        When enabled, Metagraf reads selected and nearby text from the focused field \
+                        when dictation starts. Relevant identifiers and short excerpts may be included \
+                        in the refined prompt. Neither the captured context nor Prompting dictations \
+                        are saved to History.
+                        """
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                }
             }
 
             Section("Apple Intelligence") {
@@ -79,6 +97,10 @@ struct PersonasSettings: View {
                 settings.personaAdaptation = PersonaAdaptation.allCases[index]
             }
         )
+    }
+
+    private var adaptationRange: ClosedRange<Double> {
+        0...Double(PersonaAdaptation.allCases.count - 1)
     }
 
     private func adaptationLabel(

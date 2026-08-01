@@ -76,6 +76,15 @@ public final class SettingsStore {
         didSet { write(personaAdaptation.rawValue, .personaAdaptation) }
     }
 
+    /// Whether the current persona settings produce an agent-ready prompt.
+    public var usesPromptingRefinement: Bool {
+        RefinementContext.isPrompting(
+            style: refinementStyle,
+            persona: refinementPersona,
+            adaptation: personaAdaptation
+        )
+    }
+
     // MARK: - Appearance
 
     /// Whether the pill stays visible when nothing is happening.

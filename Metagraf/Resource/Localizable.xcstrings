@@ -2069,6 +2069,36 @@
           }
         }
       }
+    },
+    "Prompting" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prompting"
+          }
+        }
+      }
+    },
+    "Turn terse dictation into a clear, context-rich prompt for an AI agent." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurze Diktate in einen klaren, kontextreichen Prompt für einen KI-Agenten umwandeln."
+          }
+        }
+      }
+    },
+    "When enabled, Metagraf reads selected and nearby text from the focused field when dictation starts. Relevant identifiers and short excerpts may be included in the refined prompt. Neither the captured context nor Prompting dictations are saved to History." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn aktiviert, liest Metagraf beim Start des Diktats ausgewählten und umliegenden Text aus dem fokussierten Feld. Relevante Bezeichner und kurze Auszüge können in den überarbeiteten Prompt aufgenommen werden. Weder der erfasste Kontext noch Prompting-Diktate werden im Verlauf gespeichert."
+          }
+        }
+      }
     }
   },
   "version" : "1.3"

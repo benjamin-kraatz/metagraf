@@ -84,6 +84,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func record(_ transcript: String, target: NSRunningApplication?) {
+        // Prompting may deliberately incorporate relevant nearby content. Keep
+        // the entire result ephemeral so opted-in context never enters History.
+        guard !session.refinement.isPrompting else {
+            startedAt = nil
+            return
+        }
         guard let history else { return }
 
         let duration = startedAt.map { Date.now.timeIntervalSince($0) } ?? 0
@@ -114,7 +120,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 target = NSWorkspace.shared.frontmostApplication
                 startedAt = .now
                 let destination: RefinementDestinationContext
-                if settings.refinementStyle == .intelligent, settings.usesNearbyAppContext {
+                if (settings.refinementStyle == .intelligent || settings.usesPromptingRefinement),
+                   settings.usesNearbyAppContext {
                     destination = focusedContextReader.capture(applicationName: target?.localizedName)
                 } else {
                     destination = RefinementDestinationContext(applicationName: target?.localizedName)

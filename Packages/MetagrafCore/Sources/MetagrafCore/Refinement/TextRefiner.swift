@@ -170,6 +170,26 @@ public struct RefinementContext: Sendable {
     /// transcript rather than rewriting it.
     public var usesLanguageModel: Bool
 
+    /// Whether persona adaptation should produce an agent-ready prompt instead
+    /// of using the selected style's usual output format.
+    public var isPrompting: Bool {
+        Self.isPrompting(
+            style: style,
+            persona: persona,
+            adaptation: personaAdaptation
+        )
+    }
+
+    /// Shared rule for callers that need to decide whether to capture context
+    /// before a complete refinement context has been assembled.
+    public static func isPrompting(
+        style: RefinementStyle,
+        persona: RefinementPersona,
+        adaptation: PersonaAdaptation
+    ) -> Bool {
+        style != .raw && persona != .none && adaptation == .prompting
+    }
+
     public init(
         style: RefinementStyle,
         persona: RefinementPersona = .none,

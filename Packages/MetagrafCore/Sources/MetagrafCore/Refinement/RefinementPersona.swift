@@ -57,6 +57,7 @@ public enum PersonaAdaptation: String, Codable, CaseIterable, Sendable, Identifi
     case minimalCorrection
     case contextualPolish
     case strongAdaptation
+    case prompting
 
     public var id: String { rawValue }
 
@@ -65,6 +66,7 @@ public enum PersonaAdaptation: String, Codable, CaseIterable, Sendable, Identifi
         case .minimalCorrection: "Minimal correction"
         case .contextualPolish: "Contextual polish"
         case .strongAdaptation: "Strong adaptation"
+        case .prompting: "Prompting"
         }
     }
 
@@ -76,6 +78,8 @@ public enum PersonaAdaptation: String, Codable, CaseIterable, Sendable, Identifi
             "Improve phrasing, terminology, and formatting while preserving meaning and certainty."
         case .strongAdaptation:
             "Rewrite more substantially for the persona while retaining the speaker’s meaning."
+        case .prompting:
+            "Turn terse dictation into a clear, context-rich prompt for an AI agent."
         }
     }
 
@@ -88,6 +92,8 @@ public enum PersonaAdaptation: String, Codable, CaseIterable, Sendable, Identifi
             "Improve phrasing, terminology, and formatting, while preserving the speaker's meaning, facts, intent, and level of certainty."
         case .strongAdaptation:
             "You may rewrite substantially to suit the persona, while preserving the speaker's meaning, facts, intent, and level of certainty."
+        case .prompting:
+            "Transform the transcript into a clear, agent-ready prompt. Expand terse or fragmented requests with useful clarification while preserving the speaker's objective, facts, intent, uncertainty, and language."
         }
     }
 }

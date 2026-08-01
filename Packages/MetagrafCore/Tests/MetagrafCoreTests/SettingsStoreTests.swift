@@ -23,7 +23,7 @@ struct SettingsStoreTests {
         first.refinementStyle = .intelligent
         first.usesNearbyAppContext = true
         first.refinementPersona = .programmer
-        first.personaAdaptation = .strongAdaptation
+        first.personaAdaptation = .prompting
         first.vocabulary = [VocabularyEntry(term: "Metagraf", misheard: ["meta graph"])]
 
         let second = SettingsStore(defaults: defaults)
@@ -33,7 +33,8 @@ struct SettingsStoreTests {
         #expect(second.refinementStyle == .intelligent)
         #expect(second.usesNearbyAppContext)
         #expect(second.refinementPersona == .programmer)
-        #expect(second.personaAdaptation == .strongAdaptation)
+        #expect(second.personaAdaptation == .prompting)
+        #expect(second.usesPromptingRefinement)
         #expect(second.vocabulary.map(\.term) == ["Metagraf"])
         #expect(second.vocabulary.first?.misheard == ["meta graph"])
     }
