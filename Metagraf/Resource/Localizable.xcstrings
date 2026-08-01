@@ -1,10 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Copy" : {
+    "Continue anyway" : {
+
+    },
+    "Copy again" : {
 
     },
     "Dictation" : {
+
+    },
+    "Dictation stays off until permissions are granted." : {
 
     },
     "General" : {
@@ -13,7 +19,13 @@
     "General settings arrive in M3." : {
 
     },
+    "Grant" : {
+
+    },
     "History" : {
+
+    },
+    "Hold %@ anywhere on your Mac, say what you want written, and let go. Everything is transcribed on this device." : {
 
     },
     "Hold %@ anywhere to dictate." : {
@@ -31,13 +43,28 @@
     "Metagraf" : {
 
     },
+    "Metagraf can't dictate until both are granted." : {
+
+    },
     "Models" : {
+
+    },
+    "Setup isn’t finished" : {
+
+    },
+    "Start dictating" : {
 
     },
     "Statistics" : {
 
     },
     "Vocabulary" : {
+
+    },
+    "Welcome to Metagraf" : {
+
+    },
+    "You're all set" : {
 
     }
   },

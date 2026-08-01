@@ -1,6 +1,7 @@
 #if os(macOS)
 import AppKit
 import ApplicationServices
+import Carbon.HIToolbox
 import MetagrafCore
 import OSLog
 
@@ -126,7 +127,7 @@ final class HotKeyMonitor {
 
         case .keyDown:
             // Escape abandons whatever is in flight.
-            if event.getIntegerValueField(.keyboardEventKeycode) == 53 {
+            if event.getIntegerValueField(.keyboardEventKeycode) == Int64(kVK_Escape) {
                 feed(.abort)
             }
 

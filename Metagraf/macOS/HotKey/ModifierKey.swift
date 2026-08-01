@@ -1,4 +1,5 @@
 #if os(macOS)
+import Carbon.HIToolbox
 import CoreGraphics
 
 /// A modifier key that can be held to dictate.
@@ -18,12 +19,12 @@ enum ModifierKey: String, CaseIterable, Codable, Sendable, Identifiable {
     /// Virtual key code reported by `flagsChanged` events.
     var keyCode: Int64 {
         switch self {
-        case .rightOption: 0x3D
-        case .leftOption: 0x3A
-        case .rightCommand: 0x36
-        case .rightControl: 0x3E
-        case .rightShift: 0x3C
-        case .function: 0x3F
+        case .rightOption: Int64(kVK_RightOption)
+        case .leftOption: Int64(kVK_Option)
+        case .rightCommand: Int64(kVK_RightCommand)
+        case .rightControl: Int64(kVK_RightControl)
+        case .rightShift: Int64(kVK_RightShift)
+        case .function: Int64(kVK_Function)
         }
     }
 

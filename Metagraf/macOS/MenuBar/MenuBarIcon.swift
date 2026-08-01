@@ -6,16 +6,25 @@ import SwiftUI
 /// even when the pill is on another screen.
 struct MenuBarIcon: View {
     let session: DictationSession
+    let permissions: PermissionsCoordinator
+
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         Image(systemName: symbol)
             .symbolEffect(.variableColor.iterative, isActive: session.phase == .recording)
+            .task {
+                // The status item is the only view that exists from launch in an
+                // agent app, so first-run onboarding is triggered from here.
+                guard !permissions.isReady else { return }
+                openWindow(id: MetagrafWindow.onboarding.rawValue)
+            }
     }
 
     private var symbol: String {
         switch session.phase {
         case .idle: "waveform"
-        case .preparing, .transcribing: "waveform.badge.magnifyingglass"
+        case .preparing, .transcribing, .inserting: "waveform.badge.magnifyingglass"
         case .recording: "waveform.badge.mic"
         case .failed: "waveform.badge.exclamationmark"
         }

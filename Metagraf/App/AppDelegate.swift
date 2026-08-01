@@ -8,17 +8,21 @@ import OSLog
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let session = DictationSession()
+    let permissions = PermissionsCoordinator()
+
+    /// Which app was frontmost when recording began. Captured up front because
+    /// by the time the transcript is ready the user may have switched away, and
+    /// per-app rules in M3 need to know where the text was headed.
+    private(set) var target: NSRunningApplication?
 
     private let logger = Logger(subsystem: Metagraf.bundleIdentifier, category: "App")
     private let hotKeys = HotKeyMonitor()
+    private let inserter = TextInserter()
     private var pill: PillWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Until insertion lands in M2, a finished transcript goes to the
-        // clipboard so the loop is usable end to end.
-        session.onTranscript = { transcript in
-            NSPasteboard.general.clearContents()
-            NSPasteboard.general.setString(transcript, forType: .string)
+        session.deliver = { [weak self] transcript in
+            try await self?.inserter.insert(transcript, using: .paste)
         }
 
         let pill = PillWindowController(session: session)
@@ -27,6 +31,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         session.prewarm()
         startHotKeys()
+
+        if !permissions.isReady {
+            permissions.beginPolling()
+        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -36,6 +44,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func startHotKeys() {
         hotKeys.onActivation = { [weak self] activation in
             guard let self else { return }
+
+            if activation == .began {
+                target = NSWorkspace.shared.frontmostApplication
+            }
+
             Task {
                 switch activation {
                 case .began:
@@ -52,9 +65,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             try hotKeys.start()
         } catch {
             logger.error("Hot key monitor unavailable: \(error.localizedDescription, privacy: .public)")
-            // The prompt is the only way the user can grant this, and without it
-            // the app cannot do its one job.
-            AccessibilityPermission.requestTrust()
             waitForAccessibilityTrust()
         }
     }
@@ -70,6 +80,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
                 do {
                     try self.hotKeys.start()
+                    self.permissions.refresh()
                     self.logger.info("Hot key monitor started after access was granted")
                     return
                 } catch {
@@ -79,4 +90,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 }
+
+extension HotKeyMonitor.Activation: Equatable {}
 #endif

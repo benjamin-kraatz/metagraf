@@ -23,8 +23,10 @@ struct PillView: View {
         .frame(minWidth: 78)
         .fixedSize()
         .glassEffect(.regular.tint(tint), in: .capsule)
+        // Only phase changes animate. Animating on `liveText` re-ran a 0.3s
+        // geometry animation over the whole pill for every recognized token,
+        // which visibly stalled the meter's own much faster animation.
         .animation(.smooth(duration: 0.3), value: session.phase)
-        .animation(.smooth(duration: 0.3), value: session.liveText)
         .onChange(of: session.level) { _, level in
             history.removeFirst()
             history.append(level)
@@ -46,7 +48,7 @@ struct PillView: View {
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(.secondary)
 
-        case .preparing, .transcribing:
+        case .preparing, .transcribing, .inserting:
             ProgressView()
                 .controlSize(.small)
                 .scaleEffect(0.7)
@@ -72,15 +74,27 @@ struct PillView: View {
             label("Getting ready…")
 
         case .recording:
-            if session.liveText.isEmpty {
+            // A fixed width keeps the capsule's geometry stable for the whole
+            // utterance, so arriving words never relayout the pill.
+            HStack(spacing: 10) {
+                Group {
+                    if session.liveText.isEmpty {
+                        label("Listening…")
+                    } else {
+                        Text(session.liveText)
+                            .font(.system(size: 12))
+                            .lineLimit(1)
+                            .truncationMode(.head)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
                 elapsed
-            } else {
-                Text(session.liveText)
-                    .font(.system(size: 12))
-                    .lineLimit(1)
-                    .truncationMode(.head)
-                    .frame(maxWidth: 320, alignment: .leading)
             }
+            .frame(width: 320)
+
+        case .inserting:
+            label("Inserting…")
 
         case .transcribing:
             label("Transcribing…")

@@ -15,12 +15,13 @@ public final class DictationSession {
         case preparing
         case recording
         case transcribing
+        case inserting
         case failed(String)
 
         public var isBusy: Bool {
             switch self {
             case .idle, .failed: false
-            case .preparing, .recording, .transcribing: true
+            case .preparing, .recording, .transcribing, .inserting: true
             }
         }
     }
@@ -42,9 +43,11 @@ public final class DictationSession {
     /// Locale and vocabulary for the next utterance.
     public var configuration: EngineConfiguration
 
-    /// Receives each finished transcript. The macOS app inserts it into the
-    /// frontmost application; until M2 lands it goes to the clipboard.
-    public var onTranscript: ((String) -> Void)?
+    /// Delivers each finished transcript, typically by inserting it into the
+    /// frontmost application. Throwing surfaces the reason in the pill, which
+    /// matters because delivery is the step most likely to be blocked by
+    /// something outside the app's control.
+    public var deliver: ((String) async throws -> Void)?
 
     private let logger = Logger(subsystem: Metagraf.bundleIdentifier, category: "Dictation")
     private let capture: AudioCaptureEngine
@@ -148,13 +151,16 @@ public final class DictationSession {
 
             lastTranscript = transcript
             liveText = transcript
-            phase = .idle
 
-            if transcript.isEmpty {
+            guard !transcript.isEmpty else {
                 logger.debug("Utterance produced no text")
-            } else {
-                onTranscript?(transcript)
+                phase = .idle
+                return
             }
+
+            phase = .inserting
+            try await deliver?(transcript)
+            phase = .idle
         } catch {
             fail(with: error)
         }
