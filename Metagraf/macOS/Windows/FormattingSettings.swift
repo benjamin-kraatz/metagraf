@@ -42,7 +42,7 @@ struct FormattingSettings: View {
 
                 Text(
                     """
-                    Clean up runs entirely on rules and never needs a model. \
+                    "Exactly as spoken" will not post-process the transcript. \
                     The other styles ask Apple Intelligence to rewrite the text \
                     on this device, and fall back to the cleaned-up version if \
                     it is unavailable or takes too long.

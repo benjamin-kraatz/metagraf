@@ -35,11 +35,13 @@ public enum RefinementStyle: String, Codable, CaseIterable, Sendable, Identifiab
         }
     }
 
-    /// Whether a language model is needed, or the rule-based pass suffices.
+    /// Whether this style changes the text at all.
+    public var isPassthrough: Bool { self == .raw }
+    
     public var needsLanguageModel: Bool {
         switch self {
-        case .raw, .cleanup: false
-        case .email, .message, .notes: true
+            case .raw: return true
+            case .email, .message, .notes, .cleanup: return true
         }
     }
 }
@@ -53,16 +55,34 @@ public struct RefinementContext: Sendable {
     /// Name of the app the text is headed for, when known.
     public var targetApplication: String?
 
+    /// Whether a language model may be used. Turning this off keeps refinement
+    /// to the instant rule-based pass, for people who would rather have the
+    /// text immediately than have it read better.
+    public var usesLanguageModel: Bool
+
     public init(
         style: RefinementStyle,
         locale: Locale = .current,
         vocabulary: [VocabularyEntry] = [],
-        targetApplication: String? = nil
+        targetApplication: String? = nil,
+        usesLanguageModel: Bool = true
     ) {
         self.style = style
         self.locale = locale
         self.vocabulary = vocabulary
         self.targetApplication = targetApplication
+        self.usesLanguageModel = usesLanguageModel
+    }
+}
+
+/// What refinement produced, and which step produced it.
+public struct RefinementOutcome: Sendable, Equatable {
+    public var text: String
+    public var refiner: RefinerID
+
+    public init(text: String, refiner: RefinerID) {
+        self.text = text
+        self.refiner = refiner
     }
 }
 

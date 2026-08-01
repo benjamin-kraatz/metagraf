@@ -11,7 +11,7 @@ struct MenuBarContent: View {
     @Environment(\.openSettings) private var openSettings
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 10) {
             header
 
             if !permissions.isReady {
@@ -24,39 +24,40 @@ struct MenuBarContent: View {
 
             Divider()
 
-            VStack(alignment: .leading, spacing: 2) {
-                menuButton("Open Metagraf", symbol: "waveform") {
+            VStack(alignment: .leading, spacing: 1) {
+                menuButton("Open Metagraf") {
                     openWindow(id: MetagrafWindow.main.rawValue)
                     NSApp.activate(ignoringOtherApps: true)
                 }
-                menuButton("Settings…", symbol: "gearshape") {
+                menuButton("Settings…") {
                     openSettings()
                     NSApp.activate(ignoringOtherApps: true)
                 }
-                menuButton("Quit Metagraf", symbol: "power") {
+
+                Divider()
+                    .padding(.vertical, 3)
+
+                menuButton("Quit Metagraf") {
                     NSApp.terminate(nil)
                 }
             }
         }
-        .padding(14)
-        .frame(width: 290, alignment: .leading)
+        .padding(10)
+        .frame(width: 260, alignment: .leading)
         .onAppear { permissions.refresh() }
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 7) {
-                Circle()
-                    .fill(statusColor)
-                    .frame(width: 7, height: 7)
-                Text(statusTitle)
-                    .font(.headline)
-            }
+        VStack(alignment: .leading, spacing: 3) {
+            Text(statusTitle)
+                .font(.callout.weight(.semibold))
 
             Text("Hold \(ModifierKey.rightOption.displayName) anywhere to dictate.")
-                .font(.callout)
+                .font(.caption)
                 .foregroundStyle(.secondary)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 6)
     }
 
     private var permissionWarning: some View {
@@ -64,7 +65,7 @@ struct MenuBarContent: View {
             openWindow(id: MetagrafWindow.onboarding.rawValue)
             NSApp.activate(ignoringOtherApps: true)
         } label: {
-            HStack(spacing: 9) {
+            HStack(spacing: 8) {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .foregroundStyle(.orange)
                 VStack(alignment: .leading, spacing: 2) {
@@ -76,16 +77,16 @@ struct MenuBarContent: View {
                 }
                 Spacer(minLength: 0)
             }
-            .padding(10)
+            .padding(9)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.orange.opacity(0.12), in: .rect(cornerRadius: 10))
+            .background(.orange.opacity(0.12), in: .rect(cornerRadius: 6))
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
     }
 
     private var lastTranscript: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 5) {
             Text("Last transcript")
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -99,10 +100,10 @@ struct MenuBarContent: View {
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(session.lastTranscript, forType: .string)
             }
-            .buttonStyle(.glass)
             .controlSize(.small)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 6)
     }
 
     private var statusTitle: String {
@@ -117,26 +118,46 @@ struct MenuBarContent: View {
         }
     }
 
-    private var statusColor: Color {
-        switch session.phase {
-        case .idle: permissions.isReady ? .green : .orange
-        case .recording: .red
-        case .failed: .orange
-        default: .yellow
-        }
-    }
-
     private func menuButton(
         _ title: String,
-        symbol: String,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            Label(title, systemImage: symbol)
+            Text(title)
+                .font(.system(size: 13))
+                .lineLimit(1)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 10)
+                .frame(height: 24)
                 .contentShape(.rect)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(MenuItemButtonStyle())
     }
+}
+
+private struct MenuItemButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        MenuItemButton(configuration: configuration)
+    }
+
+    private struct MenuItemButton: View {
+        let configuration: Configuration
+        @State private var isHovering = false
+
+        var body: some View {
+            configuration.label
+                .foregroundStyle(isHovering ? .white : .primary)
+                .background(
+                    isHovering ? Color.accentColor : Color.clear,
+                    in: .rect(cornerRadius: 4)
+                )
+                .opacity(configuration.isPressed ? 0.85 : 1)
+                .onHover { isHovering = $0 }
+        }
+    }
+}
+
+#Preview {
+    MenuBarContent(session: DictationSession(), permissions: PermissionsCoordinator())
 }
 #endif

@@ -166,13 +166,25 @@
     "Nothing dictated yet" : {
 
     },
+    "Open Metagraf" : {
+
+    },
     "Open System Settings" : {
 
     },
     "Permissions" : {
 
     },
+    "Play a cue when dictation starts and ends" : {
+
+    },
+    "Position" : {
+
+    },
     "Privacy" : {
+
+    },
+    "Quit Metagraf" : {
 
     },
     "Remove" : {
@@ -181,7 +193,13 @@
     "Search transcripts" : {
 
     },
+    "Settings…" : {
+
+    },
     "Setup isn’t finished" : {
+
+    },
+    "Sound" : {
 
     },
     "Start dictating" : {
@@ -202,19 +220,22 @@
     "The pill" : {
 
     },
+    "The pill floats above every app and ignores clicks, so it never gets in the way of what is underneath it." : {
+
+    },
     "These words are fed to the speech model so it favours them over similar-sounding ones." : {
 
     },
     "They appear once you have dictated something." : {
 
     },
+    "Useful because the dictation key has no visible press of its own." : {
+
+    },
     "Vocabulary" : {
 
     },
     "Welcome to Metagraf" : {
-
-    },
-    "When off, the pill appears only while you are dictating." : {
 
     },
     "Where text goes" : {
