@@ -2,21 +2,24 @@ import Foundation
 import MetagrafCore
 import OSLog
 
-/// Drives the keyboard's dictation.
+/// Drives the Metagraf keyboard.
 ///
-/// Uses Apple's `SpeechAnalyzer` only. A keyboard extension runs under a hard
-/// memory limit, and Whisper weights would not fit; Apple's engine runs out of
-/// process, so the transcription happens somewhere the keyboard does not pay
-/// for it.
+/// The keyboard does not dictate. iOS refuses microphone access to app
+/// extensions — keyboards are sandboxed against audio keylogging, and no
+/// entitlement or Full Access switch changes that. So the split is: the app
+/// captures speech, and the keyboard puts the result where the caret is,
+/// without the user leaving the field they are typing in.
 @MainActor
 @Observable
 final class KeyboardModel {
-    let session = DictationSession()
     let hasFullAccess: Bool
 
+    private(set) var transcripts: [RecentTranscript] = []
+    private(set) var justInserted: RecentTranscript.ID?
+
     private let logger = Logger(subsystem: Metagraf.bundleIdentifier, category: "Keyboard")
-    private let settings: SettingsStore
-    private let insert: (String) -> Void
+    private let recents = RecentTranscripts.shared
+    private let insertText: (String) -> Void
     private let deleteBackward: () -> Void
     private let advance: () -> Void
 
@@ -27,63 +30,30 @@ final class KeyboardModel {
         advanceToNextKeyboard: @escaping () -> Void
     ) {
         self.hasFullAccess = hasFullAccess
-        self.insert = insert
+        self.insertText = insert
         self.deleteBackward = deleteBackward
         self.advance = advanceToNextKeyboard
-
-        // Without Full Access the shared container is unreachable, so the
-        // keyboard falls back to its own defaults rather than failing outright.
-        self.settings = hasFullAccess ? SettingsStore.shared : SettingsStore(defaults: .standard)
-
-        session.deliver = { [weak self] transcript in
-            self?.insert(transcript)
-        }
     }
 
-    var phase: DictationSession.Phase { session.phase }
-    var isRecording: Bool { session.phase == .recording }
-
-    func startRecording() async {
-        guard !session.phase.isBusy else { return }
-
-        session.configuration = EngineConfiguration(
-            locale: settings.effectiveLocale,
-            contextualStrings: settings.contextualStrings
-        )
-        session.refinement = RefinementContext(
-            style: settings.refinementStyle,
-            locale: settings.effectiveLocale,
-            vocabulary: settings.vocabulary
-        )
-
-        await session.begin()
+    /// Re-reads the shared list. Called every time the keyboard appears, since
+    /// the app may have dictated something since it was last on screen.
+    func refresh() {
+        guard hasFullAccess else { return }
+        transcripts = recents.all()
     }
 
-    func finishRecording() async {
-        guard session.phase == .recording else { return }
-        await session.complete()
+    func insert(_ transcript: RecentTranscript) {
+        insertText(transcript.text)
+        justInserted = transcript.id
     }
 
-    func cancel() async {
-        await session.abort()
-    }
-
-    /// Tears everything down synchronously enough to survive the extension
-    /// being dismissed.
-    func stopImmediately() {
-        Task { await session.abort() }
+    func delete(_ transcript: RecentTranscript) {
+        recents.remove(transcript)
+        refresh()
     }
 
     func deleteBackwards() {
         deleteBackward()
-    }
-
-    func insertSpace() {
-        insert(" ")
-    }
-
-    func insertReturn() {
-        insert("\n")
     }
 
     func nextKeyboard() {

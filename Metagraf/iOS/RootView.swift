@@ -111,14 +111,25 @@ struct KeyboardSetupView: View {
                     title: "Turn on Full Access",
                     detail: "Tap Metagraf in that list and enable Allow Full Access."
                 )
+            } header: {
+                Text("Insert what you dictated, without leaving the app you’re typing in")
             } footer: {
                 Text(
                     """
-                    iOS only lets a keyboard reach the microphone and your \
-                    settings with Full Access granted. Metagraf still transcribes \
-                    entirely on this iPhone — nothing is sent anywhere.
+                    The keyboard doesn’t record — iOS doesn’t allow keyboards to \
+                    use the microphone. Dictate here in Metagraf, then tap the \
+                    Metagraf keyboard anywhere to drop that text in. Full Access \
+                    is what lets it read your transcripts. Nothing leaves this iPhone.
                     """
                 )
+            }
+
+            Section {
+                Text("Add “Start Dictation” to your Action Button, Control Centre, or a Shortcut to begin dictating in one press.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            } header: {
+                Text("Faster ways in")
             }
 
             Section {

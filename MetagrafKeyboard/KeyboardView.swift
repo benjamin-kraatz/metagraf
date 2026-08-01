@@ -1,144 +1,137 @@
 import MetagrafCore
 import SwiftUI
 
-/// The keyboard's face.
+/// The keyboard's face: things you have dictated, ready to drop in.
 struct KeyboardView: View {
     let model: KeyboardModel
 
     var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 0) {
             if model.hasFullAccess {
-                status
-                Spacer(minLength: 0)
-                controls
+                content
             } else {
                 fullAccessNeeded
             }
+            controls
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    // MARK: - Pieces
+    // MARK: - Content
 
     @ViewBuilder
-    private var status: some View {
-        switch model.phase {
-        case .recording where !model.session.liveText.isEmpty:
-            Text(model.session.liveText)
-                .font(.callout)
-                .lineLimit(3)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-        case .failed(let message):
-            Label(message, systemImage: "exclamationmark.triangle.fill")
-                .font(.footnote)
-                .foregroundStyle(.orange)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-        default:
-            Text(hint)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-
-    private var hint: LocalizedStringKey {
-        switch model.phase {
-        case .idle: "Hold the button and speak."
-        case .preparing: "Getting ready…"
-        case .recording: "Listening…"
-        case .transcribing: "Transcribing…"
-        case .refining: "Tidying up…"
-        case .inserting: "Inserting…"
-        case .failed: ""
-        }
-    }
-
-    private var controls: some View {
-        HStack(spacing: 12) {
-            KeyButton(symbol: "globe", label: "Switch keyboard") {
-                model.nextKeyboard()
+    private var content: some View {
+        if model.transcripts.isEmpty {
+            VStack(spacing: 6) {
+                Image(systemName: "waveform")
+                    .font(.system(size: 22))
+                    .foregroundStyle(.secondary)
+                Text("Nothing dictated yet")
+                    .font(.callout.weight(.medium))
+                Text("Dictate in the Metagraf app and it will show up here.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
             }
-
-            MicButton(model: model)
-
-            KeyButton(symbol: "delete.left", label: "Delete") {
-                model.deleteBackwards()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            ScrollView {
+                LazyVStack(spacing: 6) {
+                    ForEach(model.transcripts) { transcript in
+                        TranscriptChip(
+                            transcript: transcript,
+                            wasJustInserted: model.justInserted == transcript.id,
+                            insert: { model.insert(transcript) },
+                            delete: { model.delete(transcript) }
+                        )
+                    }
+                }
+                .padding(.vertical, 2)
             }
+            .frame(maxHeight: .infinity)
         }
     }
 
     private var fullAccessNeeded: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 8) {
             Image(systemName: "lock")
-                .font(.system(size: 26))
+                .font(.system(size: 22))
                 .foregroundStyle(.secondary)
-
             Text("Metagraf needs Full Access")
-                .font(.headline)
-
+                .font(.callout.weight(.medium))
             Text(
                 """
                 Turn on Allow Full Access in Settings → General → Keyboard → \
-                Keyboards → Metagraf. It is what lets the keyboard reach the \
-                microphone. Your speech is still transcribed on this iPhone.
+                Keyboards → Metagraf. It is what lets this keyboard read what \
+                you dictated in the app.
                 """
             )
             .font(.footnote)
             .foregroundStyle(.secondary)
             .multilineTextAlignment(.center)
-
-            Button("Use another keyboard") { model.nextKeyboard() }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
+
+    private var controls: some View {
+        HStack(spacing: 8) {
+            KeyButton(symbol: "globe", label: "Switch keyboard") {
+                model.nextKeyboard()
+            }
+
+            Text("Metagraf")
+                .font(.footnote.weight(.medium))
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity)
+
+            KeyButton(symbol: "delete.left", label: "Delete") {
+                model.deleteBackwards()
+            }
+        }
+        .padding(.top, 6)
+    }
 }
 
-// MARK: - Buttons
+// MARK: - Pieces
 
-private struct MicButton: View {
-    let model: KeyboardModel
-
-    @State private var isPressed = false
+private struct TranscriptChip: View {
+    let transcript: RecentTranscript
+    let wasJustInserted: Bool
+    let insert: () -> Void
+    let delete: () -> Void
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(model.isRecording ? AnyShapeStyle(.red) : AnyShapeStyle(.tint))
+        Button(action: insert) {
+            HStack(alignment: .top, spacing: 10) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(transcript.text)
+                        .font(.callout)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
-            HStack(spacing: 8) {
-                Image(systemName: model.isRecording ? "waveform" : "mic.fill")
-                    .font(.system(size: 20, weight: .semibold))
-                    .symbolEffect(.variableColor.iterative, isActive: model.isRecording)
-                Text(model.isRecording ? "Listening" : "Hold to dictate")
-                    .font(.callout.weight(.semibold))
+                    Text(transcript.createdAt, format: .relative(presentation: .named))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+
+                Image(systemName: wasJustInserted ? "checkmark.circle.fill" : "arrow.down.left.circle")
+                    .font(.system(size: 17))
+                    .foregroundStyle(wasJustInserted ? AnyShapeStyle(.green) : AnyShapeStyle(.tint))
             }
-            .foregroundStyle(.white)
+            .padding(10)
+            .background(.quaternary.opacity(0.5), in: .rect(cornerRadius: 12, style: .continuous))
+            .contentShape(.rect)
         }
-        .frame(height: 62)
-        .scaleEffect(isPressed ? 0.97 : 1)
-        .contentShape(.rect)
-        .gesture(
-            DragGesture(minimumDistance: 0)
-                .onChanged { _ in
-                    guard !isPressed else { return }
-                    isPressed = true
-                    Task { await model.startRecording() }
-                }
-                .onEnded { _ in
-                    isPressed = false
-                    Task { await model.finishRecording() }
-                }
-        )
-        .animation(.smooth(duration: 0.15), value: isPressed)
-        .animation(.smooth(duration: 0.2), value: model.isRecording)
-        .accessibilityLabel("Dictate")
-        .accessibilityHint("Hold to record, release to insert")
+        .buttonStyle(.plain)
+        .animation(.smooth(duration: 0.2), value: wasJustInserted)
+        .contextMenu {
+            Button("Remove", systemImage: "trash", role: .destructive, action: delete)
+        }
+        .accessibilityLabel(transcript.text)
+        .accessibilityHint("Inserts this text")
     }
 }
 
@@ -150,9 +143,9 @@ private struct KeyButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: symbol)
-                .font(.system(size: 18, weight: .medium))
-                .frame(width: 54, height: 62)
-                .background(.quaternary, in: .rect(cornerRadius: 14, style: .continuous))
+                .font(.system(size: 17, weight: .medium))
+                .frame(width: 50, height: 40)
+                .background(.quaternary, in: .rect(cornerRadius: 10, style: .continuous))
         }
         .buttonStyle(.plain)
         .accessibilityLabel(label)

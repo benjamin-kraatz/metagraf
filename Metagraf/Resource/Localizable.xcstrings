@@ -178,6 +178,9 @@
         }
       }
     },
+    "Add “Start Dictation” to your Action Button, Control Centre, or a Shortcut to begin dictating in one press." : {
+
+    },
     "Add a name or term Metagraf keeps getting wrong" : {
       "localizations" : {
         "de" : {
@@ -649,6 +652,9 @@
         }
       }
     },
+    "Faster ways in" : {
+
+    },
     "Fastest and smallest. Fine for short, clear dictation." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -699,6 +705,9 @@
           }
         }
       }
+    },
+    "Get Last Transcript" : {
+
     },
     "Getting ready…" : {
       "localizations" : {
@@ -856,6 +865,9 @@
         }
       }
     },
+    "Insert what you dictated, without leaving the app you’re typing in" : {
+
+    },
     "Insert with" : {
       "localizations" : {
         "de" : {
@@ -886,9 +898,6 @@
           }
         }
       }
-    },
-    "iOS only lets a keyboard reach the microphone and your settings with Full Access granted. Metagraf still transcribes entirely on this iPhone — nothing is sent anywhere." : {
-
     },
     "Keep it short and conversational." : {
       "extractionState" : "stale",
@@ -1184,6 +1193,9 @@
         }
       }
     },
+    "Opens Metagraf and starts listening straight away." : {
+
+    },
     "Paste" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1275,6 +1287,9 @@
           }
         }
       }
+    },
+    "Returns the most recent thing you dictated." : {
+
     },
     "Right ⇧" : {
       "localizations" : {
@@ -1405,6 +1420,9 @@
         }
       }
     },
+    "Start Dictation" : {
+
+    },
     "Statistics" : {
       "localizations" : {
         "de" : {
@@ -1475,6 +1493,9 @@
           }
         }
       }
+    },
+    "The keyboard doesn’t record — iOS doesn’t allow keyboards to use the microphone. Dictate here in Metagraf, then tap the Metagraf keyboard anywhere to drop that text in. Full Access is what lets it read your transcripts. Nothing leaves this iPhone." : {
+
     },
     "The most accurate option, and quick on Apple silicon." : {
       "extractionState" : "stale",

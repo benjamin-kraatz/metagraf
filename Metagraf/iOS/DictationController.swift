@@ -73,6 +73,8 @@ final class DictationController {
     private func deliver(_ transcript: String) {
         UIPasteboard.general.string = transcript
         didCopyAt = .now
+        // Shared with the keyboard, which cannot dictate but can insert this.
+        RecentTranscripts.shared.add(transcript)
         record(transcript)
     }
 

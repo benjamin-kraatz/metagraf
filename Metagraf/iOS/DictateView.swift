@@ -32,6 +32,13 @@ struct DictateView: View {
             }
             .padding(.horizontal, 24)
             .navigationTitle("Metagraf")
+            // The Action Button, Control Center, or Siri can ask for dictation
+            // before this screen exists, so the request is picked up on appear.
+            .task(id: DictationLaunchRequest.shared.isPending) {
+                guard DictationLaunchRequest.shared.isPending else { return }
+                DictationLaunchRequest.shared.isPending = false
+                await controller.toggle()
+            }
         }
     }
 
