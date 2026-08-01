@@ -9,23 +9,34 @@ import OSLog
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let session = DictationSession()
     let permissions = PermissionsCoordinator()
-
-    /// Which app was frontmost when recording began. Captured up front because
-    /// by the time the transcript is ready the user may have switched away, and
-    /// per-app rules in M3 need to know where the text was headed.
-    private(set) var target: NSRunningApplication?
+    let settings = SettingsStore.shared
+    private(set) var history: HistoryStore?
 
     private let logger = Logger(subsystem: Metagraf.bundleIdentifier, category: "App")
     private let hotKeys = HotKeyMonitor()
     private let inserter = TextInserter()
     private var pill: PillWindowController?
 
+    /// Which app was frontmost when recording began, and when it began.
+    /// Captured up front because by the time the transcript is ready the user
+    /// may have switched away.
+    private var target: NSRunningApplication?
+    private var startedAt: Date?
+
     func applicationDidFinishLaunching(_ notification: Notification) {
-        session.deliver = { [weak self] transcript in
-            try await self?.inserter.insert(transcript, using: .paste)
+        do {
+            let history = try HistoryStore(inMemory: false)
+            history.prune(retentionDays: settings.retentionDays)
+            self.history = history
+        } catch {
+            logger.error("History unavailable: \(error.localizedDescription, privacy: .public)")
         }
 
-        let pill = PillWindowController(session: session)
+        session.deliver = { [weak self] transcript in
+            try await self?.deliver(transcript)
+        }
+
+        let pill = PillWindowController(session: session, settings: settings)
         pill.show()
         self.pill = pill
 
@@ -41,12 +52,52 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         hotKeys.stop()
     }
 
+    // MARK: - Delivery
+
+    private func deliver(_ transcript: String) async throws {
+        let target = target
+        record(transcript, target: target)
+
+        let strategy = settings.insertion(forBundleIdentifier: target?.bundleIdentifier)
+        try await inserter.insert(transcript, using: strategy)
+    }
+
+    private func record(_ transcript: String, target: NSRunningApplication?) {
+        guard let history else { return }
+
+        let duration = startedAt.map { Date.now.timeIntervalSince($0) } ?? 0
+        startedAt = nil
+
+        history.record(
+            Transcript(
+                text: transcript,
+                localeIdentifier: settings.effectiveLocale.identifier,
+                engineIdentifier: EngineID.appleSpeech.rawValue,
+                durationSeconds: duration,
+                appBundleIdentifier: target?.bundleIdentifier,
+                appName: target?.localizedName
+            ),
+            retentionDays: settings.retentionDays
+        )
+    }
+
+    // MARK: - Hotkey
+
     private func startHotKeys() {
+        applySettings()
+
         hotKeys.onActivation = { [weak self] activation in
             guard let self else { return }
 
             if activation == .began {
                 target = NSWorkspace.shared.frontmostApplication
+                startedAt = .now
+                // Picked up fresh each time so changing the language or adding a
+                // vocabulary term takes effect on the very next dictation.
+                session.configuration = EngineConfiguration(
+                    locale: settings.effectiveLocale,
+                    contextualStrings: settings.contextualStrings
+                )
             }
 
             Task {
@@ -67,6 +118,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             logger.error("Hot key monitor unavailable: \(error.localizedDescription, privacy: .public)")
             waitForAccessibilityTrust()
         }
+    }
+
+    /// Pushes the user's hotkey preferences into the monitor.
+    func applySettings() {
+        hotKeys.binding = ModifierKey(rawValue: settings.hotKey) ?? .rightOption
+        hotKeys.machine.minimumHold = settings.minimumHold
+        hotKeys.machine.doubleTapWindow = settings.doubleTapWindow
     }
 
     /// Polls for Accessibility trust, because the system sends no notification

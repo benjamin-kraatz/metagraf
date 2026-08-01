@@ -9,15 +9,23 @@ import SwiftUI
 /// mystery, but it also never demands attention.
 struct PillView: View {
     let session: DictationSession
+    let settings: SettingsStore
 
     private static let barCount = 30
     @State private var history = [Float](repeating: 0, count: PillView.barCount)
+
+    /// Hidden entirely when idle if the user asked for that, rather than merely
+    /// dimmed — an always-on indicator is a matter of taste.
+    private var isHidden: Bool {
+        session.phase == .idle && !settings.showPillWhenIdle
+    }
 
     var body: some View {
         HStack(spacing: 10) {
             leading
             trailing
         }
+        .opacity(isHidden ? 0 : 1)
         .padding(.horizontal, 14)
         .padding(.vertical, 9)
         .frame(minWidth: 78)
@@ -27,6 +35,7 @@ struct PillView: View {
         // geometry animation over the whole pill for every recognized token,
         // which visibly stalled the meter's own much faster animation.
         .animation(.smooth(duration: 0.3), value: session.phase)
+        .animation(.smooth(duration: 0.25), value: isHidden)
         .onChange(of: session.level) { _, level in
             history.removeFirst()
             history.append(level)
@@ -146,7 +155,7 @@ struct PillView: View {
 }
 
 #Preview("Idle") {
-    PillView(session: DictationSession())
+    PillView(session: DictationSession(), settings: SettingsStore())
         .padding(40)
 }
 #endif

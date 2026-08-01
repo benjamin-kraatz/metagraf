@@ -17,11 +17,11 @@ final class PillWindowController {
     private let panel: PillPanel
     private var screenObserver: (any NSObjectProtocol)?
 
-    init(session: DictationSession) {
+    init(session: DictationSession, settings: SettingsStore) {
         panel = PillPanel(contentRect: NSRect(origin: .zero, size: Self.canvasSize))
 
         let host = NSHostingView(
-            rootView: PillView(session: session)
+            rootView: PillView(session: session, settings: settings)
                 .frame(width: Self.canvasSize.width, height: Self.canvasSize.height)
         )
         panel.contentView = host

@@ -1,8 +1,7 @@
-#if os(macOS)
 import Foundation
 
 /// How a finished transcript reaches the app the user is working in.
-enum InsertionStrategy: String, Codable, CaseIterable, Sendable, Identifiable {
+public enum InsertionStrategy: String, Codable, CaseIterable, Sendable, Identifiable {
     /// Put the text on the clipboard and synthesize ⌘V, then put the clipboard
     /// back. Works in essentially every app, including Electron and terminals.
     case paste
@@ -15,9 +14,9 @@ enum InsertionStrategy: String, Codable, CaseIterable, Sendable, Identifiable {
     /// Only copy. For apps where synthesized keystrokes are unwelcome.
     case clipboardOnly
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 
-    var displayName: String {
+    public var displayName: String {
         switch self {
         case .paste: "Paste"
         case .accessibility: "Direct insertion"
@@ -25,7 +24,7 @@ enum InsertionStrategy: String, Codable, CaseIterable, Sendable, Identifiable {
         }
     }
 
-    var explanation: String {
+    public var explanation: String {
         switch self {
         case .paste:
             "Pastes into the focused app and restores your clipboard afterwards."
@@ -36,4 +35,3 @@ enum InsertionStrategy: String, Codable, CaseIterable, Sendable, Identifiable {
         }
     }
 }
-#endif

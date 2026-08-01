@@ -1,4 +1,5 @@
 import MetagrafCore
+import SwiftData
 import SwiftUI
 
 @main
@@ -15,7 +16,20 @@ struct MetagrafApp: App {
         .menuBarExtraStyle(.window)
 
         Window("Metagraf", id: MetagrafWindow.main.rawValue) {
-            MainWindow()
+            // The delegate's container, not a fresh one: `modelContainer(for:)`
+            // would build a second store and the window would show a
+            // permanently empty history.
+            if let history = appDelegate.history {
+                MainWindow()
+                    .modelContainer(history.container)
+            } else {
+                ContentUnavailableView(
+                    "History is unavailable",
+                    systemImage: "exclamationmark.triangle",
+                    description: Text("Dictation still works; only the transcript log could not be opened.")
+                )
+                .frame(minWidth: 420, minHeight: 260)
+            }
         }
         .defaultSize(width: 900, height: 600)
 
@@ -32,7 +46,8 @@ struct MetagrafApp: App {
         .defaultLaunchBehavior(.suppressed)
 
         Settings {
-            SettingsView()
+            SettingsView(settings: appDelegate.settings, permissions: appDelegate.permissions)
+                .onDisappear { appDelegate.applySettings() }
         }
     }
     #else
