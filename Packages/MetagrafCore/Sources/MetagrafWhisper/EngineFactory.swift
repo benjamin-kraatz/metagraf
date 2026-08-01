@@ -1,4 +1,5 @@
 import Foundation
+import MetagrafCore
 
 /// Builds the transcription backend a chosen model needs.
 public enum EngineFactory {

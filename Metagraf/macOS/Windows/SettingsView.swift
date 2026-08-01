@@ -1,5 +1,6 @@
 #if os(macOS)
 import MetagrafCore
+import MetagrafWhisper
 import SwiftUI
 
 /// Preferences window.

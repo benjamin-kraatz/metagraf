@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		000000000000000000000220 /* MetagrafCore in Frameworks */ = {isa = PBXBuildFile; productRef = 000000000000000000000210 /* MetagrafCore */; };
+		000000000000000000000221 /* MetagrafWhisper in Frameworks */ = {isa = PBXBuildFile; productRef = 000000000000000000000211 /* MetagrafWhisper */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 			isa = PBXFrameworksBuildPhase;
 			files = (
 				000000000000000000000220 /* MetagrafCore in Frameworks */,
+				000000000000000000000221 /* MetagrafWhisper in Frameworks */,
 			);
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -67,6 +69,7 @@
 			name = Metagraf;
 			packageProductDependencies = (
 				000000000000000000000210 /* MetagrafCore */,
+				000000000000000000000211 /* MetagrafWhisper */,
 			);
 			productName = MyApp;
 			productReference = 000000000000000000000120 /* Metagraf.app */;
@@ -415,6 +418,10 @@
 		000000000000000000000210 /* MetagrafCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = MetagrafCore;
+		};
+		000000000000000000000211 /* MetagrafWhisper */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MetagrafWhisper;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

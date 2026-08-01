@@ -1,5 +1,6 @@
 #if os(macOS)
 import MetagrafCore
+import MetagrafWhisper
 import SwiftUI
 
 /// Chooses which speech model dictation uses, and manages what is on disk.

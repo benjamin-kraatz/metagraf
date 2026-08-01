@@ -2,6 +2,7 @@
 import AppKit
 import Darwin
 import MetagrafCore
+import MetagrafWhisper
 import OSLog
 
 /// Wires the always-running parts of the app: the hotkey tap, the pill, and the
