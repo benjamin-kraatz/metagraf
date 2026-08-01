@@ -40,6 +40,11 @@ public final class SettingsStore {
         didSet { write(insertion.rawValue, .insertion) }
     }
 
+    /// Identifier of the chosen model from `ModelCatalog`.
+    public var modelID: String {
+        didSet { write(modelID, .model) }
+    }
+
     // MARK: - Appearance
 
     /// Whether the pill stays visible when nothing is happening.
@@ -75,6 +80,7 @@ public final class SettingsStore {
         doubleTapWindow = defaults.object(forKey: Key.doubleTapWindow.rawValue) as? TimeInterval ?? 0.4
         insertion = defaults.string(forKey: Key.insertion.rawValue)
             .flatMap(InsertionStrategy.init(rawValue:)) ?? .paste
+        modelID = defaults.string(forKey: Key.model.rawValue) ?? ModelCatalog.default.id
         showPillWhenIdle = defaults.object(forKey: Key.showPillWhenIdle.rawValue) as? Bool ?? true
         launchAtLogin = defaults.object(forKey: Key.launchAtLogin.rawValue) as? Bool ?? false
         retentionDays = defaults.object(forKey: Key.retentionDays.rawValue) as? Int ?? 30
@@ -113,6 +119,7 @@ public final class SettingsStore {
         case minimumHold = "dictation.minimumHold"
         case doubleTapWindow = "dictation.doubleTapWindow"
         case insertion = "dictation.insertion"
+        case model = "dictation.model"
         case showPillWhenIdle = "appearance.showPillWhenIdle"
         case launchAtLogin = "general.launchAtLogin"
         case retentionDays = "history.retentionDays"

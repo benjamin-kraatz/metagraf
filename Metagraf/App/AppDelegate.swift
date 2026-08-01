@@ -10,6 +10,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let session = DictationSession()
     let permissions = PermissionsCoordinator()
     let settings = SettingsStore.shared
+    let models = ModelStore()
     private(set) var history: HistoryStore?
 
     private let logger = Logger(subsystem: Metagraf.bundleIdentifier, category: "App")
@@ -22,6 +23,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// may have switched away.
     private var target: NSRunningApplication?
     private var startedAt: Date?
+
+    /// Which model the session is currently loaded with, so switching only
+    /// happens when the choice actually changed.
+    private var activeModelID = ModelCatalog.default.id
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         do {
@@ -72,7 +77,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             Transcript(
                 text: transcript,
                 localeIdentifier: settings.effectiveLocale.identifier,
-                engineIdentifier: EngineID.appleSpeech.rawValue,
+                engineIdentifier: session.engineIdentifier.rawValue,
                 durationSeconds: duration,
                 appBundleIdentifier: target?.bundleIdentifier,
                 appName: target?.localizedName
@@ -120,11 +125,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// Pushes the user's hotkey preferences into the monitor.
+    /// Pushes the user's preferences into the pieces that hold their own copy.
     func applySettings() {
         hotKeys.binding = ModifierKey(rawValue: settings.hotKey) ?? .rightOption
         hotKeys.machine.minimumHold = settings.minimumHold
         hotKeys.machine.doubleTapWindow = settings.doubleTapWindow
+
+        let model = EngineFactory.resolve(modelID: settings.modelID, store: models)
+        if model.id != activeModelID {
+            session.use(EngineFactory.make(for: model, store: models))
+            activeModelID = model.id
+        }
     }
 
     /// Polls for Accessibility trust, because the system sends no notification

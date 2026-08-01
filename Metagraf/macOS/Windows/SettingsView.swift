@@ -6,6 +6,7 @@ import SwiftUI
 struct SettingsView: View {
     let settings: SettingsStore
     let permissions: PermissionsCoordinator
+    let models: ModelStore
 
     var body: some View {
         TabView {
@@ -14,6 +15,9 @@ struct SettingsView: View {
             }
             Tab("Dictation", systemImage: "mic") {
                 DictationSettings(settings: settings)
+            }
+            Tab("Models", systemImage: "cube") {
+                ModelsSettings(settings: settings, models: models)
             }
             Tab("Vocabulary", systemImage: "character.book.closed") {
                 VocabularySettings(settings: settings)

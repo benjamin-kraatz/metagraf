@@ -46,8 +46,14 @@ struct MetagrafApp: App {
         .defaultLaunchBehavior(.suppressed)
 
         Settings {
-            SettingsView(settings: appDelegate.settings, permissions: appDelegate.permissions)
-                .onDisappear { appDelegate.applySettings() }
+            SettingsView(
+                settings: appDelegate.settings,
+                permissions: appDelegate.permissions,
+                models: appDelegate.models
+            )
+            // Preferences are applied on close rather than on every keystroke,
+            // so a half-typed value never takes effect.
+            .onDisappear { appDelegate.applySettings() }
         }
     }
     #else

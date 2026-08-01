@@ -51,7 +51,7 @@ public final class DictationSession {
 
     private let logger = Logger(subsystem: Metagraf.bundleIdentifier, category: "Dictation")
     private let capture: AudioCaptureEngine
-    private let engine: any TranscriptionEngine
+    private var engine: any TranscriptionEngine
 
     private var pumpTask: Task<Void, Never>?
     private var updatesTask: Task<Void, Never>?
@@ -85,6 +85,17 @@ public final class DictationSession {
     /// Allocates audio and model resources so the next `begin` is instant.
     public func prewarm() {
         capture.prewarm()
+    }
+
+    /// The backend currently in use.
+    public var engineIdentifier: EngineID { engine.identifier }
+
+    /// Swaps the transcription backend. Ignored mid-dictation, so changing the
+    /// model in Settings never cuts off an utterance in progress.
+    public func use(_ newEngine: any TranscriptionEngine) {
+        guard !phase.isBusy else { return }
+        engine = newEngine
+        logger.info("Switched to \(newEngine.identifier.rawValue, privacy: .public)")
     }
 
     /// Starts listening. Safe to call when already recording — it does nothing.
