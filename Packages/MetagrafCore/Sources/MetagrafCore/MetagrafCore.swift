@@ -9,6 +9,12 @@ public enum Metagraf {
     /// App group used to share settings and history between the app and its extensions.
     public static let appGroupIdentifier = "group.de.dzwei.apps.metagraf"
 
+    /// Whether this code is running inside an app extension rather than the app.
+    ///
+    /// Extensions cannot present privacy prompts, so several messages have to
+    /// point at the containing app instead of at a system setting.
+    public static let isRunningInExtension = Bundle.main.bundleURL.pathExtension == "appex"
+
     /// Directory holding downloaded speech models and the transcript database.
     public static var supportDirectory: URL {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]

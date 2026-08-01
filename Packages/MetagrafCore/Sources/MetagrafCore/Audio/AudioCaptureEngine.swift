@@ -13,12 +13,24 @@ import OSLog
 public final class AudioCaptureEngine {
     public enum CaptureError: Error, LocalizedError, Equatable {
         case microphoneAccessDenied
+        case noInputDevice
         case unsupportedFormat
 
         public var errorDescription: String? {
             switch self {
             case .microphoneAccessDenied:
-                String(localized: "Metagraf needs microphone access to hear you.", bundle: .main)
+                // iOS refuses microphone access to app extensions outright, so
+                // in one there is no permission the user could grant to fix it.
+                // Saying "allow microphone access" would send them looking for
+                // a switch that does not exist.
+                Metagraf.isRunningInExtension
+                    ? String(
+                        localized: "iOS doesn’t let keyboards use the microphone.",
+                        bundle: .main
+                    )
+                    : String(localized: "Metagraf needs microphone access to hear you.", bundle: .main)
+            case .noInputDevice:
+                String(localized: "No microphone is available right now.", bundle: .main)
             case .unsupportedFormat:
                 String(localized: "The selected input device produced an unusable audio format.", bundle: .main)
             }
@@ -47,10 +59,16 @@ public final class AudioCaptureEngine {
     /// input node reports a zero-rate format.
     public func prewarm() {
         guard !isCapturing, MicrophoneAuthorization.isAuthorized else { return }
+        #if os(macOS)
         // Referencing the input node attaches it. `prepare()` raises on a graph
         // that has no nodes at all.
         _ = engine.inputNode
         engine.prepare()
+        #else
+        // Not on iOS: reaching for the input node before a recording session is
+        // active makes AVAudioEngine cache a zero-rate input format, and it
+        // keeps that stale format even once the session comes up properly.
+        #endif
     }
 
     /// Begins capture, converting to `target` when the engine needs a specific
@@ -59,10 +77,23 @@ public final class AudioCaptureEngine {
         if isCapturing { stop() }
         try activateAudioSession()
 
+        try requireInputRoute()
+
         let input = engine.inputNode
         let inputFormat = input.outputFormat(forBus: 0)
         guard inputFormat.sampleRate > 0, inputFormat.channelCount > 0 else {
-            throw CaptureError.unsupportedFormat
+            // A zero-rate input node nearly always means there is no microphone
+            // route rather than a genuinely odd format, so say the useful thing.
+            logger.error(
+                """
+                Input node unusable: \(inputFormat.sampleRate, privacy: .public) Hz, \
+                \(inputFormat.channelCount, privacy: .public) ch, \
+                authorized=\(MicrophoneAuthorization.isAuthorized, privacy: .public)
+                """
+            )
+            throw MicrophoneAuthorization.isAuthorized
+                ? CaptureError.unsupportedFormat
+                : CaptureError.microphoneAccessDenied
         }
 
         // Bound as a `let` so the tap closure captures it by value; capturing a
@@ -128,6 +159,33 @@ public final class AudioCaptureEngine {
         // Stay warm so the next utterance starts without rebuilding the graph.
         engine.prepare()
         deactivateAudioSession()
+    }
+
+    /// Fails early when the system has no microphone to give us.
+    ///
+    /// In an app extension this is the common case and the confusing one: the
+    /// audio session activates happily, but the route is empty because the
+    /// microphone was never granted to the *containing* app. An extension
+    /// cannot show that prompt itself, so the message has to send the user to
+    /// the app rather than to a Settings switch that will not help.
+    private func requireInputRoute() throws {
+        #if os(iOS)
+        let session = AVAudioSession.sharedInstance()
+        let hasRoute = !session.currentRoute.inputs.isEmpty
+
+        guard session.isInputAvailable, hasRoute else {
+            logger.error(
+                """
+                No input route: inputAvailable=\(session.isInputAvailable, privacy: .public), \
+                routes=\(session.currentRoute.inputs.count, privacy: .public), \
+                permission=\(String(describing: AVAudioApplication.shared.recordPermission), privacy: .public)
+                """
+            )
+            throw AVAudioApplication.shared.recordPermission == .granted
+                ? CaptureError.noInputDevice
+                : CaptureError.microphoneAccessDenied
+        }
+        #endif
     }
 
     /// iOS requires an active, recording-capable audio session before the input
