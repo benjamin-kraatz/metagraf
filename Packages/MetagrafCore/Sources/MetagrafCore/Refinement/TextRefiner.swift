@@ -12,6 +12,8 @@ public enum RefinementStyle: String, Codable, CaseIterable, Sendable, Identifiab
     case message
     /// Terse, as notes rather than prose.
     case notes
+    /// Infer the most useful format from the transcript and its destination.
+    case intelligent
 
     public var id: String { rawValue }
 
@@ -22,6 +24,7 @@ public enum RefinementStyle: String, Codable, CaseIterable, Sendable, Identifiab
         case .email: "Email"
         case .message: "Message"
         case .notes: "Notes"
+        case .intelligent: "Intelligent"
         }
     }
 
@@ -32,6 +35,7 @@ public enum RefinementStyle: String, Codable, CaseIterable, Sendable, Identifiab
         case .email: "Tidy up and lay the text out as an email."
         case .message: "Keep it short and conversational."
         case .notes: "Condense into terse notes rather than full sentences."
+        case .intelligent: "Adapt the wording and format to what you’re writing."
         }
     }
 
@@ -40,9 +44,110 @@ public enum RefinementStyle: String, Codable, CaseIterable, Sendable, Identifiab
     
     public var needsLanguageModel: Bool {
         switch self {
-            case .raw: return true
-            case .email, .message, .notes, .cleanup: return true
+        case .raw: false
+        case .cleanup, .email, .message, .notes, .intelligent: true
         }
+    }
+}
+
+/// Information about where a transcript will be inserted.
+///
+/// `applicationName` is always safe to provide. The remaining fields are only
+/// populated after the user opts in to nearby app context.
+public struct RefinementDestinationContext: Sendable, Equatable {
+    public var applicationName: String?
+    public var windowTitle: String?
+    public var focusedElementRole: String?
+    public var focusedElementTitle: String?
+    public var focusedElementDescription: String?
+    public var placeholder: String?
+    public var selectedText: String?
+    public var nearbyText: String?
+
+    public init(
+        applicationName: String? = nil,
+        windowTitle: String? = nil,
+        focusedElementRole: String? = nil,
+        focusedElementTitle: String? = nil,
+        focusedElementDescription: String? = nil,
+        placeholder: String? = nil,
+        selectedText: String? = nil,
+        nearbyText: String? = nil
+    ) {
+        self.applicationName = applicationName
+        self.windowTitle = windowTitle
+        self.focusedElementRole = focusedElementRole
+        self.focusedElementTitle = focusedElementTitle
+        self.focusedElementDescription = focusedElementDescription
+        self.placeholder = placeholder
+        self.selectedText = selectedText
+        self.nearbyText = nearbyText
+    }
+
+    public var hasRichContext: Bool {
+        [
+            windowTitle,
+            focusedElementRole,
+            focusedElementTitle,
+            focusedElementDescription,
+            placeholder,
+            selectedText,
+            nearbyText,
+        ].contains { $0?.isEmpty == false }
+    }
+}
+
+/// Applies the privacy and prompt-size limits to focused-field context.
+public enum RefinementContextLimit {
+    public static let maximumTextCharacters = 4_000
+    public static let maximumMetadataCharacters = 256
+
+    public static func bounded(
+        applicationName: String?,
+        windowTitle: String?,
+        focusedElementRole: String?,
+        focusedElementTitle: String?,
+        focusedElementDescription: String?,
+        placeholder: String?,
+        selectedText: String?,
+        nearbyText: String?,
+        isSecure: Bool
+    ) -> RefinementDestinationContext {
+        let selected = isSecure ? nil : prefix(selectedText, maximumTextCharacters)
+        let remaining = maximumTextCharacters - (selected?.count ?? 0)
+        let nearby = isSecure ? nil : prefix(nearbyText, remaining)
+
+        return RefinementDestinationContext(
+            applicationName: prefix(applicationName, maximumMetadataCharacters),
+            windowTitle: prefix(windowTitle, maximumMetadataCharacters),
+            focusedElementRole: prefix(focusedElementRole, maximumMetadataCharacters),
+            focusedElementTitle: prefix(focusedElementTitle, maximumMetadataCharacters),
+            focusedElementDescription: prefix(focusedElementDescription, maximumMetadataCharacters),
+            placeholder: prefix(placeholder, maximumMetadataCharacters),
+            selectedText: selected,
+            nearbyText: nearby
+        )
+    }
+
+    /// A centered character range around the current selection or caret.
+    public static func excerptRange(
+        totalLength: Int,
+        selection: NSRange,
+        maximumLength: Int
+    ) -> NSRange {
+        guard totalLength > 0, maximumLength > 0 else { return NSRange(location: 0, length: 0) }
+
+        let length = min(totalLength, maximumLength)
+        let safeLocation = min(max(0, selection.location), totalLength)
+        let safeSelectionLength = min(max(0, selection.length), totalLength - safeLocation)
+        let center = safeLocation + safeSelectionLength / 2
+        let start = min(max(0, center - length / 2), totalLength - length)
+        return NSRange(location: start, length: length)
+    }
+
+    private static func prefix(_ value: String?, _ length: Int) -> String? {
+        guard let value, !value.isEmpty, length > 0 else { return nil }
+        return String(value.prefix(length))
     }
 }
 
@@ -51,13 +156,16 @@ public struct RefinementContext: Sendable {
     public var style: RefinementStyle
     public var locale: Locale
     public var vocabulary: [VocabularyEntry]
+    public var destination: RefinementDestinationContext
 
-    /// Name of the app the text is headed for, when known.
-    public var targetApplication: String?
+    /// Source-compatible alias for the destination application's display name.
+    public var targetApplication: String? {
+        get { destination.applicationName }
+        set { destination.applicationName = newValue }
+    }
 
-    /// Whether a language model may be used. Turning this off keeps refinement
-    /// to the instant rule-based pass, for people who would rather have the
-    /// text immediately than have it read better.
+    /// Whether a language model may be used. Turning this off keeps the original
+    /// transcript rather than rewriting it.
     public var usesLanguageModel: Bool
 
     public init(
@@ -65,12 +173,17 @@ public struct RefinementContext: Sendable {
         locale: Locale = .current,
         vocabulary: [VocabularyEntry] = [],
         targetApplication: String? = nil,
-        usesLanguageModel: Bool = true
+        usesLanguageModel: Bool = true,
+        destination: RefinementDestinationContext? = nil
     ) {
         self.style = style
         self.locale = locale
         self.vocabulary = vocabulary
-        self.targetApplication = targetApplication
+        var resolvedDestination = destination ?? RefinementDestinationContext()
+        if resolvedDestination.applicationName == nil {
+            resolvedDestination.applicationName = targetApplication
+        }
+        self.destination = resolvedDestination
         self.usesLanguageModel = usesLanguageModel
     }
 }
@@ -93,7 +206,6 @@ public struct RefinerID: RawRepresentable, Hashable, Sendable, Codable {
         self.rawValue = rawValue
     }
 
-    public static let rules = RefinerID(rawValue: "rules")
     public static let appleIntelligence = RefinerID(rawValue: "apple.intelligence")
 }
 

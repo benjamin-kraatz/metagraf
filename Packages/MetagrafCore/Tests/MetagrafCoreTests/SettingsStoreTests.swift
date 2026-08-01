@@ -20,14 +20,25 @@ struct SettingsStoreTests {
         first.localeIdentifier = "de_DE"
         first.insertion = .accessibility
         first.retentionDays = 7
+        first.refinementStyle = .intelligent
+        first.usesNearbyAppContext = true
         first.vocabulary = [VocabularyEntry(term: "Metagraf", misheard: ["meta graph"])]
 
         let second = SettingsStore(defaults: defaults)
         #expect(second.localeIdentifier == "de_DE")
         #expect(second.insertion == .accessibility)
         #expect(second.retentionDays == 7)
+        #expect(second.refinementStyle == .intelligent)
+        #expect(second.usesNearbyAppContext)
         #expect(second.vocabulary.map(\.term) == ["Metagraf"])
         #expect(second.vocabulary.first?.misheard == ["meta graph"])
+    }
+
+    @Test("Refinement defaults are conservative")
+    func refinementDefaults() {
+        let settings = SettingsStore(defaults: makeDefaults())
+        #expect(settings.refinementStyle == .cleanup)
+        #expect(!settings.usesNearbyAppContext)
     }
 
     @Test("An empty language setting follows the system")

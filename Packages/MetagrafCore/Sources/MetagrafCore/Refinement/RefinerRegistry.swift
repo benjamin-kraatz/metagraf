@@ -1,36 +1,31 @@
 import Foundation
 import OSLog
 
-/// Runs the refinement chain: deterministic cleanup first, then a language
-/// model if the chosen style needs one and a model is available.
+/// Runs a language-model refinement when the chosen style needs one and a model
+/// is available.
 ///
 /// Every step can fail without consequence — the text from the previous step is
-/// carried forward — so a transcript always reaches the user.
+/// preserved — so a transcript always reaches the user.
 public struct RefinerRegistry: Sendable {
-    private let rules: RuleBasedRefiner
     private let modelRefiners: [any TextRefiner]
     private let logger = Logger(subsystem: Metagraf.bundleIdentifier, category: "Refinement")
 
     /// `modelRefiners` are tried in order; the first available one is used.
     /// Additional backends plug in here without changes elsewhere.
     public init(
-        rules: RuleBasedRefiner = RuleBasedRefiner(),
         modelRefiners: [any TextRefiner] = [AppleIntelligenceRefiner()]
     ) {
-        self.rules = rules
         self.modelRefiners = modelRefiners
     }
 
     public func refine(_ text: String, context: RefinementContext) async -> String {
         guard context.style != .raw else { return text }
-
-        let cleaned = (try? await rules.refine(text, context: context)) ?? text
-        guard context.style.needsLanguageModel else { return cleaned }
+        guard context.usesLanguageModel, context.style.needsLanguageModel else { return text }
 
         for refiner in modelRefiners {
             guard await refiner.availability.isAvailable else { continue }
             do {
-                return try await refiner.refine(cleaned, context: context)
+                return try await refiner.refine(text, context: context)
             } catch {
                 logger.notice(
                     """
@@ -41,7 +36,7 @@ public struct RefinerRegistry: Sendable {
             }
         }
 
-        return cleaned
+        return text
     }
 
     /// Why the language-model step is unavailable, for the settings UI to show.

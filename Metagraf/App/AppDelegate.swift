@@ -16,6 +16,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let logger = Logger(subsystem: Metagraf.bundleIdentifier, category: "App")
     private let hotKeys = HotKeyMonitor()
     private let inserter = TextInserter()
+    private let focusedContextReader = FocusedContextReader()
     private let feedback = FeedbackPlayer()
     private var pill: PillWindowController?
 
@@ -102,6 +103,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             if activation == .began {
                 target = NSWorkspace.shared.frontmostApplication
                 startedAt = .now
+                let destination: RefinementDestinationContext
+                if settings.refinementStyle == .intelligent, settings.usesNearbyAppContext {
+                    destination = focusedContextReader.capture(applicationName: target?.localizedName)
+                } else {
+                    destination = RefinementDestinationContext(applicationName: target?.localizedName)
+                }
                 // Picked up fresh each time so changing the language or adding a
                 // vocabulary term takes effect on the very next dictation.
                 session.configuration = EngineConfiguration(
@@ -112,7 +119,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     style: settings.refinementStyle,
                     locale: settings.effectiveLocale,
                     vocabulary: settings.vocabulary,
-                    targetApplication: target?.localizedName
+                    destination: destination
                 )
             }
 

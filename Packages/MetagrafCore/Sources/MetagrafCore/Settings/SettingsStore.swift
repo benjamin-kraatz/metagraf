@@ -50,6 +50,12 @@ public final class SettingsStore {
         didSet { write(refinementStyle.rawValue, .refinementStyle) }
     }
 
+    /// Whether Intelligent refinement may inspect the focused field for nearby
+    /// text and metadata. Off by default because this is a privacy choice.
+    public var usesNearbyAppContext: Bool {
+        didSet { write(usesNearbyAppContext, .usesNearbyAppContext) }
+    }
+
     // MARK: - Appearance
 
     /// Whether the pill stays visible when nothing is happening.
@@ -97,6 +103,7 @@ public final class SettingsStore {
         modelID = defaults.string(forKey: Key.model.rawValue) ?? ModelCatalog.default.id
         refinementStyle = defaults.string(forKey: Key.refinementStyle.rawValue)
             .flatMap(RefinementStyle.init(rawValue:)) ?? .cleanup
+        usesNearbyAppContext = defaults.object(forKey: Key.usesNearbyAppContext.rawValue) as? Bool ?? false
         showPillWhenIdle = defaults.object(forKey: Key.showPillWhenIdle.rawValue) as? Bool ?? true
         pillPlacement = defaults.string(forKey: Key.pillPlacement.rawValue)
             .flatMap(PillPlacement.init(rawValue:)) ?? .bottomCenter
@@ -140,6 +147,7 @@ public final class SettingsStore {
         case insertion = "dictation.insertion"
         case model = "dictation.model"
         case refinementStyle = "refinement.style"
+        case usesNearbyAppContext = "refinement.usesNearbyAppContext"
         case showPillWhenIdle = "appearance.showPillWhenIdle"
         case pillPlacement = "appearance.pillPlacement"
         case playsSounds = "appearance.playsSounds"

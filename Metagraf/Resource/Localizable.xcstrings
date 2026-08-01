@@ -21,12 +21,12 @@
         }
       }
     },
-    "\"Exactly as spoken\" will not post-process the transcript. The other styles ask Apple Intelligence to rewrite the text on this device, and fall back to the cleaned-up version if it is unavailable or takes too long." : {
+    "“Exactly as spoken” does not post-process the transcript. Every other style asks Apple Intelligence to rewrite on-device and preserves the original transcript if it becomes unavailable or takes too long." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\"Genau wie gesprochen\" verarbeitet das Transkript nicht nach. Die anderen Stile bitten Apple Intelligence, den Text auf diesem Gerät umzuschreiben, und fallen auf die bereinigte Version zurück, wenn sie nicht verfügbar ist oder zu lange braucht."
+            "value" : "„Genau wie gesprochen“ verarbeitet das Transkript nicht nach. Alle anderen Stile bitten Apple Intelligence, den Text auf dem Gerät umzuschreiben, und behalten das ursprüngliche Transkript bei, wenn es nicht verfügbar ist oder zu lange braucht."
           }
         }
       }
@@ -150,6 +150,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Genauigkeit"
+          }
+        }
+      }
+    },
+    "Adapt the wording and format to what you’re writing." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wortwahl und Format an den jeweiligen Text anpassen."
           }
         }
       }
@@ -362,17 +373,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bereinigen"
-          }
-        }
-      }
-    },
-    "Clean up runs entirely on rules and never needs a model. The other styles ask Apple Intelligence to rewrite the text on this device, and fall back to the cleaned-up version if it is unavailable or takes too long." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bereinigen läuft vollständig regelbasiert und benötigt nie ein Modell. Die anderen Stile bitten Apple Intelligence, den Text auf diesem Gerät umzuschreiben, und fallen auf die bereinigte Version zurück, wenn sie nicht verfügbar ist oder zu lange braucht."
           }
         }
       }
@@ -625,17 +625,6 @@
         }
       }
     },
-    "Exactly as spoken will not post-process the transcript. The other styles ask Apple Intelligence to rewrite the text on this device, and fall back to the cleaned-up version if it is unavailable or takes too long." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Genau wie gesprochen verarbeitet das Transkript nicht nach. Die anderen Stile bitten Apple Intelligence, den Text auf diesem Gerät umzuschreiben, und fallen auf die bereinigte Version zurück, wenn sie nicht verfügbar ist oder zu lange braucht."
-          }
-        }
-      }
-    },
     "Fastest and smallest. Fine for short, clear dictation." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -856,6 +845,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wird eingefügt …"
+          }
+        }
+      }
+    },
+    "Intelligent" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intelligent"
           }
         }
       }
@@ -1576,6 +1576,16 @@
         }
       }
     },
+    "Use nearby app context" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontext aus der App verwenden"
+          }
+        }
+      }
+    },
     "Useful because the dictation key has no visible press of its own." : {
       "localizations" : {
         "de" : {
@@ -1602,6 +1612,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Willkommen bei Metagraf"
+          }
+        }
+      }
+    },
+    "When enabled, Metagraf reads selected and nearby text from the focused field only while dictation starts. It is processed on-device and is never saved." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn diese Option aktiviert ist, liest Metagraf nur beim Start der Diktierfunktion ausgewählten und benachbarten Text aus dem fokussierten Feld. Die Verarbeitung erfolgt auf dem Gerät, und der Kontext wird niemals gespeichert."
           }
         }
       }
