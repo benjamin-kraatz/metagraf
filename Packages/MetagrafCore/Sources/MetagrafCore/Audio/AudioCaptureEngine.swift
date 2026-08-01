@@ -18,9 +18,9 @@ public final class AudioCaptureEngine {
         public var errorDescription: String? {
             switch self {
             case .microphoneAccessDenied:
-                "Metagraf needs microphone access to hear you."
+                String(localized: "Metagraf needs microphone access to hear you.", bundle: .main)
             case .unsupportedFormat:
-                "The selected input device produced an unusable audio format."
+                String(localized: "The selected input device produced an unusable audio format.", bundle: .main)
             }
         }
     }

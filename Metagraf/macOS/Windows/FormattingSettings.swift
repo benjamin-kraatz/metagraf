@@ -16,10 +16,10 @@ struct FormattingSettings: View {
             Section("Style") {
                 Picker("Write it as", selection: $settings.refinementStyle) {
                     ForEach(RefinementStyle.allCases) { style in
-                        Text(style.displayName).tag(style)
+                        Text(LocalizedStringKey(style.displayName)).tag(style)
                     }
                 }
-                Text(settings.refinementStyle.explanation)
+                Text(LocalizedStringKey(settings.refinementStyle.explanation))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

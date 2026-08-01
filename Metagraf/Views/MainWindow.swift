@@ -10,7 +10,7 @@ struct MainWindow: View {
 
         var id: String { rawValue }
 
-        var title: String {
+        var title: LocalizedStringKey {
             switch self {
             case .history: "History"
             case .statistics: "Statistics"
@@ -168,7 +168,7 @@ private struct StatisticsView: View {
                     ) {
                         StatTile(title: "Dictations", value: transcripts.count.formatted())
                         StatTile(title: "Words", value: totalWords.formatted())
-                        StatTile(title: "Average pace", value: "\(averageWordsPerMinute) wpm")
+                        StatTile(title: "Average pace", value: String(localized: "\(averageWordsPerMinute) wpm"))
                         StatTile(
                             title: "Time saved vs. typing",
                             value: Duration.seconds(secondsSaved)
@@ -184,7 +184,7 @@ private struct StatisticsView: View {
 }
 
 private struct StatTile: View {
-    let title: String
+    let title: LocalizedStringKey
     let value: String
 
     var body: some View {

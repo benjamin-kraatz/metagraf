@@ -49,7 +49,7 @@ struct MenuBarContent: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 3) {
-            Text(statusTitle)
+            statusTitle
                 .font(.callout.weight(.semibold))
 
             Text("Hold \(ModifierKey.rightOption.displayName) anywhere to dictate.")
@@ -106,20 +106,21 @@ struct MenuBarContent: View {
         .padding(.horizontal, 6)
     }
 
-    private var statusTitle: String {
+    private var statusTitle: Text {
         switch session.phase {
-        case .idle: permissions.isReady ? "Ready" : "Needs setup"
-        case .preparing: "Getting ready…"
-        case .recording: "Listening"
-        case .transcribing: "Transcribing…"
-        case .refining: "Tidying up…"
-        case .inserting: "Inserting…"
-        case .failed(let message): message
+        case .idle where permissions.isReady: Text("Ready")
+        case .idle: Text("Needs setup")
+        case .preparing: Text("Getting ready…")
+        case .recording: Text("Listening")
+        case .transcribing: Text("Transcribing…")
+        case .refining: Text("Tidying up…")
+        case .inserting: Text("Inserting…")
+        case .failed(let message): Text(message)
         }
     }
 
     private func menuButton(
-        _ title: String,
+        _ title: LocalizedStringKey,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {

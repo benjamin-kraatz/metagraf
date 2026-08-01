@@ -69,8 +69,9 @@ public actor WhisperKitEngine: TranscriptionEngine {
         guard pipeline == nil else { return }
 
         guard let modelFolder else {
+            let format = String(localized: "The %@ model isn’t downloaded yet.", bundle: .main)
             throw TranscriptionError.engineUnavailable(
-                "The \(modelID) model isn’t downloaded yet."
+                String(format: format, modelID)
             )
         }
 
@@ -85,8 +86,9 @@ public actor WhisperKitEngine: TranscriptionEngine {
             pipeline = Pipeline(try await WhisperKit(config))
             logger.info("Loaded \(self.modelID, privacy: .public)")
         } catch {
+            let format = String(localized: "The %@ model could not be loaded.", bundle: .main)
             throw TranscriptionError.engineUnavailable(
-                "The \(modelID) model could not be loaded."
+                String(format: format, modelID)
             )
         }
     }

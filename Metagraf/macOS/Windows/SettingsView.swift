@@ -56,7 +56,7 @@ private struct GeneralSettings: View {
 
                 Picker("Position", selection: $settings.pillPlacement) {
                     ForEach(PillPlacement.allCases) { placement in
-                        Text(placement.displayName).tag(placement)
+                        Text(LocalizedStringKey(placement.displayName)).tag(placement)
                     }
                 }
 
@@ -157,10 +157,10 @@ private struct DictationSettings: View {
             Section("Where text goes") {
                 Picker("Insert with", selection: $settings.insertion) {
                     ForEach(InsertionStrategy.allCases) { strategy in
-                        Text(strategy.displayName).tag(strategy)
+                        Text(LocalizedStringKey(strategy.displayName)).tag(strategy)
                     }
                 }
-                Text(settings.insertion.explanation)
+                Text(LocalizedStringKey(settings.insertion.explanation))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

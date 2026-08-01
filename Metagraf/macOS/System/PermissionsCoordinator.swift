@@ -27,17 +27,17 @@ final class PermissionsCoordinator {
 
         var title: String {
             switch self {
-            case .microphone: "Microphone"
-            case .accessibility: "Accessibility"
+            case .microphone: String(localized: "Microphone")
+            case .accessibility: String(localized: "Accessibility")
             }
         }
 
         var reason: String {
             switch self {
             case .microphone:
-                "So Metagraf can hear you while you hold the dictation key."
+                String(localized: "So Metagraf can hear you while you hold the dictation key.")
             case .accessibility:
-                "So Metagraf can notice the dictation key in other apps, and paste what you said."
+                String(localized: "So Metagraf can notice the dictation key in other apps, and paste what you said.")
             }
         }
 

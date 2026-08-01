@@ -31,9 +31,9 @@ final class HotKeyMonitor {
         var errorDescription: String? {
             switch self {
             case .accessibilityNotTrusted:
-                "Metagraf needs Accessibility access to see the dictation key."
+                String(localized: "Metagraf needs Accessibility access to see the dictation key.")
             case .tapCreationFailed:
-                "The system refused to install a keyboard event tap."
+                String(localized: "The system refused to install a keyboard event tap.")
             }
         }
     }

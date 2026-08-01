@@ -26,13 +26,13 @@ public struct AppleIntelligenceRefiner: TextRefiner, Sendable {
             case .available:
                 .available
             case .unavailable(.deviceNotEligible):
-                .unavailable("This Mac doesn’t support Apple Intelligence.")
+                .unavailable(String(localized: "This Mac doesn’t support Apple Intelligence.", bundle: .main))
             case .unavailable(.appleIntelligenceNotEnabled):
-                .unavailable("Apple Intelligence is turned off in System Settings.")
+                .unavailable(String(localized: "Apple Intelligence is turned off in System Settings.", bundle: .main))
             case .unavailable(.modelNotReady):
-                .unavailable("Apple Intelligence is still downloading its model.")
+                .unavailable(String(localized: "Apple Intelligence is still downloading its model.", bundle: .main))
             case .unavailable:
-                .unavailable("Apple Intelligence isn’t available right now.")
+                .unavailable(String(localized: "Apple Intelligence isn’t available right now.", bundle: .main))
             }
         }
     }
@@ -140,6 +140,6 @@ public enum RefinementError: Error, Sendable, LocalizedError {
     case unavailable
 
     public var errorDescription: String? {
-        "Apple Intelligence isn’t available."
+        String(localized: "Apple Intelligence isn’t available.", bundle: .main)
     }
 }

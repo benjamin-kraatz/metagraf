@@ -1,6 +1,7 @@
 #if os(macOS)
 import Carbon.HIToolbox
 import CoreGraphics
+import Foundation
 
 /// A modifier key that can be held to dictate.
 ///
@@ -41,12 +42,12 @@ enum ModifierKey: String, CaseIterable, Codable, Sendable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .rightOption: "Right ⌥"
-        case .leftOption: "Left ⌥"
-        case .rightCommand: "Right ⌘"
-        case .rightControl: "Right ⌃"
-        case .rightShift: "Right ⇧"
-        case .function: "Globe (fn)"
+        case .rightOption: String(localized: "Right ⌥")
+        case .leftOption: String(localized: "Left ⌥")
+        case .rightCommand: String(localized: "Right ⌘")
+        case .rightControl: String(localized: "Right ⌃")
+        case .rightShift: String(localized: "Right ⇧")
+        case .function: String(localized: "Globe (fn)")
         }
     }
 }

@@ -64,8 +64,14 @@ struct OnboardingWindow: View {
 
             Spacer()
 
-            Button(permissions.isReady ? "Start dictating" : "Continue anyway") {
+            Button {
                 dismissWindow(id: MetagrafWindow.onboarding.rawValue)
+            } label: {
+                if permissions.isReady {
+                    Text("Start dictating")
+                } else {
+                    Text("Continue anyway")
+                }
             }
             .buttonStyle(.glassProminent)
             .keyboardShortcut(.defaultAction)

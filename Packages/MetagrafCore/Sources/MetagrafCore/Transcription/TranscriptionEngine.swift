@@ -62,12 +62,14 @@ extension TranscriptionError: LocalizedError {
         switch self {
         case .localeNotSupported(let locale):
             let name = locale.localizedString(forIdentifier: locale.identifier) ?? locale.identifier
-            return "\(name) isn’t supported by this model."
+            let format = String(localized: "%@ isn’t supported by this model.", bundle: .main)
+            return String(format: format, name)
         case .assetsUnavailable(let locale):
             let name = locale.localizedString(forIdentifier: locale.identifier) ?? locale.identifier
-            return "The speech model for \(name) couldn’t be downloaded."
+            let format = String(localized: "The speech model for %@ couldn’t be downloaded.", bundle: .main)
+            return String(format: format, name)
         case .notPrepared:
-            return "The transcription engine wasn’t ready."
+            return String(localized: "The transcription engine wasn’t ready.", bundle: .main)
         case .engineUnavailable(let reason):
             return reason
         }

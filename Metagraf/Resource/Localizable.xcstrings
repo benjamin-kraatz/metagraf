@@ -2,250 +2,1715 @@
   "sourceLanguage" : "en",
   "strings" : {
     "·" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "·"
+          }
+        }
+      }
     },
     "· %lld GB RAM suggested" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· %lld GB RAM empfohlen"
+          }
+        }
+      }
+    },
+    "\"Exactly as spoken\" will not post-process the transcript. The other styles ask Apple Intelligence to rewrite the text on this device, and fall back to the cleaned-up version if it is unavailable or takes too long." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"Genau wie gesprochen\" verarbeitet das Transkript nicht nach. Die anderen Stile bitten Apple Intelligence, den Text auf diesem Gerät umzuschreiben, und fallen auf die bereinigte Version zurück, wenn sie nicht verfügbar ist oder zu lange braucht."
+          }
+        }
+      }
+    },
+    "%@ isn’t supported by this model." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ wird von diesem Modell nicht unterstützt."
+          }
+        }
+      }
+    },
+    "%lld wpm" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld W/min"
+          }
+        }
+      }
     },
     "^[%lld word](inflect: true)" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "^[%lld Wort](inflect: true)"
+          }
+        }
+      }
     },
     "0.1s" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0,1 s"
+          }
+        }
+      }
     },
     "1s" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 s"
+          }
+        }
+      }
     },
     "7 days" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "7 Tage"
+          }
+        }
+      }
     },
     "30 days" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 Tage"
+          }
+        }
+      }
     },
     "90 days" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "90 Tage"
+          }
+        }
+      }
+    },
+    "A good balance of accuracy and speed for everyday use." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein guter Kompromiss aus Genauigkeit und Geschwindigkeit für den Alltag."
+          }
+        }
+      }
+    },
+    "A noticeable step up from Tiny at a modest cost." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein spürbarer Schritt gegenüber Tiny bei moderatem Aufwand."
+          }
+        }
+      }
+    },
+    "Accessibility" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bedienungshilfen"
+          }
+        }
+      }
+    },
+    "Accuracy" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Genauigkeit"
+          }
+        }
+      }
     },
     "Add" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hinzufügen"
+          }
+        }
+      }
     },
     "Add a name or term Metagraf keeps getting wrong" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name oder Begriff, den Metagraf oft falsch versteht"
+          }
+        }
+      }
     },
     "Also heard as" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auch gehört als"
+          }
+        }
+      }
     },
     "Apple Intelligence" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence"
+          }
+        }
+      }
+    },
+    "Apple Intelligence is still downloading its model." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence lädt sein Modell noch herunter."
+          }
+        }
+      }
+    },
+    "Apple Intelligence is turned off in System Settings." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence ist in den Systemeinstellungen deaktiviert."
+          }
+        }
+      }
+    },
+    "Apple Intelligence isn’t available right now." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence ist gerade nicht verfügbar."
+          }
+        }
+      }
+    },
+    "Apple Intelligence isn’t available." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence ist nicht verfügbar."
+          }
+        }
+      }
+    },
+    "Apple Speech" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Speech"
+          }
+        }
+      }
     },
     "Available on this Mac" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf diesem Mac verfügbar"
+          }
+        }
+      }
+    },
+    "Average pace" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durchschnittstempo"
+          }
+        }
+      }
+    },
+    "Basic" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einfach"
+          }
+        }
+      }
+    },
+    "Best" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Am besten"
+          }
+        }
+      }
+    },
+    "Bottom left" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unten links"
+          }
+        }
+      }
+    },
+    "Bottom right" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unten rechts"
+          }
+        }
+      }
+    },
+    "Bottom, centred" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unten mittig"
+          }
+        }
+      }
+    },
+    "Built into macOS. Shows words as you speak and needs no download." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In macOS integriert. Zeigt Wörter während des Sprechens und benötigt keinen Download."
+          }
+        }
+      }
     },
     "Cancel" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
+          }
+        }
+      }
     },
     "Checking availability…" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verfügbarkeit wird geprüft …"
+          }
+        }
+      }
+    },
+    "Clean up" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereinigen"
+          }
+        }
+      }
     },
     "Clean up runs entirely on rules and never needs a model. The other styles ask Apple Intelligence to rewrite the text on this device, and fall back to the cleaned-up version if it is unavailable or takes too long." : {
-
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereinigen läuft vollständig regelbasiert und benötigt nie ein Modell. Die anderen Stile bitten Apple Intelligence, den Text auf diesem Gerät umzuschreiben, und fallen auf die bereinigte Version zurück, wenn sie nicht verfügbar ist oder zu lange braucht."
+          }
+        }
+      }
+    },
+    "Condense into terse notes rather than full sentences." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu knappen Notizen statt ganzen Sätzen verdichten."
+          }
+        }
+      }
     },
     "Continue anyway" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trotzdem fortfahren"
+          }
+        }
+      }
+    },
+    "Copied instead — a password field is capturing input." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stattdessen kopiert - ein Passwortfeld fängt die Eingabe ab."
+          }
+        }
+      }
+    },
+    "Copied instead — no text field is focused." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stattdessen kopiert - kein Textfeld ist fokussiert."
+          }
+        }
+      }
+    },
+    "Copied instead — the system refused a synthetic keystroke." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stattdessen kopiert - das System hat einen simulierten Tastendruck verweigert."
+          }
+        }
+      }
+    },
+    "Copies the transcript so you can paste it yourself." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopiert das Transkript, damit du es selbst einfügen kannst."
+          }
+        }
+      }
     },
     "Copy" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopieren"
+          }
+        }
+      }
     },
     "Copy again" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erneut kopieren"
+          }
+        }
+      }
+    },
+    "Copy only" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur kopieren"
+          }
+        }
+      }
     },
     "Dictate in" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diktieren auf"
+          }
+        }
+      }
     },
     "Dictation" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diktat"
+          }
+        }
+      }
     },
     "Dictation stays off until permissions are granted." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Diktat bleibt deaktiviert, bis die Berechtigungen erteilt sind."
+          }
+        }
+      }
     },
     "Dictation still works; only the transcript log could not be opened." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Diktat funktioniert weiterhin; nur das Transkriptprotokoll konnte nicht geöffnet werden."
+          }
+        }
+      }
+    },
+    "Dictations" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diktate"
+          }
+        }
+      }
+    },
+    "Direct insertion" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Direkt einfügen"
+          }
+        }
+      }
     },
     "Don’t keep any" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine behalten"
+          }
+        }
+      }
     },
     "Download" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laden"
+          }
+        }
+      }
     },
     "Downloaded models use %@." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geladene Modelle belegen %@."
+          }
+        }
+      }
+    },
+    "Drop “um” and “you know”, fix punctuation and capitalisation." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Füllwörter entfernen sowie Zeichensetzung und Groß-/Kleinschreibung korrigieren."
+          }
+        }
+      }
+    },
+    "Email" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-Mail"
+          }
+        }
+      }
+    },
+    "English only" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Englisch"
+          }
+        }
+      }
+    },
+    "English only, and more accurate than Small for it." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Englisch, dafür genauer als Small."
+          }
+        }
+      }
     },
     "Everything is transcribed on this Mac and nothing is uploaded. History is only for your own reference." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles wird auf diesem Mac transkribiert und nichts wird hochgeladen. Der Verlauf dient nur deiner eigenen Referenz."
+          }
+        }
+      }
+    },
+    "Exactly as spoken" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Genau wie gesprochen"
+          }
+        }
+      }
+    },
+    "Exactly as spoken will not post-process the transcript. The other styles ask Apple Intelligence to rewrite the text on this device, and fall back to the cleaned-up version if it is unavailable or takes too long." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Genau wie gesprochen verarbeitet das Transkript nicht nach. Die anderen Stile bitten Apple Intelligence, den Text auf diesem Gerät umzuschreiben, und fallen auf die bereinigte Version zurück, wenn sie nicht verfügbar ist oder zu lange braucht."
+          }
+        }
+      }
+    },
+    "Fastest and smallest. Fine for short, clear dictation." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Am schnellsten und kleinsten. Gut für kurze, klare Diktate."
+          }
+        }
+      }
     },
     "Follow system language" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Systemsprache verwenden"
+          }
+        }
+      }
     },
     "Forever" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für immer"
+          }
+        }
+      }
     },
     "Formatting" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formatierung"
+          }
+        }
+      }
     },
     "General" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allgemein"
+          }
+        }
+      }
+    },
+    "Getting ready…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird vorbereitet …"
+          }
+        }
+      }
+    },
+    "Globe (fn)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Globus (fn)"
+          }
+        }
+      }
+    },
+    "Good" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gut"
+          }
+        }
+      }
     },
     "Grant" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlauben"
+          }
+        }
+      }
     },
     "Granted" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erteilt"
+          }
+        }
+      }
+    },
+    "Great" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sehr gut"
+          }
+        }
+      }
     },
     "History" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlauf"
+          }
+        }
+      }
     },
     "History is unavailable" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlauf ist nicht verfügbar"
+          }
+        }
+      }
     },
     "Hold %@ anywhere on your Mac, say what you want written, and let go. Everything is transcribed on this device." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Halte %@ irgendwo auf deinem Mac gedrückt, sag, was geschrieben werden soll, und lass los. Alles wird auf diesem Gerät transkribiert."
+          }
+        }
+      }
     },
     "Hold %@ anywhere to dictate." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Halte %@ irgendwo gedrückt, um zu diktieren."
+          }
+        }
+      }
     },
     "Hold the dictation key anywhere and start talking." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Halte die Diktattaste irgendwo gedrückt und sprich los."
+          }
+        }
+      }
     },
     "Hold to dictate" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum Diktieren halten"
+          }
+        }
+      }
     },
     "Hotkey" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehl"
+          }
+        }
+      }
     },
     "Ignore holds shorter than" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Halten kürzer als ignorieren"
+          }
+        }
+      }
+    },
+    "Insert the transcript untouched." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transkript unverändert einfügen."
+          }
+        }
+      }
     },
     "Insert with" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einfügen mit"
+          }
+        }
+      }
+    },
+    "Inserting…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird eingefügt …"
+          }
+        }
+      }
+    },
+    "Keep it short and conversational." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurz und dialognah halten."
+          }
+        }
+      }
     },
     "Keep the pill visible when idle" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pill im Leerlauf sichtbar lassen"
+          }
+        }
+      }
     },
     "Keep transcripts for" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transkripte behalten für"
+          }
+        }
+      }
     },
     "Language" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sprache"
+          }
+        }
+      }
     },
     "Languages with a download badge are already on this Mac. Others are fetched the first time you use them. Currently dictating in %@." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sprachen mit Download-Symbol sind bereits auf diesem Mac. Andere werden beim ersten Verwenden geladen. Aktuell wird auf %@ diktiert."
+          }
+        }
+      }
     },
     "Last transcript" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letztes Transkript"
+          }
+        }
+      }
     },
     "Launch Metagraf at login" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metagraf beim Anmelden starten"
+          }
+        }
+      }
+    },
+    "Left ⌥" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linke ⌥"
+          }
+        }
+      }
+    },
+    "Listening" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hört zu"
+          }
+        }
+      }
+    },
+    "Listening…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hört zu …"
+          }
+        }
+      }
+    },
+    "Live text" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Live-Text"
+          }
+        }
+      }
     },
     "Looking up available languages…" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verfügbare Sprachen werden gesucht …"
+          }
+        }
+      }
+    },
+    "Message" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nachricht"
+          }
+        }
+      }
     },
     "Metagraf" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metagraf"
+          }
+        }
+      }
     },
     "Metagraf can't dictate until both are granted." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metagraf kann erst diktieren, wenn beide Berechtigungen erteilt sind."
+          }
+        }
+      }
     },
     "Metagraf lives in the menu bar and has no Dock icon." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metagraf befindet sich in der Menüleiste und hat kein Dock-Symbol."
+          }
+        }
+      }
+    },
+    "Metagraf needs Accessibility access to insert text." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metagraf benötigt Zugriff auf Bedienungshilfen, um Text einzufügen."
+          }
+        }
+      }
+    },
+    "Metagraf needs Accessibility access to see the dictation key." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metagraf benötigt Zugriff auf Bedienungshilfen, um die Diktattaste zu erkennen."
+          }
+        }
+      }
+    },
+    "Metagraf needs microphone access to hear you." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metagraf benötigt Mikrofonzugriff, um dich zu hören."
+          }
+        }
+      }
+    },
+    "Microphone" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mikrofon"
+          }
+        }
+      }
     },
     "Models" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelle"
+          }
+        }
+      }
+    },
+    "Needs setup" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einrichtung nötig"
+          }
+        }
+      }
     },
     "No statistics yet" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine Statistiken"
+          }
+        }
+      }
+    },
+    "No text model is configured." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es ist kein Textmodell konfiguriert."
+          }
+        }
+      }
+    },
+    "Notes" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notizen"
+          }
+        }
+      }
     },
     "Nothing dictated yet" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch nichts diktiert"
+          }
+        }
+      }
     },
     "Open Metagraf" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metagraf öffnen"
+          }
+        }
+      }
     },
     "Open System Settings" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Systemeinstellungen öffnen"
+          }
+        }
+      }
+    },
+    "Paste" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einfügen"
+          }
+        }
+      }
+    },
+    "Pastes into the focused app and restores your clipboard afterwards." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fügt in die fokussierte App ein und stellt danach deine Zwischenablage wieder her."
+          }
+        }
+      }
     },
     "Permissions" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berechtigungen"
+          }
+        }
+      }
     },
     "Play a cue when dictation starts and ends" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hinweiston beim Starten und Beenden des Diktats abspielen"
+          }
+        }
+      }
     },
     "Position" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position"
+          }
+        }
+      }
     },
     "Privacy" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenschutz"
+          }
+        }
+      }
     },
     "Quit Metagraf" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metagraf beenden"
+          }
+        }
+      }
+    },
+    "Ready" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereit"
+          }
+        }
+      }
     },
     "Remove" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entfernen"
+          }
+        }
+      }
+    },
+    "Right ⇧" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechte ⇧"
+          }
+        }
+      }
+    },
+    "Right ⌃" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechte ⌃"
+          }
+        }
+      }
+    },
+    "Right ⌘" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechte ⌘"
+          }
+        }
+      }
+    },
+    "Right ⌥" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechte ⌥"
+          }
+        }
+      }
     },
     "Search transcripts" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transkripte suchen"
+          }
+        }
+      }
     },
     "Settings…" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen …"
+          }
+        }
+      }
     },
     "Setup isn’t finished" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einrichtung ist noch nicht abgeschlossen"
+          }
+        }
+      }
+    },
+    "So Metagraf can hear you while you hold the dictation key." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Damit Metagraf dich hören kann, während du die Diktattaste gedrückt hältst."
+          }
+        }
+      }
+    },
+    "So Metagraf can notice the dictation key in other apps, and paste what you said." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Damit Metagraf die Diktattaste in anderen Apps erkennen und das Gesagte einfügen kann."
+          }
+        }
+      }
     },
     "Sound" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ton"
+          }
+        }
+      }
+    },
+    "Speed" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tempo"
+          }
+        }
+      }
     },
     "Start dictating" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diktieren starten"
+          }
+        }
+      }
     },
     "Statistics" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statistiken"
+          }
+        }
+      }
     },
     "Style" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stil"
+          }
+        }
+      }
     },
     "Tap twice quickly to keep dictation running hands-free; press once more to finish. Escape cancels." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippe zweimal schnell, damit das Diktat freihändig weiterläuft; drücke einmal mehr zum Beenden. Escape bricht ab."
+          }
+        }
+      }
     },
     "Term" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Begriff"
+          }
+        }
+      }
+    },
+    "The %@ model could not be loaded." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Modell %@ konnte nicht geladen werden."
+          }
+        }
+      }
+    },
+    "The %@ model isn’t downloaded yet." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Modell %@ wurde noch nicht geladen."
+          }
+        }
+      }
+    },
+    "The most accurate option, and quick on Apple silicon." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die genaueste Option und schnell auf Apple Silicon."
+          }
+        }
+      }
     },
     "The pill" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Pill"
+          }
+        }
+      }
     },
     "The pill floats above every app and ignores clicks, so it never gets in the way of what is underneath it." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Pill schwebt über jeder App und ignoriert Klicks, damit sie nie im Weg ist."
+          }
+        }
+      }
+    },
+    "The selected input device produced an unusable audio format." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ausgewählte Eingabegerät hat ein unbrauchbares Audioformat geliefert."
+          }
+        }
+      }
+    },
+    "The speech model for %@ couldn’t be downloaded." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Sprachmodell für %@ konnte nicht geladen werden."
+          }
+        }
+      }
+    },
+    "The system refused to install a keyboard event tap." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das System hat die Installation eines Tastatur-Event-Taps verweigert."
+          }
+        }
+      }
+    },
+    "The transcription engine wasn’t ready." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Transkriptionsengine war nicht bereit."
+          }
+        }
+      }
     },
     "These words are fed to the speech model so it favours them over similar-sounding ones." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Wörter werden an das Sprachmodell übergeben, damit es sie ähnlich klingenden Wörtern vorzieht."
+          }
+        }
+      }
     },
     "They appear once you have dictated something." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie erscheinen, sobald du etwas diktiert hast."
+          }
+        }
+      }
+    },
+    "This Mac doesn’t support Apple Intelligence." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Mac unterstützt Apple Intelligence nicht."
+          }
+        }
+      }
+    },
+    "Tidy up and lay the text out as an email." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aufräumen und als E-Mail formatieren."
+          }
+        }
+      }
+    },
+    "Tidying up…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird aufgeräumt …"
+          }
+        }
+      }
+    },
+    "Time saved vs. typing" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeitersparnis gegenüber Tippen"
+          }
+        }
+      }
+    },
+    "Top, centred" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oben mittig"
+          }
+        }
+      }
+    },
+    "Transcribing…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird transkribiert …"
+          }
+        }
+      }
     },
     "Useful because the dictation key has no visible press of its own." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nützlich, weil die Diktattaste selbst keinen sichtbaren Tastendruck hat."
+          }
+        }
+      }
     },
     "Vocabulary" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vokabular"
+          }
+        }
+      }
     },
     "Welcome to Metagraf" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Willkommen bei Metagraf"
+          }
+        }
+      }
     },
     "Where text goes" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziel für Text"
+          }
+        }
+      }
+    },
+    "Whisper Base" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whisper Base"
+          }
+        }
+      }
+    },
+    "Whisper Large v3 Turbo" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whisper Large v3 Turbo"
+          }
+        }
+      }
+    },
+    "Whisper Small" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whisper Small"
+          }
+        }
+      }
+    },
+    "Whisper Small (English)" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whisper Small (Englisch)"
+          }
+        }
+      }
+    },
+    "Whisper Tiny" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whisper Tiny"
+          }
+        }
+      }
+    },
+    "Words" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wörter"
+          }
+        }
+      }
     },
     "Write it as" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schreiben als"
+          }
+        }
+      }
+    },
+    "Writes into the text field without touching the clipboard. Not every app supports it." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schreibt in das Textfeld, ohne die Zwischenablage zu verändern. Nicht jede App unterstützt das."
+          }
+        }
+      }
     },
     "You're all set" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles bereit"
+          }
+        }
+      }
     }
   },
   "version" : "1.3"

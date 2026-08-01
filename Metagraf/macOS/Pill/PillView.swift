@@ -30,7 +30,7 @@ struct PillView: View {
         .padding(.vertical, 9)
         .frame(minWidth: 78)
         .fixedSize()
-        .glassEffect(.regular.tint(tint), in: .capsule)
+        .glassEffect(.clear, in: .capsule)
         // Only phase changes animate. Animating on `liveText` re-ran a 0.3s
         // geometry animation over the whole pill for every recognized token,
         // which visibly stalled the meter's own much faster animation.
@@ -142,7 +142,7 @@ struct PillView: View {
         }
     }
 
-    private func label(_ text: String) -> some View {
+    private func label(_ text: LocalizedStringKey) -> some View {
         Text(text)
             .font(.system(size: 12))
             .foregroundStyle(.secondary)

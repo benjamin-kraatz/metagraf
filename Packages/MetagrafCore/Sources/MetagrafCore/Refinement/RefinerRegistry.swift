@@ -52,6 +52,6 @@ public struct RefinerRegistry: Sendable {
             case .unavailable(let reason): return reason
             }
         }
-        return "No text model is configured."
+        return String(localized: "No text model is configured.", bundle: .main)
     }
 }

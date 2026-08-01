@@ -67,7 +67,7 @@ private struct ModelRow: View {
                     }
                 }
 
-                Text(model.summary)
+                Text(LocalizedStringKey(model.summary))
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -143,7 +143,7 @@ private struct ModelRow: View {
 }
 
 private struct Tag: View {
-    let text: String
+    let text: LocalizedStringKey
 
     var body: some View {
         Text(text)
@@ -155,7 +155,7 @@ private struct Tag: View {
 }
 
 private struct Metric: View {
-    let label: String
+    let label: LocalizedStringKey
     let tier: ModelDescriptor.Tier
 
     var body: some View {
@@ -163,7 +163,7 @@ private struct Metric: View {
             Text(label)
                 .font(.caption)
                 .foregroundStyle(.secondary)
-            Text(tier.label)
+            Text(LocalizedStringKey(tier.label))
                 .font(.caption.weight(.medium))
         }
     }

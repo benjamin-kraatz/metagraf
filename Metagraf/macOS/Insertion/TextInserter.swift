@@ -17,13 +17,13 @@ final class TextInserter {
         var errorDescription: String? {
             switch self {
             case .secureInputActive:
-                "Copied instead — a password field is capturing input."
+                String(localized: "Copied instead — a password field is capturing input.")
             case .noFocusedTextField:
-                "Copied instead — no text field is focused."
+                String(localized: "Copied instead — no text field is focused.")
             case .notTrusted:
-                "Metagraf needs Accessibility access to insert text."
+                String(localized: "Metagraf needs Accessibility access to insert text.")
             case .eventCreationFailed:
-                "Copied instead — the system refused a synthetic keystroke."
+                String(localized: "Copied instead — the system refused a synthetic keystroke.")
             }
         }
     }
