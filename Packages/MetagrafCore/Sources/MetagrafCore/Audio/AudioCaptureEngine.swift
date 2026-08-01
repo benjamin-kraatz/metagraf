@@ -64,12 +64,16 @@ public final class AudioCaptureEngine {
             throw CaptureError.unsupportedFormat
         }
 
-        var converter: BufferConverter?
+        // Bound as a `let` so the tap closure captures it by value; capturing a
+        // `var` across the concurrency boundary would be a race.
+        let converter: BufferConverter?
         if let target, target != inputFormat {
             guard let made = BufferConverter(from: inputFormat, to: target) else {
                 throw CaptureError.unsupportedFormat
             }
             converter = made
+        } else {
+            converter = nil
         }
 
         let (stream, continuation) = AsyncStream<CapturedAudio>.makeStream(bufferingPolicy: .unbounded)
@@ -77,8 +81,14 @@ public final class AudioCaptureEngine {
 
         // Everything the tap touches is captured by value here: the closure runs
         // on a realtime audio thread and must not reach back into this actor.
+        //
+        // `@Sendable` is load-bearing. `AVAudioNodeTapBlock` is an Objective-C
+        // block with no sendability annotation, so inside this `@MainActor`
+        // type Swift would otherwise infer the closure as main-actor-isolated
+        // and emit an isolation check — which traps the moment AVAudioEngine
+        // invokes it from its realtime thread.
         let levelSink = levelContinuation
-        input.installTap(onBus: 0, bufferSize: 4096, format: inputFormat) { buffer, _ in
+        input.installTap(onBus: 0, bufferSize: 4096, format: inputFormat) { @Sendable buffer, _ in
             levelSink.yield(AudioLevel.normalized(from: buffer))
 
             if let converter {

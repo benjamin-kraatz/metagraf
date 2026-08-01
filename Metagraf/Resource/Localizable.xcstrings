@@ -1,7 +1,43 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Get started!" : {
+    "Copy" : {
+
+    },
+    "Dictation" : {
+
+    },
+    "General" : {
+
+    },
+    "General settings arrive in M3." : {
+
+    },
+    "History" : {
+
+    },
+    "Hold %@ anywhere to dictate." : {
+
+    },
+    "Hold the dictation hotkey anywhere to start talking." : {
+
+    },
+    "Hotkey and audio settings arrive in M3." : {
+
+    },
+    "Last transcript" : {
+
+    },
+    "Metagraf" : {
+
+    },
+    "Models" : {
+
+    },
+    "Statistics" : {
+
+    },
+    "Vocabulary" : {
 
     }
   },

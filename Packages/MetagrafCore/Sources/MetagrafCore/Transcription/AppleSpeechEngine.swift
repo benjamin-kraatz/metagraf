@@ -57,7 +57,7 @@ public actor AppleSpeechEngine: TranscriptionEngine {
             analysisContext: context
         )
 
-        let format = await transcriber.availableCompatibleAudioFormats.first
+        let format = Self.bestFormat(from: await transcriber.availableCompatibleAudioFormats)
         try await analyzer.prepareToAnalyze(in: format)
 
         let (updates, updateContinuation) = AsyncThrowingStream<TranscriptionUpdate, any Error>.makeStream()
@@ -85,7 +85,21 @@ public actor AppleSpeechEngine: TranscriptionEngine {
             }
         }
 
-        logger.debug("Prepared for \(locale.identifier, privacy: .public)")
+        logger.debug(
+            """
+            Prepared for \(locale.identifier, privacy: .public) \
+            at \(format?.sampleRate ?? 0, privacy: .public) Hz
+            """
+        )
+    }
+
+    /// Picks the highest-fidelity format the transcriber will accept.
+    ///
+    /// The list is not ordered by quality: its first entry can be 8 kHz
+    /// telephone-grade audio, which throws away most of the frequency range
+    /// speech recognition relies on.
+    private static func bestFormat(from formats: [AVAudioFormat]) -> AVAudioFormat? {
+        formats.max { $0.sampleRate < $1.sampleRate }
     }
 
     public func updates() -> AsyncThrowingStream<TranscriptionUpdate, any Error> {
