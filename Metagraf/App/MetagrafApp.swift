@@ -20,20 +20,7 @@ struct MetagrafApp: App {
         .menuBarExtraStyle(.window)
 
         Window("Metagraf", id: MetagrafWindow.main.rawValue) {
-            // The delegate's container, not a fresh one: `modelContainer(for:)`
-            // would build a second store and the window would show a
-            // permanently empty history.
-            if let history = appDelegate.history {
-                MainWindow()
-                    .modelContainer(history.container)
-            } else {
-                ContentUnavailableView(
-                    "History is unavailable",
-                    systemImage: "exclamationmark.triangle",
-                    description: Text("Dictation still works; only the transcript log could not be opened.")
-                )
-                .frame(minWidth: 420, minHeight: 260)
-            }
+            MainWindowContent()
         }
         .defaultSize(width: 900, height: 600)
 
@@ -80,6 +67,28 @@ struct MetagrafApp: App {
     }
     #endif
 }
+
+#if os(macOS)
+private struct MainWindowContent: View {
+    @EnvironmentObject private var appDelegate: AppDelegate
+
+    var body: some View {
+        // Use the delegate's container, not a fresh one: `modelContainer(for:)`
+        // would build a second store and show a permanently empty history.
+        if let history = appDelegate.history {
+            MainWindow()
+                .modelContainer(history.container)
+        } else {
+            ContentUnavailableView(
+                "History is unavailable",
+                systemImage: "exclamationmark.triangle",
+                description: Text("Dictation still works; only the transcript log could not be opened.")
+            )
+            .frame(minWidth: 420, minHeight: 260)
+        }
+    }
+}
+#endif
 
 /// Identifiers for the app's windows, so `openWindow` calls stay typo-proof.
 enum MetagrafWindow: String {
