@@ -15,7 +15,7 @@ Complete this checklist before pushing the first release tag.
 1. In **Users and Access → Integrations → App Store Connect API**, create a team key for release automation with the Developer role.
 2. Download the `.p8` once and back it up in the team password manager.
 3. Record its issuer ID and key ID.
-4. Add GitHub encrypted secrets:
+4. Add encrypted secrets to the GitHub `Release` environment:
    - `ASC_ISSUER_ID`
    - `ASC_KEY_ID`
    - `ASC_PRIVATE_KEY` containing the full PEM `.p8` text
@@ -64,15 +64,16 @@ The checked-in `ci_pre_xcodebuild.sh` validates the tag and sets only the SemVer
 
 ## GitHub repository
 
+- [ ] Create a GitHub environment named exactly `Release`. Add `ASC_ISSUER_ID`, `ASC_KEY_ID`, and `ASC_PRIVATE_KEY` as its environment secrets. The orchestrator job selects this environment so those secrets are available.
 - [ ] Under **Settings → Pages**, select **GitHub Actions** as the deployment source.
 - [ ] Under **Settings → Actions → General**, allow GitHub Actions to create and update Releases.
-- [ ] Add repository variables:
+- [ ] Add repository variables (recommended for these non-sensitive values):
   - `XCODE_CLOUD_WORKFLOW_ID`: opaque ID of **Mac Release**.
   - `XCODE_CLOUD_PRODUCT_ID`: opaque Xcode Cloud product ID.
   - `APP_STORE_CONNECT_APP_ID`: numeric App Store Connect app ID.
   - `REPOSITORY_IDENTITY`: exactly `benjamin-kraatz/metagraf`.
   - `APPCAST_URL`: exactly `https://benjamin-kraatz.github.io/metagraf/appcast.xml`.
-- [ ] Add encrypted secrets `ASC_ISSUER_ID`, `ASC_KEY_ID`, `ASC_PRIVATE_KEY`, and `SPARKLE_PRIVATE_KEY`.
+- [ ] Add `SPARKLE_PRIVATE_KEY` as a repository secret. The workflow also accepts the five non-sensitive settings above as repository secrets for compatibility, but do not define the same setting as both a variable and a secret.
 - [ ] Ensure the `github-pages` environment permits the release workflow to deploy without a manual approval, because releases publish automatically.
 - [ ] Keep workflow permissions at `contents: write`, `pages: write`, `id-token: write`, and `actions: read`.
 - [ ] Protect `main` with the normal macOS CI check before enabling production releases.
