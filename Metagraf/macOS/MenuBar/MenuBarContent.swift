@@ -27,8 +27,7 @@ struct MenuBarContent: View {
 
             VStack(alignment: .leading, spacing: 1) {
                 menuButton("Open Metagraf") {
-                    openWindow(id: MetagrafWindow.main.rawValue)
-                    NSApp.activate(ignoringOtherApps: true)
+                    openMainWindow()
                 }
                 menuButton("Settings…") {
                     openSettings()
@@ -120,6 +119,23 @@ struct MenuBarContent: View {
         case .refining: Text("Tidying up…")
         case .inserting: Text("Inserting…")
         case .failed(let message): Text(message)
+        }
+    }
+
+    private func openMainWindow() {
+        openWindow(id: MetagrafWindow.main.rawValue)
+
+        // SwiftUI creates or reveals the window asynchronously. Wait for that
+        // work before making it key; activating the accessory app alone can
+        // leave the menu-bar popover as the focused window.
+        Task { @MainActor in
+            await Task.yield()
+            guard let window = NSApp.windows.first(where: {
+                $0.identifier?.rawValue == MetagrafWindow.main.rawValue
+            }) else { return }
+
+            window.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
         }
     }
 

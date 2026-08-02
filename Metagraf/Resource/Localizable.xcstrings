@@ -299,6 +299,16 @@
         }
       }
     },
+    "Average words per dictation" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ø Wörter pro Diktat"
+          }
+        }
+      }
+    },
     "Basic" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -320,6 +330,9 @@
           }
         }
       }
+    },
+    "Beta builds may be less stable. Stable releases are always offered." : {
+
     },
     "Bottom left" : {
       "extractionState" : "stale",
@@ -374,6 +387,9 @@
           }
         }
       }
+    },
+    "Check for Updates…" : {
+
     },
     "Checking availability…" : {
       "localizations" : {
@@ -1172,6 +1188,16 @@
         }
       }
     },
+    "Most-used app" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meistgenutzte App"
+          }
+        }
+      }
+    },
     "Needs setup" : {
       "localizations" : {
         "de" : {
@@ -1438,6 +1464,9 @@
           }
         }
       }
+    },
+    "Receive beta updates" : {
+
     },
     "Remove" : {
       "localizations" : {
@@ -1881,6 +1910,9 @@
           }
         }
       }
+    },
+    "Updates" : {
+
     },
     "Use clear, natural wording that fits a broad range of contexts." : {
       "extractionState" : "stale",

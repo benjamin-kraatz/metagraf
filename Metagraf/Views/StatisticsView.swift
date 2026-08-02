@@ -24,6 +24,25 @@ struct StatisticsView: View {
         return Int((Double(totalWords) / totalSeconds) * 60)
     }
 
+    private var averageWordsPerDictation: Double {
+        Double(totalWords) / Double(transcripts.count)
+    }
+
+    private var mostUsedApp: String {
+        let counts = transcripts.reduce(into: [String: Int]()) { counts, transcript in
+            guard let appName = transcript.appName, !appName.isEmpty else { return }
+            counts[appName, default: 0] += 1
+        }
+
+        return counts.sorted {
+            if $0.value != $1.value {
+                return $0.value > $1.value
+            }
+            return $0.key.localizedStandardCompare($1.key) == .orderedAscending
+        }
+        .first?.key ?? "—"
+    }
+
     /// How much longer typing those words would plausibly have taken.
     private var secondsSaved: Double {
         max(0, (Double(totalWords) / Self.typingWordsPerMinute) * 60 - totalSeconds)
@@ -45,6 +64,13 @@ struct StatisticsView: View {
                     ) {
                         StatTile(title: "Dictations", value: transcripts.count.formatted())
                         StatTile(title: "Words", value: totalWords.formatted())
+                        StatTile(title: "Most-used app", value: mostUsedApp)
+                        StatTile(
+                            title: "Average words per dictation",
+                            value: averageWordsPerDictation.formatted(
+                                .number.precision(.fractionLength(1))
+                            )
+                        )
                         StatTile(title: "Average pace", value: String(localized: "\(averageWordsPerMinute) wpm"))
                         StatTile(
                             title: "Time saved vs. typing",
