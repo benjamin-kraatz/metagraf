@@ -105,6 +105,11 @@ public final class SettingsStore {
         didSet { write(launchAtLogin, .launchAtLogin) }
     }
 
+    /// Whether Sparkle may offer prerelease builds in addition to stable ones.
+    public var receivesBetaUpdates: Bool {
+        didSet { write(receivesBetaUpdates, .receivesBetaUpdates) }
+    }
+
     // MARK: - History
 
     /// How long transcripts are kept. Zero means nothing is ever written down.
@@ -142,6 +147,7 @@ public final class SettingsStore {
             .flatMap(PillPlacement.init(rawValue:)) ?? .bottomCenter
         playsSounds = defaults.object(forKey: Key.playsSounds.rawValue) as? Bool ?? true
         launchAtLogin = defaults.object(forKey: Key.launchAtLogin.rawValue) as? Bool ?? false
+        receivesBetaUpdates = defaults.object(forKey: Key.receivesBetaUpdates.rawValue) as? Bool ?? false
         retentionDays = defaults.object(forKey: Key.retentionDays.rawValue) as? Int ?? 30
 
         vocabulary = Self.readJSON([VocabularyEntry].self, .vocabulary, from: defaults) ?? []
@@ -187,6 +193,7 @@ public final class SettingsStore {
         case pillPlacement = "appearance.pillPlacement"
         case playsSounds = "appearance.playsSounds"
         case launchAtLogin = "general.launchAtLogin"
+        case receivesBetaUpdates = "updates.receivesBeta"
         case retentionDays = "history.retentionDays"
         case vocabulary = "vocabulary.entries"
         case appRules = "rules.apps"

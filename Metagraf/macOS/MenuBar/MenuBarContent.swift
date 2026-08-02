@@ -6,6 +6,7 @@ import SwiftUI
 struct MenuBarContent: View {
     let session: DictationSession
     let permissions: PermissionsCoordinator
+    let updates: UpdateController
 
     @Environment(\.openWindow) private var openWindow
     @Environment(\.openSettings) private var openSettings
@@ -26,12 +27,14 @@ struct MenuBarContent: View {
 
             VStack(alignment: .leading, spacing: 1) {
                 menuButton("Open Metagraf") {
-                    openWindow(id: MetagrafWindow.main.rawValue)
-                    NSApp.activate(ignoringOtherApps: true)
+                    openMainWindow()
                 }
                 menuButton("Settings…") {
                     openSettings()
                     NSApp.activate(ignoringOtherApps: true)
+                }
+                menuButton("Check for Updates…") {
+                    updates.checkForUpdates()
                 }
 
                 Divider()
@@ -119,6 +122,23 @@ struct MenuBarContent: View {
         }
     }
 
+    private func openMainWindow() {
+        openWindow(id: MetagrafWindow.main.rawValue)
+
+        // SwiftUI creates or reveals the window asynchronously. Wait for that
+        // work before making it key; activating the accessory app alone can
+        // leave the menu-bar popover as the focused window.
+        Task { @MainActor in
+            await Task.yield()
+            guard let window = NSApp.windows.first(where: {
+                $0.identifier?.rawValue == MetagrafWindow.main.rawValue
+            }) else { return }
+
+            window.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+        }
+    }
+
     private func menuButton(
         _ title: LocalizedStringKey,
         action: @escaping () -> Void
@@ -159,6 +179,10 @@ private struct MenuItemButtonStyle: ButtonStyle {
 }
 
 #Preview {
-    MenuBarContent(session: DictationSession(), permissions: PermissionsCoordinator())
+    MenuBarContent(
+        session: DictationSession(),
+        permissions: PermissionsCoordinator(),
+        updates: UpdateController()
+    )
 }
 #endif

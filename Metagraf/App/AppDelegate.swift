@@ -1,5 +1,6 @@
 #if os(macOS)
 import AppKit
+import Combine
 import Darwin
 import MetagrafCore
 import MetagrafWhisper
@@ -8,12 +9,13 @@ import OSLog
 /// Wires the always-running parts of the app: the hotkey tap, the pill, and the
 /// dictation session they both talk to.
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     let session = DictationSession()
     let permissions = PermissionsCoordinator()
     let settings = SettingsStore.shared
     let models = ModelStore()
-    private(set) var history: HistoryStore?
+    let updates = UpdateController()
+    @Published private(set) var history: HistoryStore?
 
     private let logger = Logger(subsystem: Metagraf.bundleIdentifier, category: "App")
     private let hotKeys = HotKeyMonitor()

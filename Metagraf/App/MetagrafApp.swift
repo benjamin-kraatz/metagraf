@@ -9,27 +9,18 @@ struct MetagrafApp: App {
 
     var body: some Scene {
         MenuBarExtra {
-            MenuBarContent(session: appDelegate.session, permissions: appDelegate.permissions)
+            MenuBarContent(
+                session: appDelegate.session,
+                permissions: appDelegate.permissions,
+                updates: appDelegate.updates
+            )
         } label: {
             MenuBarIcon(session: appDelegate.session, permissions: appDelegate.permissions)
         }
         .menuBarExtraStyle(.window)
 
         Window("Metagraf", id: MetagrafWindow.main.rawValue) {
-            // The delegate's container, not a fresh one: `modelContainer(for:)`
-            // would build a second store and the window would show a
-            // permanently empty history.
-            if let history = appDelegate.history {
-                MainWindow()
-                    .modelContainer(history.container)
-            } else {
-                ContentUnavailableView(
-                    "History is unavailable",
-                    systemImage: "exclamationmark.triangle",
-                    description: Text("Dictation still works; only the transcript log could not be opened.")
-                )
-                .frame(minWidth: 420, minHeight: 260)
-            }
+            MainWindowContent()
         }
         .defaultSize(width: 900, height: 600)
 
@@ -49,7 +40,8 @@ struct MetagrafApp: App {
             SettingsView(
                 settings: appDelegate.settings,
                 permissions: appDelegate.permissions,
-                models: appDelegate.models
+                models: appDelegate.models,
+                updates: appDelegate.updates
             )
             // Preferences are applied on close rather than on every keystroke,
             // so a half-typed value never takes effect.
@@ -75,6 +67,28 @@ struct MetagrafApp: App {
     }
     #endif
 }
+
+#if os(macOS)
+private struct MainWindowContent: View {
+    @EnvironmentObject private var appDelegate: AppDelegate
+
+    var body: some View {
+        // Use the delegate's container, not a fresh one: `modelContainer(for:)`
+        // would build a second store and show a permanently empty history.
+        if let history = appDelegate.history {
+            MainWindow()
+                .modelContainer(history.container)
+        } else {
+            ContentUnavailableView(
+                "History is unavailable",
+                systemImage: "exclamationmark.triangle",
+                description: Text("Dictation still works; only the transcript log could not be opened.")
+            )
+            .frame(minWidth: 420, minHeight: 260)
+        }
+    }
+}
+#endif
 
 /// Identifiers for the app's windows, so `openWindow` calls stay typo-proof.
 enum MetagrafWindow: String {
