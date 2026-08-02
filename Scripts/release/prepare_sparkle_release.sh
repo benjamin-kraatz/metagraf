@@ -21,6 +21,7 @@ history_dir="$work_dir/history"
 
 tag="$(jq -r '.tag' "$manifest")"
 version="$(jq -r '.version' "$manifest")"
+bundle_version="${version%%-beta.*}"
 expected_build="$(jq -r '.build' "$manifest")"
 artifact_file="$(jq -r '.artifactFile' "$manifest")"
 archive="$input_dir/$artifact_file"
@@ -49,7 +50,7 @@ assert_plist() {
 }
 
 assert_plist CFBundleIdentifier de.dzwei.apps.metagraf
-assert_plist CFBundleShortVersionString "$version"
+assert_plist CFBundleShortVersionString "$bundle_version"
 assert_plist CFBundleVersion "$expected_build"
 assert_plist SUFeedURL "$APPCAST_URL"
 assert_plist SURequireSignedFeed true

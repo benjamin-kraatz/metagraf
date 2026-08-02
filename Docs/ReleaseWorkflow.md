@@ -31,7 +31,7 @@ The workflow caches the pinned Python package download on Ubuntu and SwiftPM che
 - Beta: `v1.2.3-beta.1`
 - Other tag formats fail before release creation.
 - The tag must point to a commit contained in `main`.
-- `CFBundleShortVersionString` is the tag without `v`.
+- `CFBundleShortVersionString` is the three-part numeric release version. Stable `v1.2.3` and beta `v1.2.3-beta.1` both use `1.2.3`; the beta suffix is represented by the Sparkle channel and release tag.
 - `CFBundleVersion` is assigned and incremented exclusively by Xcode Cloud. The pipeline reads and validates it but never changes it.
 - Stable clients see unchannelled entries. Beta clients see both stable and `beta` entries.
 
@@ -39,7 +39,7 @@ Every generated appcast retains the new release, the previous four stable releas
 
 ## Creating and monitoring a release
 
-1. Ensure `main` has passed CI and the desired commit is pushed.
+1. Set `MARKETING_VERSION` in the Xcode project to the release's three-part numeric version, then ensure `main` has passed CI and the desired commit is pushed.
 2. Create and push an annotated tag, for example `git tag -a v0.7.0 -m "Metagraf 0.7.0"` followed by `git push origin v0.7.0`.
 3. Watch both **Xcode Cloud → Mac Release** and **GitHub Actions → Release Metagraf**.
 4. GitHub first creates a draft Release. It becomes public only after notarization, signature, archive, and upload checks pass.
