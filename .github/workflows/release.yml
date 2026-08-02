@@ -237,10 +237,6 @@ jobs:
           grep -Fxq "$ZIP_FILE" <<<"$assets"
           grep -Fxq "$CHECKSUM_FILE" <<<"$assets"
           grep -Fxq appcast.xml <<<"$assets"
-          expected_url="https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/$ZIP_FILE"
-          actual_url="$(gh release view "$GITHUB_REF_NAME" --json assets \
-            --jq ".assets[] | select(.name == \"$ZIP_FILE\") | .url")"
-          [[ "$actual_url" == "$expected_url" ]]
 
       - name: Publish GitHub Release
         env:
@@ -250,6 +246,15 @@ jobs:
           [[ "$prerelease" == "beta" ]] && prerelease=true || prerelease=false
           gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" \
             -F draft=false -F prerelease="$prerelease" >/dev/null
+
+      - name: Verify published asset URL
+        env:
+          ZIP_FILE: ${{ steps.manifest.outputs.zip }}
+        run: |
+          expected_url="https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/$ZIP_FILE"
+          actual_url="$(gh release view "$GITHUB_REF_NAME" --json assets \
+            --jq ".assets[] | select(.name == \"$ZIP_FILE\") | .url")"
+          [[ "$actual_url" == "$expected_url" ]]
 
       - name: Prepare Pages artifact
         run: |
