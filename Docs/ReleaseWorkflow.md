@@ -30,7 +30,7 @@ Only the macOS job may create or modify `appcast.xml`. The final Ubuntu job veri
 - Other tag formats fail before release creation.
 - The tag must point to a commit contained in `main`.
 - `CFBundleShortVersionString` is the tag without `v`.
-- `CFBundleVersion` is Xcode Cloud’s increasing `CI_BUILD_NUMBER`.
+- `CFBundleVersion` is assigned and incremented exclusively by Xcode Cloud. The pipeline reads and validates it but never changes it.
 - Stable clients see unchannelled entries. Beta clients see both stable and `beta` entries.
 
 Every generated appcast retains the new release, the previous four stable releases, and the previous two beta releases. It contains at most seven full ZIP updates and no deltas.

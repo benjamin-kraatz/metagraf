@@ -12,11 +12,11 @@ if [[ ! "$CI_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-beta\.[0-9]+)?$ ]]; then
     exit 1
 fi
 
-: "${CI_BUILD_NUMBER:?CI_BUILD_NUMBER is required for release builds}"
 : "${CI_PRIMARY_REPOSITORY_PATH:?CI_PRIMARY_REPOSITORY_PATH is required}"
 : "${SPARKLE_PUBLIC_ED_KEY:?SPARKLE_PUBLIC_ED_KEY must be configured in Xcode Cloud}"
 
 version="${CI_TAG#v}"
 cd "$CI_PRIMARY_REPOSITORY_PATH"
+# The release tag owns only the user-facing version. Xcode Cloud exclusively
+# owns and injects CFBundleVersion.
 xcrun agvtool new-marketing-version "$version"
-xcrun agvtool new-version -all "$CI_BUILD_NUMBER"
