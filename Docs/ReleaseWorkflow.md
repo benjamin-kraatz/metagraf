@@ -39,7 +39,7 @@ Every generated appcast retains the new release, the previous four stable releas
 
 ## Creating and monitoring a release
 
-1. Set `MARKETING_VERSION` in the Xcode project to the release's three-part numeric version, then ensure `main` has passed CI and the desired commit is pushed.
+1. Ensure `main` has passed CI and the desired commit is pushed.
 2. Create and push an annotated tag, for example `git tag -a v0.7.0 -m "Metagraf 0.7.0"` followed by `git push origin v0.7.0`.
 3. Watch both **Xcode Cloud → Mac Release** and **GitHub Actions → Release Metagraf**.
 4. GitHub first creates a draft Release. It becomes public only after notarization, signature, archive, and upload checks pass.

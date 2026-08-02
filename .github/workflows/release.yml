@@ -55,16 +55,6 @@ jobs:
           git fetch origin main
           python3 Scripts/release/release_tools.py validate-ancestry "$GITHUB_SHA" origin/main
           metadata="$(python3 Scripts/release/release_tools.py validate-tag "$GITHUB_REF_NAME")"
-          bundle_version="$(jq -r .version <<<"$metadata")"
-          bundle_version="${bundle_version%%-beta.*}"
-          configured_versions="$(
-            sed -nE 's/^[[:space:]]*MARKETING_VERSION = ([^;]+);/\1/p' Metagraf.xcodeproj/project.pbxproj |
-              sort -u
-          )"
-          [[ "$configured_versions" == "$bundle_version" ]] || {
-            echo "error: set MARKETING_VERSION to $bundle_version in the Xcode project before tagging" >&2
-            exit 1
-          }
           echo "version=$(jq -r .version <<<"$metadata")" >> "$GITHUB_OUTPUT"
           echo "channel=$(jq -r .channel <<<"$metadata")" >> "$GITHUB_OUTPUT"
           echo "prerelease=$(jq -r .prerelease <<<"$metadata")" >> "$GITHUB_OUTPUT"

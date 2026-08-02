@@ -60,7 +60,7 @@ Losing the Sparkle key complicates feed signing and key rotation. Keep at least 
 
 The App Store Connect API cannot choose a tag when starting a build. For that reason, **Tag Changes `v*` is the one and only Xcode Cloud trigger**; GitHub correlates and reuses that build instead of starting a second one.
 
-No Xcode Cloud lifecycle scripts are required. Before creating a tag, set the app targets' `MARKETING_VERSION` in Xcode to the tag's numeric version (`1.2.3` for both `v1.2.3` and `v1.2.3-beta.1`). The Ubuntu orchestrator validates this before creating a draft release. Xcode Cloud exclusively manages `CFBundleVersion`; repository scripts must never set or increment it.
+No Xcode Cloud lifecycle scripts are required. The existing tag-push configuration supplies the marketing version automatically. Repository scripts do not set or mutate `MARKETING_VERSION` or `CFBundleVersion`; the macOS job only verifies the values embedded in Xcode Cloud's finished artifact.
 
 ## GitHub repository
 
