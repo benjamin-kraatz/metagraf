@@ -25,7 +25,12 @@ class AppStoreConnect:
     def authorization(self) -> str:
         now = int(time.time())
         token = jwt.encode(
-            {"iss": os.environ["ASC_ISSUER_ID"], "iat": now, "exp": now + 15 * 60, "aud": "appstoreconnect-v1"},
+            {
+                "iss": os.environ["ASC_ISSUER_ID"],
+                "iat": now - 60,
+                "exp": now + 10 * 60,
+                "aud": "appstoreconnect-v1",
+            },
             self.private_key,
             algorithm="ES256",
             headers={"kid": os.environ["ASC_KEY_ID"], "typ": "JWT"},
@@ -33,15 +38,27 @@ class AppStoreConnect:
         return f"Bearer {token}"
 
     def get(self, path: str) -> dict:
-        request = urllib.request.Request(
-            f"{BASE_URL}{path}", headers={"Authorization": self.authorization(), "Accept": "application/json"}
-        )
-        try:
-            with urllib.request.urlopen(request, timeout=60) as response:
-                return json.load(response)
-        except urllib.error.HTTPError as error:
-            details = error.read().decode("utf-8", errors="replace")
-            raise RuntimeError(f"App Store Connect {error.code} for {path}: {details}") from error
+        for attempt in range(3):
+            request = urllib.request.Request(
+                f"{BASE_URL}{path}",
+                headers={"Authorization": self.authorization(), "Accept": "application/json"},
+            )
+            try:
+                with urllib.request.urlopen(request, timeout=60) as response:
+                    return json.load(response)
+            except urllib.error.HTTPError as error:
+                details = error.read().decode("utf-8", errors="replace")
+                retryable = error.code in (401, 408, 429) or error.code >= 500
+                if retryable and attempt < 2:
+                    print(
+                        f"App Store Connect returned {error.code}; retrying with a newly signed token…",
+                        file=sys.stderr,
+                        flush=True,
+                    )
+                    time.sleep(2**attempt)
+                    continue
+                raise RuntimeError(f"App Store Connect {error.code} for {path}: {details}") from error
+        raise RuntimeError(f"App Store Connect request failed for {path}")
 
     def download(self, url: str, destination: Path) -> None:
         with urllib.request.urlopen(url, timeout=300) as response, destination.open("wb") as output:
