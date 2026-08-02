@@ -20,6 +20,7 @@ jobs:
     name: Orchestrate release
     runs-on: ubuntu-24.04
     timeout-minutes: 100
+    environment: Release
     outputs:
       artifact-name: ${{ steps.handoff.outputs.artifact-name }}
     env:
@@ -27,10 +28,10 @@ jobs:
       ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
       ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
       ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
-      XCODE_CLOUD_WORKFLOW_ID: ${{ vars.XCODE_CLOUD_WORKFLOW_ID }}
-      XCODE_CLOUD_PRODUCT_ID: ${{ vars.XCODE_CLOUD_PRODUCT_ID }}
-      APP_STORE_CONNECT_APP_ID: ${{ vars.APP_STORE_CONNECT_APP_ID }}
-      REPOSITORY_IDENTITY: ${{ vars.REPOSITORY_IDENTITY }}
+      XCODE_CLOUD_WORKFLOW_ID: ${{ secrets.XCODE_CLOUD_WORKFLOW_ID || vars.XCODE_CLOUD_WORKFLOW_ID }}
+      XCODE_CLOUD_PRODUCT_ID: ${{ secrets.XCODE_CLOUD_PRODUCT_ID || vars.XCODE_CLOUD_PRODUCT_ID }}
+      APP_STORE_CONNECT_APP_ID: ${{ secrets.APP_STORE_CONNECT_APP_ID || vars.APP_STORE_CONNECT_APP_ID }}
+      REPOSITORY_IDENTITY: ${{ secrets.REPOSITORY_IDENTITY || vars.REPOSITORY_IDENTITY }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -134,7 +135,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
-      APPCAST_URL: ${{ vars.APPCAST_URL }}
+      APPCAST_URL: ${{ secrets.APPCAST_URL || vars.APPCAST_URL }}
     steps:
       - uses: actions/checkout@v4
 
@@ -177,7 +178,7 @@ jobs:
       url: ${{ steps.pages.outputs.page_url }}
     env:
       GH_TOKEN: ${{ github.token }}
-      APPCAST_URL: ${{ vars.APPCAST_URL }}
+      APPCAST_URL: ${{ secrets.APPCAST_URL || vars.APPCAST_URL }}
     steps:
       - uses: actions/checkout@v4
 
