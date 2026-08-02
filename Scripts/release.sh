@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Builds, signs, notarizes, and staples a distributable Metagraf.app.
+# Builds, signs, notarizes, and staples a distributable Metagraf ZIP.
 #
 # Metagraf runs unsandboxed — Accessibility is unavailable to sandboxed apps —
 # so it ships outside the Mac App Store and must be notarized, or Gatekeeper
@@ -78,10 +78,10 @@ xcrun stapler staple "$APP"
 xcrun stapler validate "$APP"
 
 echo "==> Packaging"
-DMG="$BUILD/Metagraf.dmg"
-hdiutil create -volname Metagraf -srcfolder "$APP" -ov -format UDZO "$DMG"
+rm "$ZIP"
+ditto -c -k --sequesterRsrc --keepParent "$APP" "$ZIP"
 
 echo
-echo "Done: $DMG"
+echo "Done: $ZIP"
 echo "Gatekeeper check:"
 spctl --assess --type execute --verbose=2 "$APP"

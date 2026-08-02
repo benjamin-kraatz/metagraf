@@ -9,7 +9,11 @@ struct MetagrafApp: App {
 
     var body: some Scene {
         MenuBarExtra {
-            MenuBarContent(session: appDelegate.session, permissions: appDelegate.permissions)
+            MenuBarContent(
+                session: appDelegate.session,
+                permissions: appDelegate.permissions,
+                updates: appDelegate.updates
+            )
         } label: {
             MenuBarIcon(session: appDelegate.session, permissions: appDelegate.permissions)
         }
@@ -49,7 +53,8 @@ struct MetagrafApp: App {
             SettingsView(
                 settings: appDelegate.settings,
                 permissions: appDelegate.permissions,
-                models: appDelegate.models
+                models: appDelegate.models,
+                updates: appDelegate.updates
             )
             // Preferences are applied on close rather than on every keystroke,
             // so a half-typed value never takes effect.

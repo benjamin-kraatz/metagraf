@@ -1,0 +1,62 @@
+# Release workflow
+
+Metagraf releases are produced by Xcode Cloud and published by one three-job GitHub Actions workflow. A release tag is immutable: never move or recreate a published tag.
+
+## Architecture
+
+```text
+v1.2.3 tag
+  ├─ Xcode Cloud: archive → Developer ID signing → notarize and staple
+  └─ GitHub / Ubuntu: validate → placeholder notes → draft Release → wait
+                               ↓
+                     GitHub / macOS: verify app → ZIP → Sparkle signatures → signed appcast
+                               ↓
+                     GitHub / Ubuntu: upload → publish → deploy Pages
+```
+
+Xcode Cloud and GitHub are both started by the pushed tag. GitHub does not call `POST /v1/ciBuildRuns`, because that API cannot select the pushed Git reference. The orchestrator instead identifies the Xcode Cloud build by workflow ID, full commit SHA, and `refs/tags/<tag>`.
+
+The jobs exchange short-lived GitHub workflow artifacts:
+
+- `xcode-cloud-notarized-<tag>` contains Apple’s unmodified `STAPLED_NOTARIZED_ARCHIVE` and a JSON manifest.
+- `sparkle-release-<tag>` contains the final ZIP, checksum, signed appcast, and an extended manifest.
+
+Only the macOS job may create or modify `appcast.xml`. The final Ubuntu job verifies and publishes its exact bytes.
+
+## Version and channel contract
+
+- Stable: `v1.2.3`
+- Beta: `v1.2.3-beta.1`
+- Other tag formats fail before release creation.
+- The tag must point to a commit contained in `main`.
+- `CFBundleShortVersionString` is the tag without `v`.
+- `CFBundleVersion` is Xcode Cloud’s increasing `CI_BUILD_NUMBER`.
+- Stable clients see unchannelled entries. Beta clients see both stable and `beta` entries.
+
+Every generated appcast retains the new release, the previous four stable releases, and the previous two beta releases. It contains at most seven full ZIP updates and no deltas.
+
+## Creating and monitoring a release
+
+1. Ensure `main` has passed CI and the desired commit is pushed.
+2. Create and push an annotated tag, for example `git tag -a v0.7.0 -m "Metagraf 0.7.0"` followed by `git push origin v0.7.0`.
+3. Watch both **Xcode Cloud → Mac Release** and **GitHub Actions → Release Metagraf**.
+4. GitHub first creates a draft Release. It becomes public only after notarization, signature, archive, and upload checks pass.
+5. Confirm the published ZIP and checksum exist and `https://benjamin-kraatz.github.io/metagraf/appcast.xml` includes the release.
+
+The current notes provider deliberately calls JSONPlaceholder and wraps its response as German placeholder Markdown. Replace `placeholder_notes` in `Scripts/release/release_tools.py` with the Cursor SDK/Grok provider; retain the command’s Markdown-file interface.
+
+## Recovery and reruns
+
+- **Validation or notes failure:** fix the workflow on `main`, then rerun the failed workflow. The tag itself must not be moved after any public release.
+- **Xcode Cloud does not start:** confirm its Tag Changes condition matches `v*`, the workflow is active, and its GitHub connection can see the tag.
+- **Xcode Cloud failure:** inspect archive/notarization logs in App Store Connect. The GitHub Release remains a draft.
+- **Timeout:** rerun GitHub Actions after Xcode Cloud completes. The orchestrator reuses the matching build and draft Release.
+- **Sparkle failure:** inspect macOS job output for bundle metadata, architecture, code-signing, notarization, or key errors. No assets are published.
+- **Asset upload failure:** rerun the publisher; uploads use `--clobber` and remain idempotent.
+- **Pages failure after publication:** rerun the publisher. The previous valid feed remains served until deployment succeeds.
+
+Do not delete a bad published tag or silently replace its ZIP. Remove the bad item from the served appcast as an emergency containment action, then publish a correcting release with a higher `CFBundleVersion`. Restore the normal generated feed through a successful pipeline rerun.
+
+## Security and rotation
+
+The App Store Connect API key and Sparkle private key are release credentials. Rotate them through GitHub encrypted secrets, never repository files. Update the embedded Sparkle public key in a Developer ID-signed release before rotating away from the old key. Record token expiry and key custody in the team password manager. Remove access immediately when a maintainer leaves the team.

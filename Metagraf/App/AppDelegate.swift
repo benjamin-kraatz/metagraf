@@ -13,6 +13,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let permissions = PermissionsCoordinator()
     let settings = SettingsStore.shared
     let models = ModelStore()
+    let updates = UpdateController()
     private(set) var history: HistoryStore?
 
     private let logger = Logger(subsystem: Metagraf.bundleIdentifier, category: "App")

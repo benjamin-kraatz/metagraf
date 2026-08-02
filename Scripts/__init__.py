@@ -1,0 +1,1 @@
+"""Metagraf automation scripts."""
