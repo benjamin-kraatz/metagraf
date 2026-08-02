@@ -63,9 +63,7 @@ Losing the Sparkle key complicates feed signing and key rotation. Keep at least 
    set -a
    source .env
    set +a
-   python3 -m pip install 'PyJWT[crypto]==2.10.1'
-   python3 Scripts/release/app_store_connect.py \
-     --discover-app-id "YOUR_NUMERIC_APPLE_ID"
+   Scripts/release/discover_xcode_cloud_ids.sh "YOUR_NUMERIC_APPLE_ID"
    ```
 
    The command calls Apple's [`GET /v1/apps/{id}/ciProduct`](https://developer.apple.com/documentation/appstoreconnectapi/get-v1-apps-_id_-ciproduct) endpoint and prints `XCODE_CLOUD_PRODUCT_ID`, followed by every workflow ID and name. Use the line labelled `Mac Release` for `XCODE_CLOUD_WORKFLOW_ID`. It prints identifiers only, never the API private key or JWT.
