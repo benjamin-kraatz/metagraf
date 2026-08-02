@@ -1,0 +1,261 @@
+name: Release Metagraf
+
+on:
+  push:
+    tags:
+      - "v*"
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  actions: read
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  orchestrate:
+    name: Orchestrate release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 100
+    outputs:
+      artifact-name: ${{ steps.handoff.outputs.artifact-name }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+      XCODE_CLOUD_WORKFLOW_ID: ${{ vars.XCODE_CLOUD_WORKFLOW_ID }}
+      XCODE_CLOUD_PRODUCT_ID: ${{ vars.XCODE_CLOUD_PRODUCT_ID }}
+      APP_STORE_CONNECT_APP_ID: ${{ vars.APP_STORE_CONNECT_APP_ID }}
+      REPOSITORY_IDENTITY: ${{ vars.REPOSITORY_IDENTITY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate tag and source
+        id: version
+        run: |
+          set -euo pipefail
+          [[ "$REPOSITORY_IDENTITY" == "$GITHUB_REPOSITORY" ]] || {
+            echo "error: REPOSITORY_IDENTITY does not match this repository" >&2
+            exit 1
+          }
+          git fetch origin main
+          python3 Scripts/release/release_tools.py validate-ancestry "$GITHUB_SHA" origin/main
+          metadata="$(python3 Scripts/release/release_tools.py validate-tag "$GITHUB_REF_NAME")"
+          echo "version=$(jq -r .version <<<"$metadata")" >> "$GITHUB_OUTPUT"
+          echo "channel=$(jq -r .channel <<<"$metadata")" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$(jq -r .prerelease <<<"$metadata")" >> "$GITHUB_OUTPUT"
+
+      - name: Generate temporary German release notes
+        run: |
+          python3 Scripts/release/release_tools.py placeholder-notes \
+            --output "$RUNNER_TEMP/release-notes.md"
+
+      - name: Create or reuse draft release
+        id: release
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          PRERELEASE: ${{ steps.version.outputs.prerelease }}
+        run: |
+          set -euo pipefail
+          existing="$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
+            --jq "map(select(.tag_name == \"$GITHUB_REF_NAME\")) | first // empty")"
+          if [[ -n "$existing" ]]; then
+            [[ "$(jq -r .draft <<<"$existing")" == "true" ]] || {
+              echo "error: $GITHUB_REF_NAME is already published" >&2
+              exit 1
+            }
+            release_id="$(jq -r .id <<<"$existing")"
+            gh release edit "$GITHUB_REF_NAME" --title "Metagraf $VERSION" \
+              --notes-file "$RUNNER_TEMP/release-notes.md"
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$release_id" \
+              -F prerelease="$PRERELEASE" >/dev/null
+          else
+            prerelease_args=()
+            [[ "$PRERELEASE" == "true" ]] && prerelease_args+=(--prerelease)
+            gh release create "$GITHUB_REF_NAME" --draft "${prerelease_args[@]}" \
+              --title "Metagraf $VERSION" --notes-file "$RUNNER_TEMP/release-notes.md"
+            release_id="$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
+              --jq "map(select(.tag_name == \"$GITHUB_REF_NAME\")) | first | .id // empty")"
+          fi
+          [[ -n "$release_id" ]] || { echo "error: draft release was not found" >&2; exit 1; }
+          echo "id=$release_id" >> "$GITHUB_OUTPUT"
+
+      - name: Install App Store Connect client dependency
+        run: python3 -m pip install --disable-pip-version-check 'PyJWT[crypto]==2.10.1'
+
+      - name: Wait for notarized Xcode Cloud artifact
+        env:
+          RELEASE_ID: ${{ steps.release.outputs.id }}
+          VERSION: ${{ steps.version.outputs.version }}
+          CHANNEL: ${{ steps.version.outputs.channel }}
+        run: |
+          : "${XCODE_CLOUD_WORKFLOW_ID:?Configure XCODE_CLOUD_WORKFLOW_ID}"
+          : "${XCODE_CLOUD_PRODUCT_ID:?Configure XCODE_CLOUD_PRODUCT_ID}"
+          : "${APP_STORE_CONNECT_APP_ID:?Configure APP_STORE_CONNECT_APP_ID}"
+          python3 Scripts/release/app_store_connect.py \
+            --workflow-id "$XCODE_CLOUD_WORKFLOW_ID" \
+            --product-id "$XCODE_CLOUD_PRODUCT_ID" \
+            --app-id "$APP_STORE_CONNECT_APP_ID" \
+            --tag "$GITHUB_REF_NAME" \
+            --commit "$GITHUB_SHA" \
+            --release-id "$RELEASE_ID" \
+            --version "$VERSION" \
+            --channel "$CHANNEL" \
+            --output-directory "$RUNNER_TEMP/xcode-cloud"
+
+      - name: Upload notarized handoff
+        id: handoff
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcode-cloud-notarized-${{ github.ref_name }}
+          path: ${{ runner.temp }}/xcode-cloud
+          if-no-files-found: error
+          retention-days: 2
+          overwrite: true
+
+  sparkle:
+    name: Prepare Sparkle update
+    needs: orchestrate
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+      APPCAST_URL: ${{ vars.APPCAST_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: xcode-cloud-notarized-${{ github.ref_name }}
+          path: ${{ runner.temp }}/xcode-cloud
+
+      - name: Verify, package, and sign update
+        run: |
+          Scripts/release/prepare_sparkle_release.sh \
+            "$RUNNER_TEMP/xcode-cloud" "$RUNNER_TEMP/sparkle-output"
+
+      - name: Upload Sparkle handoff
+        uses: actions/upload-artifact@v4
+        with:
+          name: sparkle-release-${{ github.ref_name }}
+          path: ${{ runner.temp }}/sparkle-output
+          if-no-files-found: error
+          retention-days: 2
+          overwrite: true
+
+  publish:
+    name: Publish artifacts and appcast
+    needs: sparkle
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.pages.outputs.page_url }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      APPCAST_URL: ${{ vars.APPCAST_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: sparkle-release-${{ github.ref_name }}
+          path: ${{ runner.temp }}/sparkle-output
+
+      - name: Validate handoff
+        id: manifest
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/sparkle-output"
+          [[ "$(jq -r .tag manifest.json)" == "$GITHUB_REF_NAME" ]]
+          [[ "$(jq -r .commit manifest.json)" == "$GITHUB_SHA" ]]
+          release_id="$(jq -r .releaseId manifest.json)"
+          actual_release="$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id")"
+          [[ "$(jq -r .tag_name <<<"$actual_release")" == "$GITHUB_REF_NAME" ]]
+          echo "release-draft=$(jq -r .draft <<<"$actual_release")" >> "$GITHUB_OUTPUT"
+          zip_file="$(jq -r .zipFile manifest.json)"
+          checksum_file="$(jq -r .checksumFile manifest.json)"
+          [[ -f "$zip_file" && -f "$checksum_file" && -f appcast.xml ]]
+          sha256sum --check "$checksum_file"
+          appcast_sha="$(sha256sum appcast.xml | awk '{print $1}')"
+          [[ "$appcast_sha" == "$(jq -r .appcastSha256 manifest.json)" ]]
+          expected_url="https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/$zip_file"
+          grep -Fq "$expected_url" appcast.xml
+          echo "release-id=$release_id" >> "$GITHUB_OUTPUT"
+          echo "zip=$zip_file" >> "$GITHUB_OUTPUT"
+          echo "checksum=$checksum_file" >> "$GITHUB_OUTPUT"
+
+      - name: Upload release assets
+        env:
+          ZIP_FILE: ${{ steps.manifest.outputs.zip }}
+          CHECKSUM_FILE: ${{ steps.manifest.outputs.checksum }}
+          RELEASE_DRAFT: ${{ steps.manifest.outputs.release-draft }}
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/sparkle-output"
+          if [[ "$RELEASE_DRAFT" == "true" ]]; then
+            gh release upload "$GITHUB_REF_NAME" "$ZIP_FILE" "$CHECKSUM_FILE" appcast.xml --clobber
+          else
+            mkdir -p "$RUNNER_TEMP/published-assets"
+            gh release download "$GITHUB_REF_NAME" --dir "$RUNNER_TEMP/published-assets" \
+              --pattern "$ZIP_FILE" --pattern "$CHECKSUM_FILE" --pattern appcast.xml
+            cmp --silent "$ZIP_FILE" "$RUNNER_TEMP/published-assets/$ZIP_FILE"
+            cmp --silent "$CHECKSUM_FILE" "$RUNNER_TEMP/published-assets/$CHECKSUM_FILE"
+            cmp --silent appcast.xml "$RUNNER_TEMP/published-assets/appcast.xml"
+          fi
+          assets="$(gh release view "$GITHUB_REF_NAME" --json assets --jq '.assets[].name')"
+          grep -Fxq "$ZIP_FILE" <<<"$assets"
+          grep -Fxq "$CHECKSUM_FILE" <<<"$assets"
+          grep -Fxq appcast.xml <<<"$assets"
+          expected_url="https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/$ZIP_FILE"
+          actual_url="$(gh release view "$GITHUB_REF_NAME" --json assets \
+            --jq ".assets[] | select(.name == \"$ZIP_FILE\") | .url")"
+          [[ "$actual_url" == "$expected_url" ]]
+
+      - name: Publish GitHub Release
+        env:
+          RELEASE_ID: ${{ steps.manifest.outputs.release-id }}
+        run: |
+          prerelease="$(jq -r .channel "$RUNNER_TEMP/sparkle-output/manifest.json")"
+          [[ "$prerelease" == "beta" ]] && prerelease=true || prerelease=false
+          gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" \
+            -F draft=false -F prerelease="$prerelease" >/dev/null
+
+      - name: Prepare Pages artifact
+        run: |
+          mkdir -p "$RUNNER_TEMP/pages"
+          cp "$RUNNER_TEMP/sparkle-output/appcast.xml" "$RUNNER_TEMP/pages/appcast.xml"
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ runner.temp }}/pages
+      - name: Deploy appcast
+        id: pages
+        uses: actions/deploy-pages@v4
+
+      - name: Verify public appcast
+        env:
+          EXPECTED: ${{ runner.temp }}/sparkle-output/appcast.xml
+        run: |
+          set -euo pipefail
+          : "${APPCAST_URL:?Configure the APPCAST_URL repository variable}"
+          for attempt in {1..12}; do
+            if curl --fail --silent --show-error \
+              "$APPCAST_URL" \
+              --output "$RUNNER_TEMP/public-appcast.xml"; then
+              if cmp --silent "$EXPECTED" "$RUNNER_TEMP/public-appcast.xml"; then
+                exit 0
+              fi
+            fi
+            sleep 10
+          done
+          echo "error: deployed appcast did not match the signed artifact" >&2
+          exit 1

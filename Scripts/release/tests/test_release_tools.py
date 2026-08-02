@@ -1,0 +1,97 @@
+import json
+import subprocess
+import tempfile
+import unittest
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+from Scripts.release.release_tools import (
+    SPARKLE_NS,
+    build_appcast,
+    is_ancestor,
+    parse_tag,
+    placeholder_notes,
+    select_history,
+    validate_appcast,
+)
+
+
+class ReleaseToolsTests(unittest.TestCase):
+    def test_tag_parsing(self):
+        self.assertEqual(parse_tag("v1.2.3").channel, "stable")
+        beta = parse_tag("v1.2.3-beta.4")
+        self.assertTrue(beta.prerelease)
+        self.assertEqual(beta.version, "1.2.3-beta.4")
+        for invalid in ("1.2.3", "v1.2", "v1.2.3-rc.1", "v01.2.3"):
+            with self.assertRaises(ValueError):
+                parse_tag(invalid)
+
+    def test_history_retains_four_stable_and_two_beta_plus_current(self):
+        releases = [{"tagName": "v2.0.0", "isDraft": True, "isPrerelease": False, "publishedAt": None}]
+        for index in range(1, 7):
+            releases.append({"tagName": f"v1.{index}.0", "isDraft": False, "isPrerelease": False, "publishedAt": f"2026-0{index}-01T00:00:00Z"})
+        for index in range(1, 5):
+            releases.append({"tagName": f"v2.0.0-beta.{index}", "isDraft": False, "isPrerelease": True, "publishedAt": f"2026-07-0{index}T00:00:00Z"})
+        selected = select_history(releases, "v2.0.0")
+        self.assertEqual(len(selected), 7)
+        self.assertEqual(sum(not item["isPrerelease"] and not item["isDraft"] for item in selected), 4)
+        self.assertEqual(sum(item["isPrerelease"] for item in selected), 2)
+
+    def test_git_ancestry(self):
+        with tempfile.TemporaryDirectory() as directory:
+            repository = Path(directory)
+            subprocess.run(["git", "init", "-q"], cwd=repository, check=True)
+            subprocess.run(["git", "config", "user.name", "Release Test"], cwd=repository, check=True)
+            subprocess.run(["git", "config", "user.email", "release@example.test"], cwd=repository, check=True)
+            (repository / "value").write_text("one", encoding="utf-8")
+            subprocess.run(["git", "add", "value"], cwd=repository, check=True)
+            subprocess.run(["git", "commit", "-qm", "one"], cwd=repository, check=True)
+            first = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repository, text=True).strip()
+            (repository / "value").write_text("two", encoding="utf-8")
+            subprocess.run(["git", "commit", "-qam", "two"], cwd=repository, check=True)
+            second = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repository, text=True).strip()
+            self.assertTrue(is_ancestor(first, second, repository))
+            self.assertFalse(is_ancestor(second, first, repository))
+
+    def test_placeholder_notes_parsing(self):
+        class Response:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_):
+                return False
+
+            def read(self):
+                return json.dumps({"title": "Titel", "body": "Inhalt"}).encode()
+
+        from unittest.mock import patch
+
+        with patch("urllib.request.urlopen", return_value=Response()):
+            notes = placeholder_notes("https://example.test")
+        self.assertIn("PLACEHOLDER", notes)
+        self.assertIn("**Titel**", notes)
+
+    def test_appcast_contains_build_channel_and_signature(self):
+        entry = {
+            "version": "1.2.3-beta.1",
+            "build": 42,
+            "channel": "beta",
+            "publishedAt": "2026-08-02T12:00:00Z",
+            "notes": "## Änderungen\n\nTest",
+            "url": "https://example.test/Metagraf.zip",
+            "signature": "signed",
+            "length": 123,
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "appcast.xml"
+            build_appcast([entry], path)
+            validate_appcast(path, [entry])
+            root = ET.parse(path).getroot()
+        self.assertEqual(root.findtext(f"channel/item/{{{SPARKLE_NS}}}version"), "42")
+        self.assertEqual(root.findtext(f"channel/item/{{{SPARKLE_NS}}}channel"), "beta")
+        enclosure = root.find("channel/item/enclosure")
+        self.assertEqual(enclosure.attrib[f"{{{SPARKLE_NS}}}edSignature"], "signed")
+
+
+if __name__ == "__main__":
+    unittest.main()

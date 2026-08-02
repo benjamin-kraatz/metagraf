@@ -6,6 +6,7 @@ import SwiftUI
 struct MenuBarContent: View {
     let session: DictationSession
     let permissions: PermissionsCoordinator
+    let updates: UpdateController
 
     @Environment(\.openWindow) private var openWindow
     @Environment(\.openSettings) private var openSettings
@@ -32,6 +33,9 @@ struct MenuBarContent: View {
                 menuButton("Settings…") {
                     openSettings()
                     NSApp.activate(ignoringOtherApps: true)
+                }
+                menuButton("Check for Updates…") {
+                    updates.checkForUpdates()
                 }
 
                 Divider()
@@ -159,6 +163,10 @@ private struct MenuItemButtonStyle: ButtonStyle {
 }
 
 #Preview {
-    MenuBarContent(session: DictationSession(), permissions: PermissionsCoordinator())
+    MenuBarContent(
+        session: DictationSession(),
+        permissions: PermissionsCoordinator(),
+        updates: UpdateController()
+    )
 }
 #endif

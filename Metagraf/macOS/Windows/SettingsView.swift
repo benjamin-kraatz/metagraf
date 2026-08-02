@@ -8,11 +8,12 @@ struct SettingsView: View {
     let settings: SettingsStore
     let permissions: PermissionsCoordinator
     let models: ModelStore
+    let updates: UpdateController
 
     var body: some View {
         TabView {
             Tab("General", systemImage: "gearshape") {
-                GeneralSettings(settings: settings)
+                GeneralSettings(settings: settings, updates: updates)
             }
             Tab("Dictation", systemImage: "mic") {
                 DictationSettings(settings: settings)
@@ -41,6 +42,7 @@ struct SettingsView: View {
 
 private struct GeneralSettings: View {
     @Bindable var settings: SettingsStore
+    let updates: UpdateController
 
     var body: some View {
         Form {
@@ -51,6 +53,17 @@ private struct GeneralSettings: View {
                     }
             } footer: {
                 Text("Metagraf lives in the menu bar and has no Dock icon.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section("Updates") {
+                Toggle("Receive beta updates", isOn: $settings.receivesBetaUpdates)
+                    .onChange(of: settings.receivesBetaUpdates) { _, _ in
+                        updates.channelsDidChange()
+                    }
+
+                Text("Beta builds may be less stable. Stable releases are always offered.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
