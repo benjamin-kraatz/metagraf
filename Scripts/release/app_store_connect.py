@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Wait for an automatically tag-triggered Xcode Cloud notarized artifact."""
+"""Discover Xcode Cloud IDs or wait for a tag-triggered notarized artifact."""
 
 from __future__ import annotations
 
@@ -90,21 +90,57 @@ def find_notarized_artifact(client: AppStoreConnect, build_id: str) -> tuple[dic
     raise RuntimeError("successful build has no STAPLED_NOTARIZED_ARCHIVE")
 
 
+def discover_ids(client: AppStoreConnect, app_id: str) -> None:
+    """Print the Xcode Cloud product and workflow IDs related to an app."""
+    product = client.get(f"/apps/{urllib.parse.quote(app_id, safe='')}/ciProduct")["data"]
+    product_id = product["id"]
+    workflows = client.get(
+        f"/ciProducts/{urllib.parse.quote(product_id, safe='')}/workflows"
+        "?limit=200&fields%5BciWorkflows%5D=name"
+    ).get("data", [])
+
+    print(f"APP_STORE_CONNECT_APP_ID={app_id}")
+    print(f"XCODE_CLOUD_PRODUCT_ID={product_id}")
+    for workflow in workflows:
+        name = workflow.get("attributes", {}).get("name", "unnamed")
+        print(f"XCODE_CLOUD_WORKFLOW_ID={workflow['id']}  # {name}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--workflow-id", required=True)
-    parser.add_argument("--product-id", required=True)
-    parser.add_argument("--app-id", required=True)
-    parser.add_argument("--tag", required=True)
-    parser.add_argument("--commit", required=True)
-    parser.add_argument("--release-id", required=True)
-    parser.add_argument("--version", required=True)
-    parser.add_argument("--channel", required=True, choices=("stable", "beta"))
-    parser.add_argument("--output-directory", type=Path, required=True)
+    parser.add_argument("--discover-app-id", help="print the product and workflow IDs related to this app")
+    parser.add_argument("--workflow-id")
+    parser.add_argument("--product-id")
+    parser.add_argument("--app-id")
+    parser.add_argument("--tag")
+    parser.add_argument("--commit")
+    parser.add_argument("--release-id")
+    parser.add_argument("--version")
+    parser.add_argument("--channel", choices=("stable", "beta"))
+    parser.add_argument("--output-directory", type=Path)
     parser.add_argument("--timeout", type=int, default=5400)
     args = parser.parse_args()
 
     client = AppStoreConnect()
+    if args.discover_app_id:
+        discover_ids(client, args.discover_app_id)
+        return
+
+    required = (
+        "workflow_id",
+        "product_id",
+        "app_id",
+        "tag",
+        "commit",
+        "release_id",
+        "version",
+        "channel",
+        "output_directory",
+    )
+    missing = [f"--{name.replace('_', '-')}" for name in required if getattr(args, name) is None]
+    if missing:
+        parser.error(f"the following arguments are required: {', '.join(missing)}")
+
     workflow = client.get(f"/ciWorkflows/{args.workflow_id}?include=product")
     product_link = workflow["data"]["relationships"]["product"]["data"]["id"]
     if product_link != args.product_id:
