@@ -39,6 +39,7 @@
 /* Begin PBXFileReference section */
 		000000000000000000000120 /* Metagraf.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Metagraf.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		000000000000000000000130 /* MetagrafKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MetagrafKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000140 /* MetagrafSmokeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MetagrafSmokeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -50,6 +51,11 @@
 		000000000000000000000011 /* MetagrafKeyboard */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = MetagrafKeyboard;
+			sourceTree = "<group>";
+		};
+		000000000000000000000012 /* MetagrafSmokeTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MetagrafSmokeTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -69,6 +75,11 @@
 				000000000000000000000222 /* MetagrafCore in Frameworks */,
 			);
 		};
+		000000000000000330000000 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -77,6 +88,7 @@
 			children = (
 				000000000000000000000010 /* Metagraf */,
 				000000000000000000000011 /* MetagrafKeyboard */,
+				000000000000000000000012 /* MetagrafSmokeTests */,
 				000000000000000000000020 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -86,6 +98,7 @@
 			children = (
 				000000000000000000000120 /* Metagraf.app */,
 				000000000000000000000130 /* MetagrafKeyboard.appex */,
+				000000000000000000000140 /* MetagrafSmokeTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -141,6 +154,28 @@
 			productReference = 000000000000000000000130 /* MetagrafKeyboard.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		000000000000000300000000 /* MetagrafSmokeTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 000000000000000310000000 /* Build configuration list for PBXNativeTarget "MetagrafSmokeTests" */;
+			buildPhases = (
+				000000000000000320000000 /* Sources */,
+				000000000000000330000000 /* Frameworks */,
+				000000000000000340000000 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				000000000000000000000012 /* MetagrafSmokeTests */,
+			);
+			name = MetagrafSmokeTests;
+			packageProductDependencies = (
+			);
+			productName = MetagrafSmokeTests;
+			productReference = 000000000000000000000140 /* MetagrafSmokeTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -153,6 +188,9 @@
 				TargetAttributes = {
 					000000000000000100000000 = {
 						CreatedOnToolsVersion = 26.3;
+					};
+					000000000000000300000000 = {
+						CreatedOnToolsVersion = 27.0;
 					};
 				};
 			};
@@ -177,6 +215,7 @@
 			targets = (
 				000000000000000100000000 /* Metagraf */,
 				000000000000000200000000 /* MetagrafKeyboard */,
+				000000000000000300000000 /* MetagrafSmokeTests */,
 			);
 		};
 /* End PBXProject section */
@@ -192,6 +231,11 @@
 			files = (
 			);
 		};
+		000000000000000340000000 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -201,6 +245,11 @@
 			);
 		};
 		000000000000000220000000 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		000000000000000320000000 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
 			);
@@ -550,6 +599,40 @@
 			};
 			name = Release;
 		};
+		000000000000000311000000 /* Debug configuration for PBXNativeTarget "MetagrafSmokeTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = U7H5KA9MG4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.dzwei.apps.metagraf.smoketests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		000000000000000312000000 /* Release configuration for PBXNativeTarget "MetagrafSmokeTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = U7H5KA9MG4;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.dzwei.apps.metagraf.smoketests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -574,6 +657,14 @@
 			buildConfigurations = (
 				000000000000000211000000 /* Debug configuration for PBXNativeTarget "MetagrafKeyboard" */,
 				000000000000000212000000 /* Release configuration for PBXNativeTarget "MetagrafKeyboard" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		000000000000000310000000 /* Build configuration list for PBXNativeTarget "MetagrafSmokeTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				000000000000000311000000 /* Debug configuration for PBXNativeTarget "MetagrafSmokeTests" */,
+				000000000000000312000000 /* Release configuration for PBXNativeTarget "MetagrafSmokeTests" */,
 			);
 			defaultConfigurationName = Release;
 		};

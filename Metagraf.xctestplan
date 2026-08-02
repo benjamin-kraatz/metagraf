@@ -1,0 +1,23 @@
+{
+  "configurations" : [
+    {
+      "id" : "6A6B8358-90B8-4E99-AE32-A1840E1FC926",
+      "name" : "Configuration 1",
+      "options" : {
+      }
+    }
+  ],
+  "defaultOptions" : {
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : false,
+      "target" : {
+        "containerPath" : "container:Metagraf.xcodeproj",
+        "identifier" : "000000000000000300000000",
+        "name" : "MetagrafSmokeTests"
+      }
+    }
+  ],
+  "version" : 1
+}
