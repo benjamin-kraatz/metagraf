@@ -57,16 +57,6 @@ Losing the Sparkle key complicates feed signing and key rotation. Keep at least 
 3. Do not configure a manual-only tag condition and do not add a second tag workflow.
 4. Add `SPARKLE_PUBLIC_ED_KEY` to the workflow environment.
 5. In App Store Connect, open **Apps → Metagraf → App Information** and copy the numeric **Apple ID**. This is `APP_STORE_CONNECT_APP_ID`.
-6. The Xcode Cloud product ID is an opaque API identifier and is not normally shown in the web UI. After placing the three `ASC_*` credentials in the local ignored `.env`, run from the repository root:
-
-   ```bash
-   set -a
-   source .env
-   set +a
-   Scripts/release/discover_xcode_cloud_ids.sh "YOUR_NUMERIC_APPLE_ID"
-   ```
-
-   The command calls Apple's [`GET /v1/apps/{id}/ciProduct`](https://developer.apple.com/documentation/appstoreconnectapi/get-v1-apps-_id_-ciproduct) endpoint and prints `XCODE_CLOUD_PRODUCT_ID`, followed by every workflow ID and name. Use the line labelled `Mac Release` for `XCODE_CLOUD_WORKFLOW_ID`. It prints identifiers only, never the API private key or JWT.
 
 The App Store Connect API cannot choose a tag when starting a build. For that reason, **Tag Changes `v*` is the one and only Xcode Cloud trigger**; GitHub correlates and reuses that build instead of starting a second one.
 
