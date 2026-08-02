@@ -1,5 +1,6 @@
 import json
 import subprocess
+import sys
 import tempfile
 import unittest
 import xml.etree.ElementTree as ET
@@ -52,6 +53,15 @@ class ReleaseToolsTests(unittest.TestCase):
             second = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repository, text=True).strip()
             self.assertTrue(is_ancestor(first, second, repository))
             self.assertFalse(is_ancestor(second, first, repository))
+
+    def test_validate_ancestry_cli(self):
+        result = subprocess.run(
+            [sys.executable, "Scripts/release/release_tools.py", "validate-ancestry", "HEAD", "HEAD"],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_placeholder_notes_parsing(self):
         class Response:
