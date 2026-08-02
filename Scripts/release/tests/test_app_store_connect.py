@@ -5,7 +5,7 @@ import unittest
 import urllib.error
 from unittest.mock import patch
 
-from Scripts.release.app_store_connect import AppStoreConnect
+from Scripts.release.app_store_connect import AppStoreConnect, ArtifactNotReady, find_notarized_artifact
 
 
 class Response:
@@ -58,6 +58,43 @@ class AppStoreConnectTests(unittest.TestCase):
         self.assertEqual(authorization.call_count, 2)
         self.assertEqual(urlopen.call_count, 2)
         sleep.assert_called_once_with(1)
+
+    def test_notarized_artifact_does_not_require_notarize_action_type(self):
+        actions = [
+            {
+                "id": "archive-action",
+                "attributes": {"name": "Archive", "actionType": "ARCHIVE", "completionStatus": "SUCCEEDED"},
+            },
+            {
+                "id": "test-action",
+                "attributes": {"name": "Test", "actionType": "TEST", "completionStatus": "SUCCEEDED"},
+            },
+        ]
+        artifact = {
+            "id": "artifact-id",
+            "attributes": {"fileType": "STAPLED_NOTARIZED_ARCHIVE"},
+        }
+        client = AppStoreConnect.__new__(AppStoreConnect)
+        client.get = lambda path: {
+            "/ciBuildRuns/build-id/actions?limit=200": {"data": actions},
+            "/ciBuildActions/archive-action/artifacts?limit=200": {"data": [artifact]},
+        }.get(path, {"data": []})
+
+        found, found_actions = find_notarized_artifact(client, "build-id")
+
+        self.assertEqual(found, artifact)
+        self.assertEqual(found_actions, actions)
+
+    def test_missing_notarized_artifact_is_retryable(self):
+        action = {
+            "id": "archive-action",
+            "attributes": {"name": "Archive", "actionType": "ARCHIVE", "completionStatus": "SUCCEEDED"},
+        }
+        client = AppStoreConnect.__new__(AppStoreConnect)
+        client.get = lambda path: {"data": [action]} if "/actions?" in path else {"data": []}
+
+        with self.assertRaises(ArtifactNotReady):
+            find_notarized_artifact(client, "build-id")
 
 
 if __name__ == "__main__":

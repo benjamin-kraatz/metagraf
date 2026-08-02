@@ -18,6 +18,10 @@ import jwt
 BASE_URL = "https://api.appstoreconnect.apple.com/v1"
 
 
+class ArtifactNotReady(RuntimeError):
+    pass
+
+
 class AppStoreConnect:
     def __init__(self) -> None:
         self.private_key = os.environ["ASC_PRIVATE_KEY"].replace("\\n", "\n")
@@ -90,9 +94,11 @@ def matching_run(client: AppStoreConnect, workflow_id: str, tag: str, commit: st
 
 def find_notarized_artifact(client: AppStoreConnect, build_id: str) -> tuple[dict, list[dict]]:
     actions = client.get(f"/ciBuildRuns/{build_id}/actions?limit=200").get("data", [])
-    action_types = {action.get("attributes", {}).get("actionType") for action in actions}
-    if "ARCHIVE" not in action_types or "NOTARIZE" not in action_types:
-        raise RuntimeError("Xcode Cloud build must contain ARCHIVE and NOTARIZE actions")
+    archive_actions = [action for action in actions if action.get("attributes", {}).get("actionType") == "ARCHIVE"]
+    if not archive_actions:
+        raise RuntimeError("Xcode Cloud build contains no ARCHIVE action")
+    if not any(action.get("attributes", {}).get("completionStatus") == "SUCCEEDED" for action in archive_actions):
+        raise RuntimeError("Xcode Cloud ARCHIVE action did not succeed")
 
     for action in actions:
         status = action.get("attributes", {}).get("completionStatus")
@@ -104,7 +110,12 @@ def find_notarized_artifact(client: AppStoreConnect, build_id: str) -> tuple[dic
         for artifact in artifacts:
             if artifact.get("attributes", {}).get("fileType") == "STAPLED_NOTARIZED_ARCHIVE":
                 return artifact, actions
-    raise RuntimeError("successful build has no STAPLED_NOTARIZED_ARCHIVE")
+    action_summary = ", ".join(
+        f"{action.get('attributes', {}).get('name', action['id'])}="
+        f"{action.get('attributes', {}).get('actionType', 'unknown')}"
+        for action in actions
+    )
+    raise ArtifactNotReady(f"stapled notarized artifact is not indexed yet; actions: {action_summary}")
 
 
 def main() -> None:
@@ -144,7 +155,12 @@ def main() -> None:
             if progress == "COMPLETE":
                 if completion != "SUCCEEDED":
                     raise RuntimeError(f"Xcode Cloud build finished with {completion}")
-                artifact, _ = find_notarized_artifact(client, build["id"])
+                try:
+                    artifact, _ = find_notarized_artifact(client, build["id"])
+                except ArtifactNotReady as error:
+                    print(f"Waiting for Xcode Cloud artifact: {error}", flush=True)
+                    time.sleep(30)
+                    continue
                 detail = client.get(f"/ciArtifacts/{artifact['id']}")["data"]["attributes"]
                 args.output_directory.mkdir(parents=True, exist_ok=True)
                 filename = Path(detail.get("fileName") or "Metagraf-notarized.zip").name
