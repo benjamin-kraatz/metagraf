@@ -31,7 +31,7 @@ The workflow caches the pinned Python package download on Ubuntu and SwiftPM che
 - Beta: `v1.2.3-beta.1`
 - Other tag formats fail before release creation.
 - The tag must point to a commit contained in `main`.
-- `CFBundleShortVersionString` is the tag without `v`.
+- `CFBundleShortVersionString` is the three-part numeric release version. Stable `v1.2.3` and beta `v1.2.3-beta.1` both use `1.2.3`; the beta suffix is represented by the Sparkle channel and release tag.
 - `CFBundleVersion` is assigned and incremented exclusively by Xcode Cloud. The pipeline reads and validates it but never changes it.
 - Stable clients see unchannelled entries. Beta clients see both stable and `beta` entries.
 

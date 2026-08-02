@@ -84,12 +84,16 @@ jobs:
             gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$release_id" \
               -F prerelease="$PRERELEASE" >/dev/null
           else
-            prerelease_args=()
-            [[ "$PRERELEASE" == "true" ]] && prerelease_args+=(--prerelease)
-            gh release create "$GITHUB_REF_NAME" --draft "${prerelease_args[@]}" \
-              --title "Metagraf $VERSION" --notes-file "$RUNNER_TEMP/release-notes.md"
-            release_id="$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
-              --jq "map(select(.tag_name == \"$GITHUB_REF_NAME\")) | first | .id // empty")"
+            created="$(
+              jq -n \
+                --arg tag "$GITHUB_REF_NAME" \
+                --arg name "Metagraf $VERSION" \
+                --rawfile body "$RUNNER_TEMP/release-notes.md" \
+                --argjson prerelease "$PRERELEASE" \
+                '{tag_name:$tag,name:$name,body:$body,draft:true,prerelease:$prerelease}' |
+                gh api --method POST "repos/$GITHUB_REPOSITORY/releases" --input -
+            )"
+            release_id="$(jq -r '.id // empty' <<<"$created")"
           fi
           [[ -n "$release_id" ]] || { echo "error: draft release was not found" >&2; exit 1; }
           echo "id=$release_id" >> "$GITHUB_OUTPUT"
