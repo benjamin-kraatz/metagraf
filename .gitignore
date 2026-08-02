@@ -16,9 +16,6 @@ xcuserdata/
 .swiftpm/
 Packages/*/.build/
 
-# Local credentials
-.env*
-
 # macOS
 .DS_Store
 
