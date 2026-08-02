@@ -332,7 +332,14 @@
       }
     },
     "Beta builds may be less stable. Stable releases are always offered." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beta-Versionen sind möglicherweise weniger stabil. Stabile Versionen werden immer angeboten."
+          }
+        }
+      }
     },
     "Bottom left" : {
       "extractionState" : "stale",
@@ -389,7 +396,14 @@
       }
     },
     "Check for Updates…" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Updates suchen …"
+          }
+        }
+      }
     },
     "Checking availability…" : {
       "localizations" : {
@@ -1466,7 +1480,14 @@
       }
     },
     "Receive beta updates" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beta-Updates erhalten"
+          }
+        }
+      }
     },
     "Remove" : {
       "localizations" : {
@@ -1912,7 +1933,14 @@
       }
     },
     "Updates" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updates"
+          }
+        }
+      }
     },
     "Use clear, natural wording that fits a broad range of contexts." : {
       "extractionState" : "stale",
