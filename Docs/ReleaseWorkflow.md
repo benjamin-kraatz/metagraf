@@ -23,6 +23,8 @@ The jobs exchange short-lived GitHub workflow artifacts:
 
 Only the macOS job may create or modify `appcast.xml`. The final Ubuntu job verifies and publishes its exact bytes.
 
+The workflow caches the pinned Python package download on Ubuntu and SwiftPM checkouts/artifacts on the macOS runner. Cache keys include their dependency manifests. Notarized archives, release ZIPs, signing keys, manifests, and signed appcasts are never cached; they move only through short-lived workflow artifacts.
+
 ## Version and channel contract
 
 - Stable: `v1.2.3`
