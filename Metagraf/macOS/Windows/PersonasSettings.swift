@@ -31,12 +31,7 @@ struct PersonasSettings: View {
                     }
                     .labelsHidden()
 
-                    HStack(alignment: .top, spacing: 0) {
-                        adaptationLabel(.minimalCorrection, alignment: .leading)
-                        adaptationLabel(.contextualPolish, alignment: .center)
-                        adaptationLabel(.strongAdaptation, alignment: .center)
-                        adaptationLabel(.prompting, alignment: .trailing)
-                    }
+                    adaptationLabels
                 }
                 .disabled(settings.refinementPersona == .none)
 
@@ -103,6 +98,34 @@ struct PersonasSettings: View {
         0...Double(PersonaAdaptation.allCases.count - 1)
     }
 
+    private var adaptationLabels: some View {
+        GeometryReader { geometry in
+            let adaptations = PersonaAdaptation.allCases
+            let segmentWidth = geometry.size.width / CGFloat(adaptations.count - 1)
+            let labelWidth = segmentWidth * 0.82
+
+            ForEach(adaptations.indices, id: \.self) { index in
+                let alignment = adaptationLabelAlignment(at: index, count: adaptations.count)
+
+                adaptationLabel(adaptations[index], alignment: alignment)
+                    .frame(width: labelWidth, alignment: alignment)
+                    .position(
+                        x: adaptationLabelPosition(
+                            at: index,
+                            count: adaptations.count,
+                            segmentWidth: segmentWidth,
+                            labelWidth: labelWidth
+                        ),
+                        y: geometry.size.height / 2
+                    )
+            }
+        }
+        // Match the slider's thumb-center inset and reserve equal height when
+        // a localized label needs a second line.
+        .padding(.horizontal, 10)
+        .frame(height: 34)
+    }
+
     private func adaptationLabel(
         _ adaptation: PersonaAdaptation,
         alignment: Alignment
@@ -111,7 +134,33 @@ struct PersonasSettings: View {
             .font(.caption)
             .foregroundStyle(.secondary)
             .multilineTextAlignment(textAlignment(for: alignment))
+            .lineLimit(2, reservesSpace: true)
             .frame(maxWidth: .infinity, alignment: alignment)
+    }
+
+    private func adaptationLabelAlignment(at index: Int, count: Int) -> Alignment {
+        if index == 0 {
+            return .leading
+        }
+        if index == count - 1 {
+            return .trailing
+        }
+        return .center
+    }
+
+    private func adaptationLabelPosition(
+        at index: Int,
+        count: Int,
+        segmentWidth: CGFloat,
+        labelWidth: CGFloat
+    ) -> CGFloat {
+        if index == 0 {
+            return labelWidth / 2
+        }
+        if index == count - 1 {
+            return segmentWidth * CGFloat(count - 1) - labelWidth / 2
+        }
+        return segmentWidth * CGFloat(index)
     }
 
     private func textAlignment(for alignment: Alignment) -> TextAlignment {
