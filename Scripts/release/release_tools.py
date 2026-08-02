@@ -143,7 +143,7 @@ def main() -> None:
 
     ancestry = commands.add_parser("validate-ancestry")
     ancestry.add_argument("commit")
-    ancestry.add_argument("main-ref")
+    ancestry.add_argument("main_ref", metavar="main-ref")
 
     notes = commands.add_parser("placeholder-notes")
     notes.add_argument("--url", default="https://jsonplaceholder.typicode.com/posts/1")
