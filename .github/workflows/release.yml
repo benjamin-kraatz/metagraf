@@ -182,6 +182,7 @@ jobs:
       url: ${{ steps.pages.outputs.page_url }}
     env:
       GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
       APPCAST_URL: ${{ secrets.APPCAST_URL || vars.APPCAST_URL }}
     steps:
       - uses: actions/checkout@v4
