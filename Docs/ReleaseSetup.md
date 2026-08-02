@@ -24,10 +24,20 @@ The same key reads Xcode Cloud build status and short-lived artifact download UR
 
 ## Sparkle signing key
 
-After resolving the Sparkle package, locate `generate_keys` in the package artifact’s `Sparkle/bin` directory.
+`generate_keys` is part of Sparkle's downloaded binary artifact, not its source checkout. Resolve the package into a predictable ignored directory from the repository root:
 
-1. Run `generate_keys` on a trusted Mac.
-2. Export the private key with its supported `-x` option and back it up securely.
+```bash
+xcodebuild -resolvePackageDependencies \
+  -project Metagraf.xcodeproj \
+  -scheme Metagraf \
+  -clonedSourcePackagesDirPath build/SparkleTools
+
+SPARKLE_GENERATE_KEYS="$PWD/build/SparkleTools/artifacts/sparkle/Sparkle/bin/generate_keys"
+"$SPARKLE_GENERATE_KEYS" --help
+```
+
+1. Run `"$SPARKLE_GENERATE_KEYS"` on a trusted Mac. It creates or reuses the private key in the login Keychain and prints the public key.
+2. Export the private key with `"$SPARKLE_GENERATE_KEYS" -x /secure/path/Metagraf-Sparkle-private-key` and back that file up securely.
 3. Add the exported base64 key as GitHub secret `SPARKLE_PRIVATE_KEY`.
 4. Add the printed public key to the Xcode Cloud `Mac Release` environment as `SPARKLE_PUBLIC_ED_KEY`.
 5. Mark the private value secret/redacted. The public key does not need secrecy.
