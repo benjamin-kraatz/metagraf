@@ -1,6 +1,6 @@
 ---
 name: cut-release
-description: Propose a MarketVer marketing version from commits since the last release, confirm with the user (including beta), then bump macOS MARKETING_VERSION, commit, annotate-tag, and push to trigger the Metagraf release pipeline. Use when cutting a release, tagging a version, or when the user invokes /cut-release.
+description: Propose a MarketVer marketing version from commits since the last release, confirm with the user (beta only if explicitly requested; otherwise stable), then bump macOS MARKETING_VERSION, commit, annotate-tag, and push to trigger the Metagraf release pipeline. After push, ask whether to babysit GitHub Actions and Xcode Cloud until publication. Use when cutting a release, tagging a version, or when the user invokes /cut-release.
 disable-model-invocation: true
 ---
 
@@ -48,14 +48,16 @@ If nothing warrants a bump but a release is still being cut, default to a **patc
 
 **Until the user confirms: no file edits, no commit, no tag, no push.** If they decline or say no → abort entirely.
 
+**Beta default:** confirmation without an explicit beta yes (`beta`, `yes beta`, `make it beta`, etc.) is a **stable** (non-beta) release. Only treat as beta when they clearly opt in.
+
 ## Phase 2 — After confirmation
 
-Use the confirmed numeric version (proposed, or the override they gave).
+Use the confirmed numeric version (proposed, or the override they gave). Apply the beta default above.
 
 ### Beta vs stable
 
-- **Stable:** tag `vX.Y.Z`
-- **Beta:** tag `vX.Y.Z-beta.N` where `N` is one greater than the highest existing `vX.Y.Z-beta.*` tag for that same `X.Y.Z`, or `1` if none. `MARKETING_VERSION` stays **numeric** `X.Y.Z` only — beta lives on the **tag** (and Sparkle channel), not in the plist marketing string.
+- **Stable (default):** tag `vX.Y.Z`
+- **Beta (explicit only):** tag `vX.Y.Z-beta.N` where `N` is one greater than the highest existing `vX.Y.Z-beta.*` tag for that same `X.Y.Z`, or `1` if none. `MARKETING_VERSION` stays **numeric** `X.Y.Z` only — beta lives on the **tag** (and Sparkle channel), not in the plist marketing string.
 
 ### Update macOS marketing version only
 
@@ -77,6 +79,29 @@ In `Metagraf.xcodeproj/project.pbxproj`, set `MARKETING_VERSION` on the **Metagr
    - `git push origin main` and `git push origin <tag>` in the same step sequence, or equivalent that publishes both without leaving a tag-less push as the only action.
 
 That push triggers the full release pipeline (Xcode Cloud + GitHub Actions). Do not invent extra release steps.
+
+## Phase 3 — Offer pipeline babysitting
+
+After a successful push, ask at the **very end**:
+
+> Should I babysit the release pipeline?
+
+- If **no** / silence / anything other than a clear yes → stop. Do not monitor further.
+- If **yes** → babysit until published or clearly blocked (see below). Do not start babysitting before they answer.
+
+### Babysit checklist
+
+Monitor both **GitHub Actions → Release Metagraf** (for the pushed tag) and **Xcode Cloud → Mac Release**. Report concise status updates; dig into logs on failure.
+
+Success criteria (`Docs/ReleaseWorkflow.md`):
+
+1. GitHub creates a draft Release, then publishes after notarization / Sparkle / upload succeed
+2. Release ZIP + checksum exist on the GitHub Release
+3. `https://benjamin-kraatz.github.io/metagraf/appcast.xml` includes the new release
+
+On failure, summarize the failing job/step and the recovery hint from the workflow doc (rerun vs fix-on-main vs Xcode Cloud). **Never** move or recreate the tag.
+
+Use `gh` for Actions/release status; check the appcast URL for publication. Prefer Xcode MCP / App Store Connect tooling when available for Xcode Cloud; otherwise report what you can see and what needs a human look.
 
 ## Abort rules
 

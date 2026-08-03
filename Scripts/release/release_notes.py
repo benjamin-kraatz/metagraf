@@ -16,7 +16,7 @@ from urllib.parse import quote
 
 from cursor_sdk import Agent, AgentOptions, CursorAgentError, LocalAgentOptions, RunResult
 
-DEFAULT_MODEL = "cursor-grok-4.5-low"
+DEFAULT_MODEL = "composer-2.5"
 PR_REF = re.compile(r"\(#(\d+)\)")
 
 

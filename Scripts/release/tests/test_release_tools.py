@@ -131,7 +131,7 @@ class ReleaseToolsTests(unittest.TestCase):
         result.agent_id = "agent-1"
         result.status = "finished"
         result.result = "## Features\n\n- Dunkler Modus\n"
-        result.model = MagicMock(id="cursor-grok-4.5-low")
+        result.model = MagicMock(id="composer-2.5")
         result.duration_ms = 12
         result.usage = None
 

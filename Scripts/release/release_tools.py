@@ -268,7 +268,7 @@ def main() -> None:
     notes.add_argument("--tag", required=True)
     notes.add_argument("--output", type=Path, required=True)
     notes.add_argument("--repository", type=Path, default=Path("."))
-    notes.add_argument("--model", default="cursor-grok-4.5-low")
+    notes.add_argument("--model", default="composer-2.5")
     notes.add_argument("--api-key", default=None)
 
     history = commands.add_parser("select-history")
