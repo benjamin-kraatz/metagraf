@@ -649,7 +649,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fenster für Doppeltipp-Einrastung"
+            "value" : "Zeitfenster für Doppeltipp"
           }
         }
       }
@@ -938,7 +938,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Halten kürzer als ignorieren"
+            "value" : "Kürzere Haltezeiten ignorieren"
           }
         }
       }
@@ -1376,7 +1376,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Optional: häufige Fehler hinzufügen, die Metagraf in diesen Begriff umschreiben soll, durch Kommas getrennt."
+            "value" : "Optional: häufige Fehlhörungen eintragen, die Metagraf in diesen Begriff umschreiben soll — durch Kommas getrennt."
           }
         }
       }
@@ -1646,7 +1646,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Varianten durch Kommas trennen. Sie werden nach dem Diktat in den Begriff umgeschrieben."
+            "value" : "Varianten durch Kommas trennen. Nach dem Diktat werden sie in den Begriff umgeschrieben."
           }
         }
       }
@@ -1797,7 +1797,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tippe zweimal schnell, damit das Diktat freihändig weiterläuft; drücke einmal mehr zum Beenden. Escape bricht ab."
+            "value" : "Tippe zweimal schnell, um freihändig weiterzudiktieren. Tippe erneut zum Beenden; Escape bricht ab."
           }
         }
       }
@@ -1807,7 +1807,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tippe zweimal innerhalb des Einrastfensters, damit das Diktat freihändig weiterläuft; drücke einmal mehr zum Beenden. Escape bricht ab."
+            "value" : "Tippe zweimal innerhalb des Zeitfensters, um freihändig weiterzudiktieren. Tippe erneut zum Beenden; Escape bricht ab."
           }
         }
       }
@@ -1827,7 +1827,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Begriff ist die Schreibweise, die Metagraf bevorzugen soll. Auch gehört als listet falsche Varianten, die in diesen Begriff umgeschrieben werden — zum Beispiel „meta graph“ → „Metagraf“. Whisper-Modelle erhalten kein Speech-Biasing; Umschreiben und Verfeinerung greifen trotzdem."
+            "value" : "Unter „Begriff“ trägst du die Schreibweise ein, die Metagraf bevorzugen soll. Unter „Auch gehört als“ listest du typische Fehlhörungen — Metagraf schreibt sie nach dem Diktat in den Begriff um, etwa „meta graph“ → „Metagraf“. Bei Whisper-Modellen wirken die Begriffe nicht schon bei der Erkennung; Umschreiben und Verfeinerung greifen trotzdem."
           }
         }
       }
