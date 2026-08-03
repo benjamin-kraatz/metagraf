@@ -27,9 +27,9 @@ struct MetagrafApp: App {
         Window("Welcome to Metagraf", id: MetagrafWindow.onboarding.rawValue) {
             OnboardingWindow(permissions: appDelegate.permissions)
                 .onAppear {
-                    // An agent app has no Dock icon to click, so it has to ask
-                    // for the foreground itself or the window opens unfocused
-                    // behind everything.
+                    // Without a Dock icon the app stays accessory, so it has to
+                    // ask for the foreground itself or the window opens
+                    // unfocused behind everything.
                     NSApp.activate(ignoringOtherApps: true)
                 }
         }
@@ -96,3 +96,11 @@ enum MetagrafWindow: String {
     case main
     case onboarding
 }
+
+#if os(macOS)
+extension Notification.Name {
+    /// Posted when the Dock icon is clicked with no visible windows, so a
+    /// SwiftUI scene that owns `openWindow` can create the main window.
+    static let metagrafOpenMainWindow = Notification.Name("Metagraf.openMainWindow")
+}
+#endif

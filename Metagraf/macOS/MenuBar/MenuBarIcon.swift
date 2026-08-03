@@ -19,6 +19,17 @@ struct MenuBarIcon: View {
                 guard !permissions.isReady else { return }
                 openWindow(id: MetagrafWindow.onboarding.rawValue)
             }
+            .onReceive(NotificationCenter.default.publisher(for: .metagrafOpenMainWindow)) { _ in
+                openWindow(id: MetagrafWindow.main.rawValue)
+                Task { @MainActor in
+                    await Task.yield()
+                    guard let window = NSApp.windows.first(where: {
+                        $0.identifier?.rawValue == MetagrafWindow.main.rawValue
+                    }) else { return }
+                    window.makeKeyAndOrderFront(nil)
+                    NSApp.activate(ignoringOtherApps: true)
+                }
+            }
     }
 
     private var symbol: String {

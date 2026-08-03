@@ -105,6 +105,11 @@ public final class SettingsStore {
         didSet { write(launchAtLogin, .launchAtLogin) }
     }
 
+    /// Whether the app keeps a Dock icon in addition to the menu bar extra.
+    public var showDockIcon: Bool {
+        didSet { write(showDockIcon, .showDockIcon) }
+    }
+
     /// Whether Sparkle may offer prerelease builds in addition to stable ones.
     public var receivesBetaUpdates: Bool {
         didSet { write(receivesBetaUpdates, .receivesBetaUpdates) }
@@ -147,6 +152,7 @@ public final class SettingsStore {
             .flatMap(PillPlacement.init(rawValue:)) ?? .bottomCenter
         playsSounds = defaults.object(forKey: Key.playsSounds.rawValue) as? Bool ?? true
         launchAtLogin = defaults.object(forKey: Key.launchAtLogin.rawValue) as? Bool ?? false
+        showDockIcon = defaults.object(forKey: Key.showDockIcon.rawValue) as? Bool ?? false
         receivesBetaUpdates = defaults.object(forKey: Key.receivesBetaUpdates.rawValue) as? Bool ?? false
         retentionDays = defaults.object(forKey: Key.retentionDays.rawValue) as? Int ?? 30
 
@@ -193,6 +199,7 @@ public final class SettingsStore {
         case pillPlacement = "appearance.pillPlacement"
         case playsSounds = "appearance.playsSounds"
         case launchAtLogin = "general.launchAtLogin"
+        case showDockIcon = "general.showDockIcon"
         case receivesBetaUpdates = "updates.receivesBeta"
         case retentionDays = "history.retentionDays"
         case vocabulary = "vocabulary.entries"

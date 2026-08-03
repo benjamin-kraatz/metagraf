@@ -63,6 +63,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         // app knowing, so trust the system rather than the stored preference.
         settings.launchAtLogin = LaunchAtLogin.isEnabled
 
+        // Apply before anything else that might present UI, so a Dock-icon
+        // preference takes effect on the first launch frame.
+        applyDockVisibility()
+
         session.prewarm()
         startHotKeys()
 
@@ -74,6 +78,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     func applicationWillTerminate(_ notification: Notification) {
         hotKeys.stop()
         releaseInstanceLock()
+    }
+
+    /// Clicking the Dock icon should reveal Metagraf even when no window is
+    /// open yet. Open windows are listed in the Dock menu automatically while
+    /// the app uses the regular activation policy.
+    func applicationShouldHandleReopen(
+        _ sender: NSApplication,
+        hasVisibleWindows flag: Bool
+    ) -> Bool {
+        guard settings.showDockIcon else { return false }
+
+        if flag {
+            NSApp.activate(ignoringOtherApps: true)
+            return true
+        }
+
+        NotificationCenter.default.post(name: .metagrafOpenMainWindow, object: nil)
+        NSApp.activate(ignoringOtherApps: true)
+        return true
     }
 
     // MARK: - Delivery
@@ -187,6 +210,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
 
     /// Pushes the user's preferences into the pieces that hold their own copy.
     func applySettings() {
+        applyDockVisibility()
+
         feedback.isEnabled = settings.playsSounds
         pill?.reposition()
 
@@ -198,6 +223,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         if model.id != activeModelID {
             session.use(EngineFactory.make(for: model, store: models))
             activeModelID = model.id
+        }
+    }
+
+    /// `LSUIElement` launches us as an accessory (menu-bar) app. Flip to
+    /// `.regular` when the user wants a Dock icon; AppKit then lists open
+    /// windows in the Dock menu on its own.
+    private func applyDockVisibility() {
+        let policy: NSApplication.ActivationPolicy = settings.showDockIcon ? .regular : .accessory
+        guard NSApp.activationPolicy() != policy else { return }
+        guard NSApp.setActivationPolicy(policy) else {
+            logger.error("Could not switch activation policy to \(String(describing: policy), privacy: .public)")
+            return
         }
     }
 
