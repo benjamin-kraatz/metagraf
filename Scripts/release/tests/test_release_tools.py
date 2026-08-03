@@ -1,18 +1,24 @@
-import json
 import subprocess
 import sys
 import tempfile
 import unittest
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from unittest.mock import MagicMock
 
+from Scripts.release.release_notes import (
+    CommitInfo,
+    PullRequestInfo,
+    format_reference_footer,
+    generate_release_notes,
+    normalize_notes_body,
+)
 from Scripts.release.release_tools import (
     SPARKLE_NS,
     build_appcast,
     extract_deltas,
     is_ancestor,
     parse_tag,
-    placeholder_notes,
     select_delta_sources,
     select_history,
     validate_appcast,
@@ -93,23 +99,67 @@ class ReleaseToolsTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr)
 
-    def test_placeholder_notes_parsing(self):
-        class Response:
-            def __enter__(self):
-                return self
+    def test_reference_footer_lists_prs_with_thanks(self):
+        footer = format_reference_footer(
+            [
+                PullRequestInfo(12, "Add dark mode", "alice", "https://example.test/12"),
+                PullRequestInfo(13, "Fix crash", None, "https://example.test/13"),
+            ],
+            [],
+        )
+        self.assertIn("Add dark mode (#12) thanks to @alice", footer)
+        self.assertIn("- Fix crash (#13)", footer)
+        self.assertNotIn("Fix crash (#13) thanks to", footer)
 
-            def __exit__(self, *_):
-                return False
+    def test_reference_footer_falls_back_to_commits(self):
+        footer = format_reference_footer(
+            [],
+            [
+                CommitInfo("aaaaaaaa", "feat: one", "", "1 file changed"),
+                CommitInfo("bbbbbbbb", "fix: two", "", "1 file changed"),
+            ],
+        )
+        self.assertIn("feat: one (aaaaaaa)", footer)
+        self.assertIn("fix: two (bbbbbbb)", footer)
 
-            def read(self):
-                return json.dumps({"title": "Titel", "body": "Inhalt"}).encode()
+    def test_normalize_notes_strips_code_fences(self):
+        self.assertEqual(normalize_notes_body("```markdown\nHallo\n```"), "Hallo")
 
-        from unittest.mock import patch
+    def test_generate_release_notes_appends_footer(self):
+        result = MagicMock()
+        result.id = "run-1"
+        result.agent_id = "agent-1"
+        result.status = "finished"
+        result.result = "## Features\n\n- Dunkler Modus\n"
+        result.model = MagicMock(id="cursor-grok-4.5-low")
+        result.duration_ms = 12
+        result.usage = None
 
-        with patch("urllib.request.urlopen", return_value=Response()):
-            notes = placeholder_notes("https://example.test")
-        self.assertIn("PLACEHOLDER", notes)
-        self.assertIn("**Titel**", notes)
+        with tempfile.TemporaryDirectory() as directory:
+            repository = Path(directory)
+            subprocess.run(["git", "init", "-q"], cwd=repository, check=True)
+            subprocess.run(["git", "config", "user.name", "Release Test"], cwd=repository, check=True)
+            subprocess.run(["git", "config", "user.email", "release@example.test"], cwd=repository, check=True)
+            (repository / "value").write_text("one", encoding="utf-8")
+            subprocess.run(["git", "add", "value"], cwd=repository, check=True)
+            subprocess.run(["git", "commit", "-qm", "feat: one"], cwd=repository, check=True)
+            subprocess.run(["git", "tag", "-am", "v0.1.0", "v0.1.0"], cwd=repository, check=True)
+            (repository / "value").write_text("two", encoding="utf-8")
+            subprocess.run(["git", "commit", "-qam", "feat: two (#7)"], cwd=repository, check=True)
+            subprocess.run(["git", "tag", "-am", "v0.2.0", "v0.2.0"], cwd=repository, check=True)
+
+            notes = generate_release_notes(
+                "v0.2.0",
+                repository=repository,
+                api_key="test-key",
+                github_repository=None,
+                github_token=None,
+                prompt_runner=lambda *_: result,
+            )
+
+        self.assertIn("Dunkler Modus", notes)
+        self.assertIn("feat: two (#7)", notes)
+        self.assertIn("---", notes)
 
     def test_appcast_contains_build_channel_and_signature(self):
         entry = {

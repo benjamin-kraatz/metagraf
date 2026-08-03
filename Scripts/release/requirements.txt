@@ -1,1 +1,2 @@
 PyJWT[crypto]==2.10.1
+cursor-sdk==1.0.26

@@ -5,10 +5,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
-import urllib.request
 import xml.etree.ElementTree as ET
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
@@ -79,21 +79,6 @@ def select_delta_sources(releases: list[dict[str, Any]], current_tag: str) -> li
     selected = [*stable, *beta]
     selected.sort(key=lambda item: item.get("publishedAt") or "", reverse=True)
     return selected
-
-
-def placeholder_notes(url: str) -> str:
-    with urllib.request.urlopen(url, timeout=15) as response:  # noqa: S310 - fixed workflow URL
-        payload = json.load(response)
-    title = str(payload.get("title", "Release")).strip()
-    body = str(payload.get("body", "Keine Details verfügbar.")).strip()
-    if not title or not body:
-        raise ValueError("placeholder notes response needs non-empty title and body")
-    return (
-        "<!-- PLACEHOLDER: replace Scripts/release/release_tools.py notes provider -->\n"
-        "## Änderungen\n\n"
-        f"**{title}**\n\n{body}\n\n"
-        "_Diese Versionshinweise wurden vorübergehend aus dem Typicode-Testdienst erzeugt._\n"
-    )
 
 
 def build_appcast(entries: list[dict[str, Any]], output: Path) -> None:
@@ -279,9 +264,12 @@ def main() -> None:
     ancestry.add_argument("commit")
     ancestry.add_argument("main_ref", metavar="main-ref")
 
-    notes = commands.add_parser("placeholder-notes")
-    notes.add_argument("--url", default="https://jsonplaceholder.typicode.com/posts/1")
+    notes = commands.add_parser("generate-notes")
+    notes.add_argument("--tag", required=True)
     notes.add_argument("--output", type=Path, required=True)
+    notes.add_argument("--repository", type=Path, default=Path("."))
+    notes.add_argument("--model", default="cursor-grok-4.5-low")
+    notes.add_argument("--api-key", default=None)
 
     history = commands.add_parser("select-history")
     history.add_argument("--releases", type=Path, required=True)
@@ -314,8 +302,27 @@ def main() -> None:
         elif args.command == "validate-ancestry":
             if not is_ancestor(args.commit, args.main_ref):
                 raise ValueError(f"{args.commit} is not contained in {args.main_ref}")
-        elif args.command == "placeholder-notes":
-            args.output.write_text(placeholder_notes(args.url), encoding="utf-8")
+        elif args.command == "generate-notes":
+            try:
+                from release_notes import generate_release_notes
+            except ImportError:  # pragma: no cover - package import path for tests
+                from Scripts.release.release_notes import generate_release_notes
+            from cursor_sdk import CursorAgentError
+
+            try:
+                notes_text = generate_release_notes(
+                    args.tag,
+                    repository=args.repository,
+                    api_key=args.api_key or os.environ.get("CURSOR_API_KEY"),
+                    model=args.model,
+                )
+            except CursorAgentError as error:
+                print(f"error: {error}", file=sys.stderr)
+                raise SystemExit(1) from error
+            except RuntimeError as error:
+                print(f"error: {error}", file=sys.stderr)
+                raise SystemExit(2) from error
+            args.output.write_text(notes_text, encoding="utf-8")
         elif args.command == "select-history":
             releases = json.loads(args.releases.read_text(encoding="utf-8"))
             args.output.write_text(json.dumps(select_history(releases, args.current_tag), indent=2), encoding="utf-8")

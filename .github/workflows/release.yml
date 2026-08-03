@@ -25,6 +25,7 @@ jobs:
       artifact-name: ${{ steps.handoff.outputs.artifact-name }}
     env:
       GH_TOKEN: ${{ github.token }}
+      CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
       ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
       ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
       ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
@@ -44,6 +45,9 @@ jobs:
           cache: pip
           cache-dependency-path: Scripts/release/requirements.txt
 
+      - name: Install release Python dependencies
+        run: python3 -m pip install --disable-pip-version-check -r Scripts/release/requirements.txt
+
       - name: Validate tag and source
         id: version
         run: |
@@ -59,10 +63,15 @@ jobs:
           echo "channel=$(jq -r .channel <<<"$metadata")" >> "$GITHUB_OUTPUT"
           echo "prerelease=$(jq -r .prerelease <<<"$metadata")" >> "$GITHUB_OUTPUT"
 
-      - name: Generate temporary German release notes
+      - name: Generate German release notes
         run: |
-          python3 Scripts/release/release_tools.py placeholder-notes \
+          : "${CURSOR_API_KEY:?Configure CURSOR_API_KEY}"
+          python3 Scripts/release/release_tools.py generate-notes \
+            --tag "$GITHUB_REF_NAME" \
             --output "$RUNNER_TEMP/release-notes.md"
+          echo "----- release notes -----"
+          cat "$RUNNER_TEMP/release-notes.md"
+          echo "----- end release notes -----"
 
       - name: Create or reuse draft release
         id: release
@@ -97,9 +106,6 @@ jobs:
           fi
           [[ -n "$release_id" ]] || { echo "error: draft release was not found" >&2; exit 1; }
           echo "id=$release_id" >> "$GITHUB_OUTPUT"
-
-      - name: Install App Store Connect client dependency
-        run: python3 -m pip install --disable-pip-version-check -r Scripts/release/requirements.txt
 
       - name: Wait for notarized Xcode Cloud artifact
         env:

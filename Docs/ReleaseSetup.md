@@ -65,6 +65,7 @@ No Xcode Cloud lifecycle scripts are required. The existing tag-push configurati
 ## GitHub repository
 
 - [ ] Create a GitHub environment named exactly `Release`. Add `ASC_ISSUER_ID`, `ASC_KEY_ID`, and `ASC_PRIVATE_KEY` as its environment secrets. The orchestrator job selects this environment so those secrets are available.
+- [ ] Add repository secret `CURSOR_API_KEY` (user or service-account key from the Cursor dashboard). The orchestrator uses it to generate German release notes via the Cursor SDK.
 - [ ] Under **Settings → Pages**, select **GitHub Actions** as the deployment source.
 - [ ] Under **Settings → Environments → github-pages → Deployment branches and tags**, allow the `main` branch and tags matching `v*`.
 - [ ] Under **Settings → Actions → General**, allow GitHub Actions to create and update Releases.
