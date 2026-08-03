@@ -68,6 +68,10 @@ struct VocabularyRefinerPipelineTests {
         var availability: RefinerAvailability = .available
         var transform: @Sendable (String) throws -> String
 
+        func availability(for locale: Locale) async -> RefinerAvailability {
+            availability
+        }
+
         func refine(_ text: String, context: RefinementContext) async throws -> String {
             try transform(text)
         }

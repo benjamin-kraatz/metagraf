@@ -50,6 +50,25 @@ struct SettingsStoreTests {
         #expect(settings.personaAdaptation == .contextualPolish)
     }
 
+    @Test("Portable refinement context carries every user setting")
+    func portableRefinementContext() {
+        let settings = SettingsStore(defaults: makeDefaults())
+        settings.refinementStyle = .notes
+        settings.refinementPersona = .programmer
+        settings.personaAdaptation = .strongAdaptation
+        settings.localeIdentifier = "de-DE"
+        settings.vocabulary = [VocabularyEntry(term: "Metagraf", misheard: ["meta graph"])]
+
+        let context = settings.portableRefinementContext(usesLanguageModel: false)
+        #expect(context.style == .notes)
+        #expect(context.persona == .programmer)
+        #expect(context.personaAdaptation == .strongAdaptation)
+        #expect(context.locale.identifier == "de-DE")
+        #expect(context.vocabulary == settings.vocabulary)
+        #expect(!context.usesLanguageModel)
+        #expect(!context.destination.hasRichContext)
+    }
+
     @Test("An empty language setting follows the system")
     func emptyLocaleFollowsSystem() {
         let settings = SettingsStore(defaults: makeDefaults())

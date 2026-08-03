@@ -51,7 +51,7 @@ struct FormattingSettings: View {
                             }
                         }
                         .tag(style)
-                        .disabled(style == .intelligent && (isChecking || unavailableReason != nil))
+                        .disabled(style.needsLanguageModel && (isChecking || unavailableReason != nil))
                     }
                 }
                 Text(LocalizedStringKey(settings.refinementStyle.explanation))
@@ -92,7 +92,9 @@ struct FormattingSettings: View {
         .formStyle(.grouped)
         .task {
             guard case .live = availabilitySource else { return }
-            unavailableReason = await refiners.languageModelUnavailableReason()
+            unavailableReason = await refiners.languageModelUnavailableReason(
+                for: settings.effectiveLocale
+            )
             isChecking = false
         }
     }

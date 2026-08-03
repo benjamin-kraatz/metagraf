@@ -27,10 +27,15 @@ public struct RefinerRegistry: Sendable {
         guard context.usesLanguageModel, context.style.needsLanguageModel else { return corrected }
 
         for refiner in modelRefiners {
-            guard await refiner.availability.isAvailable else { continue }
+            guard await refiner.availability(for: context.locale).isAvailable else { continue }
             do {
                 let refined = try await refiner.refine(corrected, context: context)
-                return VocabularyRewriter.apply(refined, vocabulary: context.vocabulary)
+                let nonempty = refined.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !nonempty.isEmpty else {
+                    logger.notice("\(refiner.identifier.rawValue, privacy: .public) returned empty text")
+                    continue
+                }
+                return VocabularyRewriter.apply(nonempty, vocabulary: context.vocabulary)
             } catch {
                 logger.notice(
                     """
@@ -44,14 +49,41 @@ public struct RefinerRegistry: Sendable {
         return corrected
     }
 
-    /// Why the language-model step is unavailable, for the settings UI to show.
-    public func languageModelUnavailableReason() async -> String? {
+    /// Loads the first suitable language model while speech is still being
+    /// recorded. This is intentionally best-effort and never blocks dictation.
+    public func prewarm(context: RefinementContext) async {
+        guard context.usesLanguageModel, context.style.needsLanguageModel else { return }
+
         for refiner in modelRefiners {
-            switch await refiner.availability {
-            case .available: return nil
-            case .unavailable(let reason): return reason
+            guard await refiner.availability(for: context.locale).isAvailable else { continue }
+            await refiner.prewarm(context: context)
+            return
+        }
+    }
+
+    /// Availability of the first configured language model for a locale.
+    public func languageModelAvailability(for locale: Locale) async -> RefinerAvailability {
+        var lastReason: String?
+        for refiner in modelRefiners {
+            switch await refiner.availability(for: locale) {
+            case .available:
+                return .available
+            case .unavailable(let reason):
+                lastReason = reason
             }
         }
-        return String(localized: "No text model is configured.", bundle: .main)
+        return .unavailable(
+            lastReason ?? String(localized: "No text model is configured.", bundle: .main)
+        )
+    }
+
+    /// Why the language-model step is unavailable, for settings UI.
+    public func languageModelUnavailableReason(for locale: Locale) async -> String? {
+        switch await languageModelAvailability(for: locale) {
+        case .available:
+            nil
+        case .unavailable(let reason):
+            reason
+        }
     }
 }

@@ -15,16 +15,21 @@ import UIKit
 @Observable
 final class DictationController {
     let session = DictationSession()
-    let settings = SettingsStore.shared
+    let settings: SettingsStore
+    let refinementAvailability: RefinementAvailabilityModel
     private(set) var history: HistoryStore?
 
     /// Set when the last transcript was copied, so the UI can confirm it.
     private(set) var didCopyAt: Date?
 
     private let logger = Logger(subsystem: Metagraf.bundleIdentifier, category: "App")
+    private let feedback = MobileFeedbackPlayer()
     private var startedAt: Date?
 
     init() {
+        settings = SettingsStore.shared
+        refinementAvailability = RefinementAvailabilityModel()
+
         do {
             let history = try HistoryStore(inMemory: false)
             history.prune(retentionDays: settings.retentionDays)
@@ -38,6 +43,10 @@ final class DictationController {
         }
 
         session.prewarm()
+
+        Task {
+            await refinementAvailability.refresh(settings: settings)
+        }
     }
 
     var isRecording: Bool { session.phase == .recording }
@@ -46,9 +55,13 @@ final class DictationController {
         if session.phase == .recording {
             await session.complete()
         } else if !session.phase.isBusy {
+            await refinementAvailability.refresh(settings: settings)
             applySettings()
             startedAt = .now
             await session.begin()
+            if session.phase == .recording {
+                feedback.play(.started)
+            }
         }
     }
 
@@ -63,11 +76,10 @@ final class DictationController {
             locale: settings.effectiveLocale,
             contextualStrings: settings.contextualStrings
         )
-        session.refinement = RefinementContext(
-            style: settings.refinementStyle,
-            locale: settings.effectiveLocale,
-            vocabulary: settings.vocabulary
+        session.refinement = settings.portableRefinementContext(
+            usesLanguageModel: refinementAvailability.allowsLanguageModel
         )
+        feedback.isEnabled = settings.playsSounds
     }
 
     private func deliver(_ transcript: String) -> DictationSession.DeliveryOutcome {
@@ -76,6 +88,7 @@ final class DictationController {
         // Shared with the keyboard, which cannot dictate but can insert this.
         RecentTranscripts.shared.add(transcript)
         record(transcript)
+        feedback.play(.finished)
         // Clipboard is the intended iOS path; keep the idle “Copied to the
         // clipboard” confirmation rather than the transient `.copied` phase.
         return .inserted

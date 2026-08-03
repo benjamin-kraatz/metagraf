@@ -248,6 +248,13 @@ public enum RefinerAvailability: Equatable, Sendable {
 /// can be added later without touching the dictation pipeline.
 public protocol TextRefiner: Sendable {
     var identifier: RefinerID { get }
-    var availability: RefinerAvailability { get async }
+    func availability(for locale: Locale) async -> RefinerAvailability
+    func prewarm(context: RefinementContext) async
     func refine(_ text: String, context: RefinementContext) async throws -> String
+}
+
+public extension TextRefiner {
+    /// Most refiners have nothing useful to prepare ahead of time. Apple
+    /// Intelligence overrides this to load its model while the user speaks.
+    func prewarm(context: RefinementContext) async {}
 }
