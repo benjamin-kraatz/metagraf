@@ -152,13 +152,27 @@ public struct AppleIntelligenceRefiner: TextRefiner, Sendable {
             }
         }
 
-        let terms = context.vocabulary.map(\.term).filter { !$0.isEmpty }
-        if !terms.isEmpty {
-            blocks.append("Preferred spellings (reference only):\n\(terms.joined(separator: "\n"))")
+        let spellings = preferredSpellingLines(from: context.vocabulary)
+        if !spellings.isEmpty {
+            blocks.append("Preferred spellings (reference only):\n\(spellings.joined(separator: "\n"))")
         }
 
         blocks.append("Speech transcript:\n\(text)")
         return blocks.joined(separator: "\n\n")
+    }
+
+    /// One line per vocabulary entry: either the term alone, or
+    /// `misheard → term` when corrections are configured.
+    func preferredSpellingLines(from vocabulary: [VocabularyEntry]) -> [String] {
+        vocabulary.compactMap { entry in
+            let term = entry.term.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !term.isEmpty else { return nil }
+            let misheard = entry.misheard
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
+            if misheard.isEmpty { return term }
+            return "\(misheard.joined(separator: ", ")) → \(term)"
+        }
     }
 
     /// Runs `work`, returning `fallback` if the deadline passes first.

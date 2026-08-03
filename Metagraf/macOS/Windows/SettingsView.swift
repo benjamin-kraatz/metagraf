@@ -216,6 +216,8 @@ private struct VocabularySettings: View {
 
     @State private var selection: VocabularyEntry.ID?
     @State private var newTerm = ""
+    @State private var editedTerm = ""
+    @State private var editedMisheard = ""
 
     var body: some View {
         VStack(spacing: 0) {
@@ -225,20 +227,52 @@ private struct VocabularySettings: View {
                 }
                 TableColumn("Also heard as") { entry in
                     Text(entry.misheard.joined(separator: ", "))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(entry.misheard.isEmpty ? .tertiary : .secondary)
                 }
             }
             .tableStyle(.inset)
+            .onChange(of: selection) { _, newValue in
+                loadEditor(for: newValue)
+            }
+
+            if selection != nil {
+                Divider()
+
+                VStack(alignment: .leading, spacing: 8) {
+                    LabeledContent("Term") {
+                        TextField("Preferred spelling", text: $editedTerm)
+                            .textFieldStyle(.roundedBorder)
+                            .onSubmit(commitEditor)
+                    }
+
+                    LabeledContent("Also heard as") {
+                        TextField("meta graph, metagraph", text: $editedMisheard)
+                            .textFieldStyle(.roundedBorder)
+                            .onSubmit(commitEditor)
+                    }
+
+                    Text(
+                        editedMisheard.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                            ? "Optional: add common mistakes Metagraf should rewrite into this term, separated by commas."
+                            : "Separate variants with commas. They are rewritten into the term after dictation."
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+                .padding(12)
+                .onChange(of: editedTerm) { _, _ in commitEditor() }
+                .onChange(of: editedMisheard) { _, _ in commitEditor() }
+            }
 
             Divider()
 
             HStack(spacing: 8) {
-                TextField("Add a name or term Metagraf keeps getting wrong", text: $newTerm)
+                TextField("Add a preferred spelling", text: $newTerm)
                     .textFieldStyle(.roundedBorder)
                     .onSubmit(add)
 
                 Button("Add", action: add)
-                    .disabled(trimmedTerm.isEmpty)
+                    .disabled(trimmedNewTerm.isEmpty)
 
                 Button("Remove", action: removeSelected)
                     .disabled(selection == nil)
@@ -246,34 +280,83 @@ private struct VocabularySettings: View {
             .padding(12)
         }
         .safeAreaInset(edge: .top) {
-            Text("These words are fed to the speech model so it favours them over similar-sounding ones.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
+            Text(
+                """
+                Term is the spelling Metagraf should favour. Also heard as lists \
+                wrong variants to rewrite into that term — for example “meta graph” \
+                → “Metagraf”. Whisper models skip speech biasing; rewrite and \
+                refinement still apply.
+                """
+            )
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
         }
     }
 
-    private var trimmedTerm: String {
+    private var trimmedNewTerm: String {
         newTerm.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
+    private func loadEditor(for id: VocabularyEntry.ID?) {
+        guard let id, let entry = settings.vocabulary.first(where: { $0.id == id }) else {
+            editedTerm = ""
+            editedMisheard = ""
+            return
+        }
+        editedTerm = entry.term
+        editedMisheard = entry.misheard.joined(separator: ", ")
+    }
+
+    private func commitEditor() {
+        guard let selection,
+              let index = settings.vocabulary.firstIndex(where: { $0.id == selection })
+        else { return }
+
+        let term = editedTerm.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !term.isEmpty else { return }
+
+        let duplicate = settings.vocabulary.contains {
+            $0.id != selection && $0.term.caseInsensitiveCompare(term) == .orderedSame
+        }
+        guard !duplicate else { return }
+
+        let misheard = Self.parseMisheard(editedMisheard)
+        var entry = settings.vocabulary[index]
+        guard entry.term != term || entry.misheard != misheard else { return }
+        entry.term = term
+        entry.misheard = misheard
+        settings.vocabulary[index] = entry
+    }
+
     private func add() {
-        let term = trimmedTerm
+        let term = trimmedNewTerm
         guard !term.isEmpty else { return }
         guard !settings.vocabulary.contains(where: { $0.term.caseInsensitiveCompare(term) == .orderedSame }) else {
             newTerm = ""
             return
         }
-        settings.vocabulary.append(VocabularyEntry(term: term))
+        let entry = VocabularyEntry(term: term)
+        settings.vocabulary.append(entry)
         newTerm = ""
+        selection = entry.id
+        loadEditor(for: entry.id)
     }
 
     private func removeSelected() {
         guard let selection else { return }
         settings.vocabulary.removeAll { $0.id == selection }
         self.selection = nil
+        editedTerm = ""
+        editedMisheard = ""
+    }
+
+    private static func parseMisheard(_ raw: String) -> [String] {
+        raw.split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
     }
 }
 
