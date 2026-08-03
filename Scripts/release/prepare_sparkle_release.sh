@@ -13,6 +13,8 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 work_dir="${RUNNER_TEMP:-$repo_root/build}/sparkle-release"
 extract_dir="$work_dir/extracted"
 history_dir="$work_dir/history"
+delta_input_dir="$work_dir/delta-input"
+delta_appcast="$work_dir/delta-appcast.xml"
 
 [[ -f "$manifest" ]] || { echo "error: missing handoff manifest" >&2; exit 1; }
 : "${SPARKLE_PRIVATE_KEY:?SPARKLE_PRIVATE_KEY is required}"
@@ -77,7 +79,9 @@ xcodebuild -resolvePackageDependencies \
     -scheme Metagraf \
     -clonedSourcePackagesDirPath "$work_dir/SourcePackages" >/dev/null
 sign_tool="$(find "$work_dir/SourcePackages/artifacts" -type f -path '*/Sparkle/bin/sign_update' -print -quit)"
+generate_appcast_tool="$(find "$work_dir/SourcePackages/artifacts" -type f -path '*/Sparkle/bin/generate_appcast' -print -quit)"
 [[ -x "$sign_tool" ]] || { echo "error: Sparkle sign_update tool not found" >&2; exit 1; }
+[[ -x "$generate_appcast_tool" ]] || { echo "error: Sparkle generate_appcast tool not found" >&2; exit 1; }
 
 gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/releases?per_page=100" > "$work_dir/releases-raw.json"
 jq '[flatten[] | {
@@ -91,6 +95,10 @@ python3 "$repo_root/Scripts/release/release_tools.py" select-history \
     --releases "$work_dir/releases.json" \
     --current-tag "$tag" \
     --output "$work_dir/selected-releases.json"
+python3 "$repo_root/Scripts/release/release_tools.py" select-delta-sources \
+    --releases "$work_dir/releases.json" \
+    --current-tag "$tag" \
+    --output "$work_dir/selected-delta-sources.json"
 
 : > "$work_dir/entries.ndjson"
 while IFS= read -r release; do
@@ -127,27 +135,65 @@ while IFS= read -r release; do
         --arg url "https://github.com/$GITHUB_REPOSITORY/releases/download/$release_tag/Metagraf-$release_version.zip" \
         --arg signature "$signature" \
         --arg length "$length" \
-        '{version:$version,build:($build|tonumber),channel:$channel,publishedAt:$publishedAt,notes:$notes,url:$url,signature:$signature,length:($length|tonumber)}' \
+        --arg tag "$release_tag" \
+        '{tag:$tag,version:$version,build:($build|tonumber),channel:$channel,publishedAt:$publishedAt,notes:$notes,url:$url,signature:$signature,length:($length|tonumber),deltas:[]}' \
         >> "$work_dir/entries.ndjson"
 done < <(jq -c '.[]' "$work_dir/selected-releases.json")
 
+mkdir -p "$delta_input_dir"
+cp "$zip_path" "$delta_input_dir/$zip_name"
+while IFS= read -r delta_source; do
+    delta_source_version="$(jq -r '.tagName' <<<"$delta_source")"
+    delta_source_version="${delta_source_version#v}"
+    delta_source_zip="$history_dir/Metagraf-$delta_source_version.zip"
+    [[ -f "$delta_source_zip" ]] || { echo "error: missing delta source ZIP for $delta_source_version" >&2; exit 1; }
+    cp "$delta_source_zip" "$delta_input_dir/"
+done < <(jq -c '.[]' "$work_dir/selected-delta-sources.json")
+
 jq -s 'sort_by(.build) | reverse' "$work_dir/entries.ndjson" > "$work_dir/entries.json"
+delta_entries='[]'
+if jq -e 'length > 0' "$work_dir/selected-delta-sources.json" >/dev/null; then
+    download_url_prefix="https://github.com/$GITHUB_REPOSITORY/releases/download/$tag"
+    printf '%s\n' "$SPARKLE_PRIVATE_KEY" | "$generate_appcast_tool" \
+        --ed-key-file - \
+        --disable-signing-warning \
+        --maximum-versions 0 \
+        --maximum-deltas 5 \
+        --download-url-prefix "$download_url_prefix/" \
+        -o "$delta_appcast" \
+        "$delta_input_dir"
+    delta_entries="$(python3 "$repo_root/Scripts/release/release_tools.py" extract-deltas \
+        --appcast "$delta_appcast" \
+        --target-build "$expected_build" \
+        --delta-directory "$delta_input_dir" \
+        --download-url-prefix "$download_url_prefix")"
+fi
+jq --arg tag "$tag" --argjson deltas "$delta_entries" \
+    'map(if .tag == $tag then .deltas = $deltas else . end)' \
+    "$work_dir/entries.json" > "$work_dir/entries-with-deltas.json"
+
 python3 "$repo_root/Scripts/release/release_tools.py" build-appcast \
-    --entries "$work_dir/entries.json" \
+    --entries "$work_dir/entries-with-deltas.json" \
     --output "$output_dir/appcast.xml"
 python3 "$repo_root/Scripts/release/release_tools.py" validate-appcast \
-    --entries "$work_dir/entries.json" --appcast "$output_dir/appcast.xml"
+    --entries "$work_dir/entries-with-deltas.json" --appcast "$output_dir/appcast.xml"
 printf '%s\n' "$SPARKLE_PRIVATE_KEY" | "$sign_tool" --ed-key-file - "$output_dir/appcast.xml"
 printf '%s\n' "$SPARKLE_PRIVATE_KEY" | "$sign_tool" --ed-key-file - --verify "$output_dir/appcast.xml"
 python3 "$repo_root/Scripts/release/release_tools.py" validate-appcast \
-    --entries "$work_dir/entries.json" --appcast "$output_dir/appcast.xml"
+    --entries "$work_dir/entries-with-deltas.json" --appcast "$output_dir/appcast.xml"
 
 cp "$zip_path" "$output_dir/$zip_name"
 (cd "$output_dir" && shasum -a 256 "$zip_name" > "$zip_name.sha256")
+delta_files_json="$(jq -c '[.[].deltas[]?.file] | unique' "$work_dir/entries-with-deltas.json")"
+while IFS= read -r delta_file; do
+    [[ -n "$delta_file" ]] || continue
+    cp "$delta_input_dir/$delta_file" "$output_dir/$delta_file"
+done < <(jq -r '.[].deltas[]?.file' "$work_dir/entries-with-deltas.json")
 appcast_sha="$(shasum -a 256 "$output_dir/appcast.xml" | awk '{print $1}')"
 jq \
     --arg zipFile "$zip_name" \
     --arg checksumFile "$zip_name.sha256" \
     --arg appcastSha256 "$appcast_sha" \
-    '. + {zipFile:$zipFile,checksumFile:$checksumFile,appcastFile:"appcast.xml",appcastSha256:$appcastSha256}' \
+    --argjson deltaFiles "$delta_files_json" \
+    '. + {zipFile:$zipFile,checksumFile:$checksumFile,deltaFiles:$deltaFiles,appcastFile:"appcast.xml",appcastSha256:$appcastSha256}' \
     "$manifest" > "$output_dir/manifest.json"

@@ -9,7 +9,7 @@ v1.2.3 tag
   ├─ Xcode Cloud: archive → Developer ID signing → notarize and staple
   └─ GitHub / Ubuntu: validate → placeholder notes → draft Release → wait
                                ↓
-                     GitHub / macOS: verify app → ZIP → Sparkle signatures → signed appcast
+                     GitHub / macOS: verify app → ZIP + deltas → Sparkle signatures → signed appcast
                                ↓
                      GitHub / Ubuntu: upload → publish → deploy Pages
 ```
@@ -19,7 +19,7 @@ Xcode Cloud and GitHub are both started by the pushed tag. GitHub does not call 
 The jobs exchange short-lived GitHub workflow artifacts:
 
 - `xcode-cloud-notarized-<tag>` contains Apple’s unmodified `STAPLED_NOTARIZED_ARCHIVE` and a JSON manifest.
-- `sparkle-release-<tag>` contains the final ZIP, checksum, signed appcast, and an extended manifest.
+- `sparkle-release-<tag>` contains the final ZIP, generated `.delta` files, checksum, signed appcast, and an extended manifest.
 
 Only the macOS job may create or modify `appcast.xml`. The final Ubuntu job verifies and publishes its exact bytes.
 
@@ -35,7 +35,7 @@ The workflow caches the pinned Python package download on Ubuntu and SwiftPM che
 - `CFBundleVersion` is assigned and incremented exclusively by Xcode Cloud. The pipeline reads and validates it but never changes it.
 - Stable clients see unchannelled entries. Beta clients see both stable and `beta` entries.
 
-Every generated appcast retains the new release, the previous four stable releases, and the previous two beta releases. It contains at most seven full ZIP updates and no deltas.
+Every generated appcast retains the new release, the previous four stable releases, and the previous two beta releases. The newest item gets deltas from the three newest stable predecessors and the two newest beta predecessors, when Sparkle determines a delta is smaller and compatible; the full ZIP always remains available as the fallback. This means a release such as `0.21.0` can offer deltas from `0.19.0`, `0.20.0`, and `0.20.1`, plus the two newest beta builds when available.
 
 ## Creating and monitoring a release
 
@@ -53,7 +53,7 @@ The current notes provider deliberately calls JSONPlaceholder and wraps its resp
 - **Xcode Cloud does not start:** confirm its Tag Changes condition matches `v*`, the workflow is active, and its GitHub connection can see the tag.
 - **Xcode Cloud failure:** inspect archive/notarization logs in App Store Connect. The GitHub Release remains a draft.
 - **Timeout:** rerun GitHub Actions after Xcode Cloud completes. The orchestrator reuses the matching build and draft Release.
-- **Sparkle failure:** inspect macOS job output for bundle metadata, architecture, code-signing, notarization, or key errors. No assets are published.
+- **Sparkle failure:** inspect macOS job output for bundle metadata, architecture, code-signing, notarization, delta generation, or key errors. No assets are published.
 - **Asset upload failure:** rerun the publisher; uploads use `--clobber` and remain idempotent.
 - **Pages failure after publication:** rerun the publisher. The previous valid feed remains served until deployment succeeds.
 

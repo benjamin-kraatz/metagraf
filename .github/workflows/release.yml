@@ -205,12 +205,20 @@ jobs:
           echo "release-draft=$(jq -r .draft <<<"$actual_release")" >> "$GITHUB_OUTPUT"
           zip_file="$(jq -r .zipFile manifest.json)"
           checksum_file="$(jq -r .checksumFile manifest.json)"
+          mapfile -t delta_files < <(jq -r '.deltaFiles[]?' manifest.json)
           [[ -f "$zip_file" && -f "$checksum_file" && -f appcast.xml ]]
+          for delta_file in "${delta_files[@]}"; do
+            [[ -f "$delta_file" ]]
+          done
           sha256sum --check "$checksum_file"
           appcast_sha="$(sha256sum appcast.xml | awk '{print $1}')"
           [[ "$appcast_sha" == "$(jq -r .appcastSha256 manifest.json)" ]]
           expected_url="https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/$zip_file"
           grep -Fq "$expected_url" appcast.xml
+          for delta_file in "${delta_files[@]}"; do
+            expected_delta_url="https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/$delta_file"
+            grep -Fq "$expected_delta_url" appcast.xml
+          done
           echo "release-id=$release_id" >> "$GITHUB_OUTPUT"
           echo "zip=$zip_file" >> "$GITHUB_OUTPUT"
           echo "checksum=$checksum_file" >> "$GITHUB_OUTPUT"
@@ -223,20 +231,25 @@ jobs:
         run: |
           set -euo pipefail
           cd "$RUNNER_TEMP/sparkle-output"
+          mapfile -t delta_files < <(jq -r '.deltaFiles[]?' manifest.json)
+          release_assets=("$ZIP_FILE" "$CHECKSUM_FILE" appcast.xml "${delta_files[@]}")
           if [[ "$RELEASE_DRAFT" == "true" ]]; then
-            gh release upload "$GITHUB_REF_NAME" "$ZIP_FILE" "$CHECKSUM_FILE" appcast.xml --clobber
+            gh release upload "$GITHUB_REF_NAME" "${release_assets[@]}" --clobber
           else
             mkdir -p "$RUNNER_TEMP/published-assets"
-            gh release download "$GITHUB_REF_NAME" --dir "$RUNNER_TEMP/published-assets" \
-              --pattern "$ZIP_FILE" --pattern "$CHECKSUM_FILE" --pattern appcast.xml
-            cmp --silent "$ZIP_FILE" "$RUNNER_TEMP/published-assets/$ZIP_FILE"
-            cmp --silent "$CHECKSUM_FILE" "$RUNNER_TEMP/published-assets/$CHECKSUM_FILE"
-            cmp --silent appcast.xml "$RUNNER_TEMP/published-assets/appcast.xml"
+            download_patterns=(--pattern "$ZIP_FILE" --pattern "$CHECKSUM_FILE" --pattern appcast.xml)
+            for delta_file in "${delta_files[@]}"; do
+              download_patterns+=(--pattern "$delta_file")
+            done
+            gh release download "$GITHUB_REF_NAME" --dir "$RUNNER_TEMP/published-assets" "${download_patterns[@]}"
+            for asset in "${release_assets[@]}"; do
+              cmp --silent "$asset" "$RUNNER_TEMP/published-assets/$asset"
+            done
           fi
           assets="$(gh release view "$GITHUB_REF_NAME" --json assets --jq '.assets[].name')"
-          grep -Fxq "$ZIP_FILE" <<<"$assets"
-          grep -Fxq "$CHECKSUM_FILE" <<<"$assets"
-          grep -Fxq appcast.xml <<<"$assets"
+          for asset in "${release_assets[@]}"; do
+            grep -Fxq "$asset" <<<"$assets"
+          done
 
       - name: Publish GitHub Release
         env:

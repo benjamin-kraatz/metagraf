@@ -85,7 +85,7 @@ No Xcode Cloud lifecycle scripts are required. The existing tag-push configurati
 2. Confirm Xcode Cloud and GitHub Actions select the same full commit SHA.
 3. Confirm the draft remains private until the notarized artifact and Sparkle files are ready.
 4. Download the public ZIP on a clean Mac, extract it, and verify Gatekeeper accepts Metagraf.
-5. Install an older signed build and test both stable-only and beta-enabled Sparkle updates.
+5. Install an older signed build and test both stable-only and beta-enabled Sparkle updates, including a release with a matching `.delta` source; verify that Sparkle falls back to the full ZIP when no matching delta is available.
 6. Confirm the public appcast exactly matches the `appcast.xml` attached to the Release.
 
 Review API-key expiry, Sparkle-key backups, Xcode Cloud access, GitHub environment access, and maintainer membership at least twice a year and whenever someone joins or leaves the release team.

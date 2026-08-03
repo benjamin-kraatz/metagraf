@@ -15,6 +15,7 @@ from datetime import datetime, timezone
 from email.utils import format_datetime
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote, unquote, urlsplit
 
 SPARKLE_NS = "http://www.andymatuschak.org/xml-namespaces/sparkle"
 NUMBER = r"(?:0|[1-9]\d*)"
@@ -65,6 +66,21 @@ def select_history(releases: list[dict[str, Any]], current_tag: str) -> list[dic
     return selected
 
 
+def select_delta_sources(releases: list[dict[str, Any]], current_tag: str) -> list[dict[str, Any]]:
+    """Return the three newest stable and two newest beta predecessors."""
+    current = next((release for release in releases if release["tagName"] == current_tag), None)
+    if current is None:
+        raise ValueError(f"current draft release {current_tag} was not provided")
+
+    published = [release for release in releases if not release.get("isDraft") and release["tagName"] != current_tag]
+    published.sort(key=lambda item: item.get("publishedAt") or "", reverse=True)
+    stable = [item for item in published if not item.get("isPrerelease")][:3]
+    beta = [item for item in published if item.get("isPrerelease")][:2]
+    selected = [*stable, *beta]
+    selected.sort(key=lambda item: item.get("publishedAt") or "", reverse=True)
+    return selected
+
+
 def placeholder_notes(url: str) -> str:
     with urllib.request.urlopen(url, timeout=15) as response:  # noqa: S310 - fixed workflow URL
         payload = json.load(response)
@@ -110,6 +126,23 @@ def build_appcast(entries: list[dict[str, Any]], output: Path) -> None:
                 "type": "application/octet-stream",
             },
         )
+        if entry.get("deltas"):
+            deltas = ET.SubElement(item, f"{{{SPARKLE_NS}}}deltas")
+            for delta in entry["deltas"]:
+                attributes = {
+                    "url": delta["url"],
+                    f"{{{SPARKLE_NS}}}deltaFrom": str(delta["fromBuild"]),
+                    "length": str(delta["length"]),
+                    "type": "application/octet-stream",
+                    f"{{{SPARKLE_NS}}}edSignature": delta["signature"],
+                }
+                if delta.get("fromSparkleExecutableSize") is not None:
+                    attributes[f"{{{SPARKLE_NS}}}deltaFromSparkleExecutableSize"] = str(
+                        delta["fromSparkleExecutableSize"]
+                    )
+                if delta.get("fromSparkleLocales"):
+                    attributes[f"{{{SPARKLE_NS}}}deltaFromSparkleLocales"] = delta["fromSparkleLocales"]
+                ET.SubElement(deltas, "enclosure", attributes)
 
     ET.indent(rss)
     output.write_bytes(ET.tostring(rss, encoding="utf-8", xml_declaration=True))
@@ -133,6 +166,107 @@ def validate_appcast(path: Path, entries: list[dict[str, Any]]) -> None:
         if channel != expected_channel:
             raise ValueError("appcast channel classification is invalid")
 
+        delta_parent = item.find(f"{{{SPARKLE_NS}}}deltas")
+        actual_deltas = [] if delta_parent is None else delta_parent.findall("enclosure")
+        expected_deltas = entry.get("deltas", [])
+        if len(actual_deltas) != len(expected_deltas):
+            raise ValueError("appcast delta entry count does not match the generated delta files")
+        seen_from_builds: set[str] = set()
+        for delta_item, delta in zip(actual_deltas, expected_deltas, strict=True):
+            from_build = delta_item.get(f"{{{SPARKLE_NS}}}deltaFrom")
+            if from_build != str(delta["fromBuild"]) or from_build in seen_from_builds:
+                raise ValueError("appcast delta source builds are invalid")
+            seen_from_builds.add(from_build)
+            if delta_item.get("url") != delta["url"]:
+                raise ValueError("appcast delta URL does not match its generated delta")
+            if delta_item.get(f"{{{SPARKLE_NS}}}edSignature") != delta["signature"]:
+                raise ValueError("appcast delta signature does not match its generated delta")
+            if delta_item.get("length") != str(delta["length"]):
+                raise ValueError("appcast delta length does not match its generated delta")
+            if delta_item.get("type") != "application/octet-stream":
+                raise ValueError("appcast delta enclosure type is invalid")
+            expected_executable_size = delta.get("fromSparkleExecutableSize")
+            actual_executable_size = delta_item.get(f"{{{SPARKLE_NS}}}deltaFromSparkleExecutableSize")
+            if actual_executable_size != (
+                str(expected_executable_size) if expected_executable_size is not None else None
+            ):
+                raise ValueError("appcast delta Sparkle executable metadata is invalid")
+            expected_locales = delta.get("fromSparkleLocales")
+            actual_locales = delta_item.get(f"{{{SPARKLE_NS}}}deltaFromSparkleLocales")
+            if actual_locales != expected_locales:
+                raise ValueError("appcast delta Sparkle locale metadata is invalid")
+
+
+def extract_deltas(
+    path: Path,
+    target_build: int,
+    delta_directory: Path,
+    download_url_prefix: str,
+) -> list[dict[str, Any]]:
+    """Extract and validate the latest item's deltas from Sparkle's generated appcast."""
+    root = ET.parse(path).getroot()
+    items = root.findall("channel/item")
+    matching = [
+        item
+        for item in items
+        if item.findtext(f"{{{SPARKLE_NS}}}version") == str(target_build)
+    ]
+    if len(matching) != 1:
+        raise ValueError(f"generated delta appcast does not contain exactly one build {target_build}")
+
+    delta_parent = matching[0].find(f"{{{SPARKLE_NS}}}deltas")
+    if delta_parent is None:
+        return []
+
+    delta_directory = delta_directory.resolve()
+    deltas: list[dict[str, Any]] = []
+    seen_from_builds: set[str] = set()
+    for enclosure in delta_parent.findall("enclosure"):
+        from_build = enclosure.get(f"{{{SPARKLE_NS}}}deltaFrom")
+        signature = enclosure.get(f"{{{SPARKLE_NS}}}edSignature")
+        length_text = enclosure.get("length")
+        raw_url = enclosure.get("url")
+        if not from_build or not signature or not length_text or not raw_url:
+            raise ValueError("generated delta appcast contains an incomplete enclosure")
+        if from_build in seen_from_builds:
+            raise ValueError("generated delta appcast contains duplicate source builds")
+        seen_from_builds.add(from_build)
+        try:
+            length = int(length_text)
+            int(from_build)
+        except ValueError as error:
+            raise ValueError("generated delta appcast contains a non-numeric build or length") from error
+
+        filename = unquote(Path(urlsplit(raw_url).path).name)
+        if not filename or not filename.endswith(".delta"):
+            raise ValueError(f"generated delta URL does not name a .delta file: {raw_url}")
+        delta_path = (delta_directory / filename).resolve()
+        if delta_path.parent != delta_directory or not delta_path.is_file():
+            raise ValueError(f"generated delta file is missing: {filename}")
+        actual_length = delta_path.stat().st_size
+        if actual_length != length:
+            raise ValueError(f"generated delta length is incorrect for {filename}")
+
+        delta: dict[str, Any] = {
+            "file": filename,
+            "url": f"{download_url_prefix.rstrip('/')}/{quote(filename)}",
+            "fromBuild": int(from_build),
+            "length": length,
+            "signature": signature,
+        }
+        executable_size = enclosure.get(f"{{{SPARKLE_NS}}}deltaFromSparkleExecutableSize")
+        if executable_size is not None:
+            try:
+                delta["fromSparkleExecutableSize"] = int(executable_size)
+            except ValueError as error:
+                raise ValueError(f"generated delta executable metadata is invalid for {filename}") from error
+        locales = enclosure.get(f"{{{SPARKLE_NS}}}deltaFromSparkleLocales")
+        if locales:
+            delta["fromSparkleLocales"] = locales
+        deltas.append(delta)
+
+    return deltas
+
 
 def main() -> None:
     parser = argparse.ArgumentParser()
@@ -154,6 +288,11 @@ def main() -> None:
     history.add_argument("--current-tag", required=True)
     history.add_argument("--output", type=Path, required=True)
 
+    delta_history = commands.add_parser("select-delta-sources")
+    delta_history.add_argument("--releases", type=Path, required=True)
+    delta_history.add_argument("--current-tag", required=True)
+    delta_history.add_argument("--output", type=Path, required=True)
+
     appcast = commands.add_parser("build-appcast")
     appcast.add_argument("--entries", type=Path, required=True)
     appcast.add_argument("--output", type=Path, required=True)
@@ -161,6 +300,12 @@ def main() -> None:
     appcast_validation = commands.add_parser("validate-appcast")
     appcast_validation.add_argument("--entries", type=Path, required=True)
     appcast_validation.add_argument("--appcast", type=Path, required=True)
+
+    delta_extraction = commands.add_parser("extract-deltas")
+    delta_extraction.add_argument("--appcast", type=Path, required=True)
+    delta_extraction.add_argument("--target-build", type=int, required=True)
+    delta_extraction.add_argument("--delta-directory", type=Path, required=True)
+    delta_extraction.add_argument("--download-url-prefix", required=True)
 
     args = parser.parse_args()
     try:
@@ -174,10 +319,24 @@ def main() -> None:
         elif args.command == "select-history":
             releases = json.loads(args.releases.read_text(encoding="utf-8"))
             args.output.write_text(json.dumps(select_history(releases, args.current_tag), indent=2), encoding="utf-8")
+        elif args.command == "select-delta-sources":
+            releases = json.loads(args.releases.read_text(encoding="utf-8"))
+            args.output.write_text(json.dumps(select_delta_sources(releases, args.current_tag), indent=2), encoding="utf-8")
         elif args.command == "build-appcast":
             build_appcast(json.loads(args.entries.read_text(encoding="utf-8")), args.output)
         elif args.command == "validate-appcast":
             validate_appcast(args.appcast, json.loads(args.entries.read_text(encoding="utf-8")))
+        elif args.command == "extract-deltas":
+            print(
+                json.dumps(
+                    extract_deltas(
+                        args.appcast,
+                        args.target_build,
+                        args.delta_directory,
+                        args.download_url_prefix,
+                    )
+                )
+            )
     except (ValueError, OSError, KeyError, json.JSONDecodeError, ET.ParseError) as error:
         print(f"error: {error}", file=sys.stderr)
         raise SystemExit(1) from error

@@ -9,9 +9,11 @@ from pathlib import Path
 from Scripts.release.release_tools import (
     SPARKLE_NS,
     build_appcast,
+    extract_deltas,
     is_ancestor,
     parse_tag,
     placeholder_notes,
+    select_delta_sources,
     select_history,
     validate_appcast,
 )
@@ -37,6 +39,34 @@ class ReleaseToolsTests(unittest.TestCase):
         self.assertEqual(len(selected), 7)
         self.assertEqual(sum(not item["isPrerelease"] and not item["isDraft"] for item in selected), 4)
         self.assertEqual(sum(item["isPrerelease"] for item in selected), 2)
+
+    def test_delta_sources_retain_three_stable_and_two_beta_predecessors(self):
+        releases = [{"tagName": "v0.21.0", "isDraft": True, "isPrerelease": False, "publishedAt": None}]
+        for index in range(1, 7):
+            releases.append(
+                {
+                    "tagName": f"v0.{20 - index}.0",
+                    "isDraft": False,
+                    "isPrerelease": False,
+                    "publishedAt": f"2026-0{index}-01T00:00:00Z",
+                }
+            )
+        for index in range(1, 5):
+            releases.append(
+                {
+                    "tagName": f"v0.21.0-beta.{index}",
+                    "isDraft": False,
+                    "isPrerelease": True,
+                    "publishedAt": f"2026-07-0{index}T00:00:00Z",
+                }
+            )
+
+        selected = select_delta_sources(releases, "v0.21.0")
+
+        self.assertEqual(len(selected), 5)
+        self.assertEqual(sum(not item["isPrerelease"] for item in selected), 3)
+        self.assertEqual(sum(item["isPrerelease"] for item in selected), 2)
+        self.assertNotIn("v0.21.0", {item["tagName"] for item in selected})
 
     def test_git_ancestry(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -91,6 +121,15 @@ class ReleaseToolsTests(unittest.TestCase):
             "url": "https://example.test/Metagraf.zip",
             "signature": "signed",
             "length": 123,
+            "deltas": [
+                {
+                    "file": "Metagraf43-42.delta",
+                    "fromBuild": 41,
+                    "url": "https://example.test/Metagraf43-42.delta",
+                    "signature": "delta-signed",
+                    "length": 17,
+                }
+            ],
         }
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "appcast.xml"
@@ -101,6 +140,48 @@ class ReleaseToolsTests(unittest.TestCase):
         self.assertEqual(root.findtext(f"channel/item/{{{SPARKLE_NS}}}channel"), "beta")
         enclosure = root.find("channel/item/enclosure")
         self.assertEqual(enclosure.attrib[f"{{{SPARKLE_NS}}}edSignature"], "signed")
+        delta = root.find(f"channel/item/{{{SPARKLE_NS}}}deltas/enclosure")
+        self.assertEqual(delta.attrib[f"{{{SPARKLE_NS}}}deltaFrom"], "41")
+        self.assertEqual(delta.attrib[f"{{{SPARKLE_NS}}}edSignature"], "delta-signed")
+
+    def test_extract_deltas_validates_generated_file_and_rewrites_download_url(self):
+        entry = {
+            "version": "1.2.3",
+            "build": 42,
+            "channel": "stable",
+            "publishedAt": "2026-08-02T12:00:00Z",
+            "notes": "Test",
+            "url": "Metagraf-1.2.3.zip",
+            "signature": "signed",
+            "length": 123,
+            "deltas": [
+                {
+                    "file": "Metagraf42-41.delta",
+                    "fromBuild": 41,
+                    "url": "Metagraf42-41.delta",
+                    "signature": "delta-signed",
+                    "length": 5,
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            delta_directory = root / "deltas"
+            delta_directory.mkdir()
+            (delta_directory / "Metagraf42-41.delta").write_bytes(b"delta")
+            generated_appcast = root / "generated-appcast.xml"
+            build_appcast([entry], generated_appcast)
+
+            deltas = extract_deltas(
+                generated_appcast,
+                42,
+                delta_directory,
+                "https://example.test/releases/v1.2.3",
+            )
+
+        self.assertEqual(deltas[0]["fromBuild"], 41)
+        self.assertEqual(deltas[0]["url"], "https://example.test/releases/v1.2.3/Metagraf42-41.delta")
+        self.assertEqual(deltas[0]["length"], 5)
 
 
 if __name__ == "__main__":
