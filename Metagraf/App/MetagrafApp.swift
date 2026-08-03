@@ -41,10 +41,11 @@ struct MetagrafApp: App {
                 settings: appDelegate.settings,
                 permissions: appDelegate.permissions,
                 models: appDelegate.models,
-                updates: appDelegate.updates
+                updates: appDelegate.updates,
+                applyRuntimeSettings: appDelegate.applySettings
             )
-            // Preferences are applied on close rather than on every keystroke,
-            // so a half-typed value never takes effect.
+            // Live apply covers the hot path while Settings is open; onDisappear
+            // remains a safety net for anything that did not fire an onChange.
             .onDisappear { appDelegate.applySettings() }
         }
     }

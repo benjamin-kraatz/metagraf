@@ -5,10 +5,11 @@ import SwiftUI
 
 /// Preferences window.
 struct SettingsView: View {
-    let settings: SettingsStore
+    @Bindable var settings: SettingsStore
     let permissions: PermissionsCoordinator
     let models: ModelStore
     let updates: UpdateController
+    let applyRuntimeSettings: () -> Void
 
     var body: some View {
         TabView {
@@ -35,6 +36,12 @@ struct SettingsView: View {
             }
         }
         .frame(width: 580, height: 460)
+        .onChange(of: settings.hotKey) { _, _ in applyRuntimeSettings() }
+        .onChange(of: settings.minimumHold) { _, _ in applyRuntimeSettings() }
+        .onChange(of: settings.doubleTapWindow) { _, _ in applyRuntimeSettings() }
+        .onChange(of: settings.modelID) { _, _ in applyRuntimeSettings() }
+        .onChange(of: settings.playsSounds) { _, _ in applyRuntimeSettings() }
+        .onChange(of: settings.pillPlacement) { _, _ in applyRuntimeSettings() }
     }
 }
 
@@ -161,10 +168,21 @@ private struct DictationSettings: View {
                     .frame(width: 220)
                 }
 
+                LabeledContent("Double-tap latch window") {
+                    Slider(value: $settings.doubleTapWindow, in: 0.15...1.0, step: 0.05) {
+                        EmptyView()
+                    } minimumValueLabel: {
+                        Text("0.15s").font(.caption)
+                    } maximumValueLabel: {
+                        Text("1s").font(.caption)
+                    }
+                    .frame(width: 220)
+                }
+
                 Text(
                     """
-                    Tap twice quickly to keep dictation running hands-free; \
-                    press once more to finish. Escape cancels.
+                    Tap twice within the latch window to keep dictation running \
+                    hands-free; press once more to finish. Escape cancels.
                     """
                 )
                 .font(.caption)

@@ -4,6 +4,16 @@
     "" : {
 
     },
+    "0.15s" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0,15 s"
+          }
+        }
+      }
+    },
     "·" : {
       "localizations" : {
         "de" : {
@@ -14,12 +24,32 @@
         }
       }
     },
+    "Double-tap latch window" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster für Doppeltipp-Einrastung"
+          }
+        }
+      }
+    },
     "· %lld GB RAM suggested" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "· %lld GB RAM empfohlen"
+          }
+        }
+      }
+    },
+    "Tap twice within the latch window to keep dictation running hands-free; press once more to finish. Escape cancels." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippe zweimal innerhalb des Einrastfensters, damit das Diktat freihändig weiterläuft; drücke einmal mehr zum Beenden. Escape bricht ab."
           }
         }
       }
@@ -1714,6 +1744,7 @@
 
     },
     "Tap twice quickly to keep dictation running hands-free; press once more to finish. Escape cancels." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
