@@ -8,23 +8,39 @@ import OSLog
 /// Gets a finished transcript into whatever app the user is typing in.
 @MainActor
 final class TextInserter {
-    enum InsertionError: LocalizedError, Equatable {
+    /// Outcome of an insertion attempt. Recoverable clipboard fallbacks are
+    /// reported as `.copied` so the UI can confirm without treating them as
+    /// hard failures.
+    enum Result: Equatable {
+        case inserted
+        case copied(CopyReason)
+    }
+
+    enum CopyReason: Equatable {
         case secureInputActive
         case noFocusedTextField
-        case notTrusted
         case eventCreationFailed
+        case clipboardOnly
 
-        var errorDescription: String? {
+        var message: String {
             switch self {
             case .secureInputActive:
                 String(localized: "Copied instead — a password field is capturing input.")
             case .noFocusedTextField:
                 String(localized: "Copied instead — no text field is focused.")
-            case .notTrusted:
-                String(localized: "Metagraf needs Accessibility access to insert text.")
             case .eventCreationFailed:
                 String(localized: "Copied instead — the system refused a synthetic keystroke.")
+            case .clipboardOnly:
+                String(localized: "Copied to the clipboard")
             }
+        }
+    }
+
+    enum InsertionError: LocalizedError, Equatable {
+        case notTrusted
+
+        var errorDescription: String? {
+            String(localized: "Metagraf needs Accessibility access to insert text.")
         }
     }
 
@@ -37,39 +53,50 @@ final class TextInserter {
     private let logger = Logger(subsystem: Metagraf.bundleIdentifier, category: "Insertion")
 
     /// Inserts `text`, falling back to leaving it on the clipboard when the
-    /// preferred route is unavailable. Throws only to explain that fallback —
-    /// the text is on the clipboard either way, so nothing is ever lost.
-    func insert(_ text: String, using strategy: InsertionStrategy) async throws {
+    /// preferred route is unavailable. Throws only for true failures where
+    /// insertion could not proceed usefully; recoverable copy-fallback cases
+    /// return `.copied` instead.
+    @discardableResult
+    func insert(_ text: String, using strategy: InsertionStrategy) async throws -> Result {
         switch strategy {
         case .clipboardOnly:
             copyToPasteboard(text)
+            return .copied(.clipboardOnly)
 
         case .accessibility:
             do {
                 try insertViaAccessibility(text)
+                return .inserted
             } catch {
                 logger.notice("Direct insertion failed, falling back to paste")
-                try await paste(text)
+                return try await paste(text)
             }
 
         case .paste:
-            try await paste(text)
+            return try await paste(text)
         }
     }
 
     // MARK: - Paste
 
-    private func paste(_ text: String) async throws {
+    private func paste(_ text: String) async throws -> Result {
         // A password field puts the window server into secure input mode, where
         // synthetic keystrokes are dropped. Copying is the only honest option.
         guard !IsSecureEventInputEnabled() else {
             copyToPasteboard(text)
-            throw InsertionError.secureInputActive
+            return .copied(.secureInputActive)
         }
 
         guard AXIsProcessTrusted() else {
             copyToPasteboard(text)
             throw InsertionError.notTrusted
+        }
+
+        // Without a focused field, ⌘V would silently do nothing useful —
+        // leave the transcript on the clipboard and say so.
+        guard focusedUIElement() != nil else {
+            copyToPasteboard(text)
+            return .copied(.noFocusedTextField)
         }
 
         let pasteboard = NSPasteboard.general
@@ -86,7 +113,7 @@ final class TextInserter {
         } catch {
             snapshot.restore(to: pasteboard)
             copyToPasteboard(text)
-            throw error
+            return .copied(.eventCreationFailed)
         }
 
         // Restoring immediately would race the target app's read of the
@@ -95,6 +122,8 @@ final class TextInserter {
             try? await Task.sleep(for: Self.pasteboardRestoreDelay)
             snapshot.restore(to: pasteboard)
         }
+
+        return .inserted
     }
 
     private func postCommandV() throws {
@@ -103,7 +132,7 @@ final class TextInserter {
             let keyDown = CGEvent(keyboardEventSource: source, virtualKey: Self.virtualKeyV, keyDown: true),
             let keyUp = CGEvent(keyboardEventSource: source, virtualKey: Self.virtualKeyV, keyDown: false)
         else {
-            throw InsertionError.eventCreationFailed
+            throw CopyReasonError.eventCreationFailed
         }
 
         // Setting flags explicitly rather than inheriting whatever is physically
@@ -132,6 +161,22 @@ final class TextInserter {
     private func insertViaAccessibility(_ text: String) throws {
         guard AXIsProcessTrusted() else { throw InsertionError.notTrusted }
 
+        guard let element = focusedUIElement() else {
+            throw AccessibilityFallback.noFocusedTextField
+        }
+
+        // Replacing the selection is what a keystroke would do: with an empty
+        // selection it inserts at the caret, and with a selection it overwrites.
+        let result = AXUIElementSetAttributeValue(
+            element,
+            kAXSelectedTextAttribute as CFString,
+            text as CFTypeRef
+        )
+
+        guard result == .success else { throw AccessibilityFallback.noFocusedTextField }
+    }
+
+    private func focusedUIElement() -> AXUIElement? {
         let system = AXUIElementCreateSystemWide()
         var focused: AnyObject?
         let status = AXUIElementCopyAttributeValue(
@@ -145,19 +190,10 @@ final class TextInserter {
             let focused,
             CFGetTypeID(focused) == AXUIElementGetTypeID()
         else {
-            throw InsertionError.noFocusedTextField
+            return nil
         }
 
-        // Replacing the selection is what a keystroke would do: with an empty
-        // selection it inserts at the caret, and with a selection it overwrites.
-        let element = focused as! AXUIElement
-        let result = AXUIElementSetAttributeValue(
-            element,
-            kAXSelectedTextAttribute as CFString,
-            text as CFTypeRef
-        )
-
-        guard result == .success else { throw InsertionError.noFocusedTextField }
+        return (focused as! AXUIElement)
     }
 
     // MARK: - Clipboard
@@ -166,5 +202,15 @@ final class TextInserter {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
     }
+}
+
+/// Internal signal that accessibility insertion should fall through to paste.
+private enum AccessibilityFallback: Error {
+    case noFocusedTextField
+}
+
+/// Internal signal that ⌘V could not be synthesized; paste maps it to `.copied`.
+private enum CopyReasonError: Error {
+    case eventCreationFailed
 }
 #endif

@@ -17,14 +17,24 @@ public final class DictationSession {
         case transcribing
         case refining
         case inserting
+        /// Transcript was left on the clipboard instead of inserted. Informational,
+        /// not a hard failure — auto-clears like `.failed`.
+        case copied(String)
         case failed(String)
 
         public var isBusy: Bool {
             switch self {
-            case .idle, .failed: false
+            case .idle, .failed, .copied: false
             case .preparing, .recording, .transcribing, .refining, .inserting: true
             }
         }
+    }
+
+    /// How delivery finished. Recoverable clipboard fallbacks use `.copied` so
+    /// the pill can confirm without the orange failure treatment.
+    public enum DeliveryOutcome: Equatable, Sendable {
+        case inserted
+        case copied(String)
     }
 
     public private(set) var phase: Phase = .idle
@@ -55,10 +65,10 @@ public final class DictationSession {
     public var refiners = RefinerRegistry()
 
     /// Delivers each finished transcript, typically by inserting it into the
-    /// frontmost application. Throwing surfaces the reason in the pill, which
-    /// matters because delivery is the step most likely to be blocked by
-    /// something outside the app's control.
-    public var deliver: ((String) async throws -> Void)?
+    /// frontmost application. Return `.copied` when the text was left on the
+    /// clipboard instead; throw only for true failures — delivery is the step
+    /// most likely to be blocked by something outside the app's control.
+    public var deliver: ((String) async throws -> DeliveryOutcome)?
 
     private let logger = Logger(subsystem: Metagraf.bundleIdentifier, category: "Dictation")
     private let capture: AudioCaptureEngine
@@ -187,8 +197,13 @@ public final class DictationSession {
             liveText = transcript
 
             phase = .inserting
-            try await deliver?(transcript)
-            phase = .idle
+            let outcome = try await deliver?(transcript) ?? .inserted
+            switch outcome {
+            case .inserted:
+                phase = .idle
+            case .copied(let message):
+                showCopied(message)
+            }
         } catch {
             fail(with: error)
         }
@@ -208,6 +223,18 @@ public final class DictationSession {
         liveText = ""
         recordingStartedAt = nil
         phase = .idle
+    }
+
+    private func showCopied(_ message: String) {
+        logger.notice("Copied instead of inserting: \(message, privacy: .public)")
+        phase = .copied(message)
+
+        // Clear on its own so a brief confirmation does not leave the pill stuck.
+        recoveryTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(4))
+            guard !Task.isCancelled, let self, case .copied = self.phase else { return }
+            self.phase = .idle
+        }
     }
 
     private func fail(with error: any Error) {

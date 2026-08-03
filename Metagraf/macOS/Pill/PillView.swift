@@ -66,6 +66,11 @@ struct PillView: View {
         case .recording:
             meter
 
+        case .copied:
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.green)
+
         case .failed:
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 12, weight: .semibold))
@@ -111,7 +116,7 @@ struct PillView: View {
         case .transcribing:
             label("Transcribing…")
 
-        case .failed(let message):
+        case .copied(let message), .failed(let message):
             Text(message)
                 .font(.system(size: 12))
                 .lineLimit(2)
@@ -151,6 +156,7 @@ struct PillView: View {
     private var tint: Color? {
         switch session.phase {
         case .recording: .accentColor.opacity(0.35)
+        case .copied: .green.opacity(0.3)
         case .failed: .orange.opacity(0.3)
         default: nil
         }

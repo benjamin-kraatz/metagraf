@@ -51,7 +51,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         }
 
         session.deliver = { [weak self] transcript in
-            try await self?.deliver(transcript)
+            guard let self else { return .inserted }
+            return try await self.deliver(transcript)
         }
 
         let pill = PillWindowController(session: session, settings: settings)
@@ -77,12 +78,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
 
     // MARK: - Delivery
 
-    private func deliver(_ transcript: String) async throws {
+    private func deliver(_ transcript: String) async throws -> DictationSession.DeliveryOutcome {
         let target = target
         record(transcript, target: target)
 
         let strategy = settings.insertion(forBundleIdentifier: target?.bundleIdentifier)
-        try await inserter.insert(transcript, using: strategy)
+        let result = try await inserter.insert(transcript, using: strategy)
+
+        // Cue after insertion resolves so a silent clipboard fallback is not
+        // heralded as a finished insert, and empty/failed transcripts stay quiet.
+        feedback.play(.finished)
+
+        switch result {
+        case .inserted:
+            return .inserted
+        case .copied(let reason):
+            return .copied(reason.message)
+        }
     }
 
     private func record(_ transcript: String, target: NSRunningApplication?) {
@@ -145,10 +157,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
             }
 
             // The hotkey is a bare modifier with no visible press, so the cue is
-            // the only confirmation that dictation actually started.
+            // the only confirmation that dictation actually started. The finished
+            // cue waits until delivery resolves — see `deliver(_:)`.
             switch activation {
             case .began: feedback.play(.started)
-            case .completed: feedback.play(.finished)
+            case .completed: break
             case .cancelled, .aborted: feedback.play(.cancelled)
             }
 

@@ -75,6 +75,16 @@
         }
       }
     },
+    "0.15s" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0,15 s"
+          }
+        }
+      }
+    },
     "1s" : {
       "localizations" : {
         "de" : {
@@ -192,11 +202,22 @@
 
     },
     "Add a name or term Metagraf keeps getting wrong" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Name oder Begriff, den Metagraf oft falsch versteht"
+          }
+        }
+      }
+    },
+    "Add a preferred spelling" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bevorzugte Schreibweise hinzufügen"
           }
         }
       }
@@ -489,7 +510,14 @@
       }
     },
     "Copied to the clipboard" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In die Zwischenablage kopiert"
+          }
+        }
+      }
     },
     "Copies the transcript so you can paste it yourself." : {
       "extractionState" : "stale",
@@ -612,6 +640,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Keine behalten"
+          }
+        }
+      }
+    },
+    "Double-tap latch window" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeitfenster für Doppeltipp"
           }
         }
       }
@@ -900,7 +938,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Halten kürzer als ignorieren"
+            "value" : "Kürzere Haltezeiten ignorieren"
           }
         }
       }
@@ -1106,6 +1144,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nachricht"
+          }
+        }
+      }
+    },
+    "meta graph, metagraph" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "meta graph, metagraph"
           }
         }
       }
@@ -1323,6 +1371,16 @@
     "Opens Metagraf and starts listening straight away." : {
 
     },
+    "Optional: add common mistakes Metagraf should rewrite into this term, separated by commas." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optional: häufige Fehlhörungen eintragen, die Metagraf in diesen Begriff umschreiben soll — durch Kommas getrennt."
+          }
+        }
+      }
+    },
     "Paste" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1412,6 +1470,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Korrekte Fachbegriffe und eine prägnante technische Ausdrucksweise bevorzugen."
+          }
+        }
+      }
+    },
+    "Preferred spelling" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bevorzugte Schreibweise"
           }
         }
       }
@@ -1573,6 +1641,16 @@
         }
       }
     },
+    "Separate variants with commas. They are rewritten into the term after dictation." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Varianten durch Kommas trennen. Nach dem Diktat werden sie in den Begriff umgeschrieben."
+          }
+        }
+      }
+    },
     "Set up the keyboard" : {
 
     },
@@ -1714,11 +1792,22 @@
 
     },
     "Tap twice quickly to keep dictation running hands-free; press once more to finish. Escape cancels." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tippe zweimal schnell, damit das Diktat freihändig weiterläuft; drücke einmal mehr zum Beenden. Escape bricht ab."
+            "value" : "Tippe zweimal schnell, um freihändig weiterzudiktieren. Tippe erneut zum Beenden; Escape bricht ab."
+          }
+        }
+      }
+    },
+    "Tap twice within the latch window to keep dictation running hands-free; press once more to finish. Escape cancels." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippe zweimal innerhalb des Zeitfensters, um freihändig weiterzudiktieren. Tippe erneut zum Beenden; Escape bricht ab."
           }
         }
       }
@@ -1729,6 +1818,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Begriff"
+          }
+        }
+      }
+    },
+    "Term is the spelling Metagraf should favour. Also heard as lists wrong variants to rewrite into that term — for example “meta graph” → “Metagraf”. Whisper models skip speech biasing; rewrite and refinement still apply." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unter „Begriff“ trägst du die Schreibweise ein, die Metagraf bevorzugen soll. Unter „Auch gehört als“ listest du typische Fehlhörungen — Metagraf schreibt sie nach dem Diktat in den Begriff um, etwa „meta graph“ → „Metagraf“. Bei Whisper-Modellen wirken die Begriffe nicht schon bei der Erkennung; Umschreiben und Verfeinerung greifen trotzdem."
           }
         }
       }
@@ -1836,6 +1935,7 @@
       }
     },
     "These words are fed to the speech model so it favours them over similar-sounding ones." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

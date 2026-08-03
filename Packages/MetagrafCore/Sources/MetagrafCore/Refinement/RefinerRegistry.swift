@@ -19,13 +19,18 @@ public struct RefinerRegistry: Sendable {
     }
 
     public func refine(_ text: String, context: RefinementContext) async -> String {
-        guard context.style != .raw else { return text }
-        guard context.usesLanguageModel, context.style.needsLanguageModel else { return text }
+        // Vocabulary corrections are deterministic and cheap; apply them even
+        // when the user chose “Exactly as spoken” or the language model is off.
+        let corrected = VocabularyRewriter.apply(text, vocabulary: context.vocabulary)
+
+        guard context.style != .raw else { return corrected }
+        guard context.usesLanguageModel, context.style.needsLanguageModel else { return corrected }
 
         for refiner in modelRefiners {
             guard await refiner.availability.isAvailable else { continue }
             do {
-                return try await refiner.refine(text, context: context)
+                let refined = try await refiner.refine(corrected, context: context)
+                return VocabularyRewriter.apply(refined, vocabulary: context.vocabulary)
             } catch {
                 logger.notice(
                     """
@@ -36,7 +41,7 @@ public struct RefinerRegistry: Sendable {
             }
         }
 
-        return text
+        return corrected
     }
 
     /// Why the language-model step is unavailable, for the settings UI to show.

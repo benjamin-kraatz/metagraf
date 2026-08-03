@@ -64,6 +64,13 @@ struct DictateView: View {
                 description: Text(message)
             )
 
+        case .copied(let message):
+            ContentUnavailableView(
+                message,
+                systemImage: "checkmark.circle.fill",
+                description: Text(session.lastTranscript)
+            )
+
         default:
             LevelMeter(level: session.level, isActive: session.phase == .recording)
         }
@@ -77,7 +84,7 @@ struct DictateView: View {
         case .transcribing: "Transcribing…"
         case .refining: "Tidying up…"
         case .inserting: "Copying…"
-        case .failed: ""
+        case .copied, .failed: ""
         }
     }
 }

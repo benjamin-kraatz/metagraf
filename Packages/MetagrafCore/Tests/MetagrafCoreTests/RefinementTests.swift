@@ -207,6 +207,23 @@ struct RefinementStyleTests {
         #expect(!prompt.contains("```"))
     }
 
+    @Test("Vocabulary prompt includes misheard to term mappings")
+    func vocabularyPromptIncludesMisheardMappings() {
+        let refiner = AppleIntelligenceRefiner()
+        let context = RefinementContext(
+            style: .cleanup,
+            vocabulary: [
+                VocabularyEntry(term: "Metagraf", misheard: ["meta graph", "metagraph"]),
+                VocabularyEntry(term: "Kubernetes"),
+            ]
+        )
+        let prompt = refiner.prompt(for: "hello", context: context)
+
+        #expect(prompt.contains("meta graph, metagraph → Metagraf"))
+        #expect(prompt.contains("Kubernetes"))
+        #expect(!prompt.contains("<preferred-spellings>"))
+    }
+
     @Test("Deadline returns the original fallback")
     func deadlineFallsBack() async throws {
         let refiner = AppleIntelligenceRefiner()
