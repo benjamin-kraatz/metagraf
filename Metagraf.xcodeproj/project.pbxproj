@@ -399,6 +399,7 @@
 		000000000000000111000000 /* Debug configuration for PBXNativeTarget "Metagraf" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				AUTOMATION_APPLE_EVENTS = NO;
 				"CODE_SIGN_ENTITLEMENTS[sdk=iphone*]" = "Config/Metagraf-iOS.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
@@ -464,6 +465,7 @@
 		000000000000000112000000 /* Release configuration for PBXNativeTarget "Metagraf" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				AUTOMATION_APPLE_EVENTS = NO;
 				"CODE_SIGN_ENTITLEMENTS[sdk=iphone*]" = "Config/Metagraf-iOS.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
