@@ -25,6 +25,7 @@ struct SettingsStoreTests {
         first.refinementPersona = .programmer
         first.personaAdaptation = .prompting
         first.vocabulary = [VocabularyEntry(term: "Metagraf", misheard: ["meta graph"])]
+        first.showDockIcon = true
 
         let second = SettingsStore(defaults: defaults)
         #expect(second.localeIdentifier == "de_DE")
@@ -37,6 +38,7 @@ struct SettingsStoreTests {
         #expect(second.usesPromptingRefinement)
         #expect(second.vocabulary.map(\.term) == ["Metagraf"])
         #expect(second.vocabulary.first?.misheard == ["meta graph"])
+        #expect(second.showDockIcon)
     }
 
     @Test("Refinement defaults are conservative")

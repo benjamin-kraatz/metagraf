@@ -24,6 +24,8 @@ final class PillPanel: NSPanel {
         hidesOnDeactivate = false
         isReleasedWhenClosed = false
         animationBehavior = .none
+        // Keep the floating pill out of the Dock's window list and Window menu.
+        isExcludedFromWindowsMenu = true
 
         // The panel is a transparent canvas larger than the pill itself, so
         // clicks must fall through to whatever is underneath.

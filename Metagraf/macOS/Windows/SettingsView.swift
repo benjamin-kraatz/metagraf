@@ -42,6 +42,7 @@ struct SettingsView: View {
         .onChange(of: settings.modelID) { _, _ in applyRuntimeSettings() }
         .onChange(of: settings.playsSounds) { _, _ in applyRuntimeSettings() }
         .onChange(of: settings.pillPlacement) { _, _ in applyRuntimeSettings() }
+        .onChange(of: settings.showDockIcon) { _, _ in applyRuntimeSettings() }
     }
 }
 
@@ -58,10 +59,17 @@ private struct GeneralSettings: View {
                     .onChange(of: settings.launchAtLogin) { _, enabled in
                         LaunchAtLogin.set(enabled)
                     }
+
+                Toggle("Always show Dock icon", isOn: $settings.showDockIcon)
             } footer: {
-                Text("Metagraf lives in the menu bar and has no Dock icon.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                Text(
+                    """
+                    Metagraf lives in the menu bar. When the Dock icon is shown, \
+                    open windows appear in its menu.
+                    """
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
             }
 
             Section("Updates") {
