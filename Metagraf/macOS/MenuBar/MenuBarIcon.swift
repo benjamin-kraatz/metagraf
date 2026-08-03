@@ -26,6 +26,7 @@ struct MenuBarIcon: View {
         case .idle: "waveform"
         case .preparing, .transcribing, .refining, .inserting: "waveform.badge.magnifyingglass"
         case .recording: "waveform.badge.mic"
+        case .copied: "waveform.badge.checkmark"
         case .failed: "waveform.badge.exclamationmark"
         }
     }

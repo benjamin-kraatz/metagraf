@@ -34,7 +34,7 @@ final class DictationController {
         }
 
         session.deliver = { [weak self] transcript in
-            self?.deliver(transcript)
+            self?.deliver(transcript) ?? .inserted
         }
 
         session.prewarm()
@@ -70,12 +70,15 @@ final class DictationController {
         )
     }
 
-    private func deliver(_ transcript: String) {
+    private func deliver(_ transcript: String) -> DictationSession.DeliveryOutcome {
         UIPasteboard.general.string = transcript
         didCopyAt = .now
         // Shared with the keyboard, which cannot dictate but can insert this.
         RecentTranscripts.shared.add(transcript)
         record(transcript)
+        // Clipboard is the intended iOS path; keep the idle “Copied to the
+        // clipboard” confirmation rather than the transient `.copied` phase.
+        return .inserted
     }
 
     private func record(_ transcript: String) {

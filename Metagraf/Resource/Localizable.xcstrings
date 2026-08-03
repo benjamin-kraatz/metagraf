@@ -519,7 +519,14 @@
       }
     },
     "Copied to the clipboard" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In die Zwischenablage kopiert"
+          }
+        }
+      }
     },
     "Copies the transcript so you can paste it yourself." : {
       "extractionState" : "stale",

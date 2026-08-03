@@ -118,7 +118,7 @@ struct MenuBarContent: View {
         case .transcribing: Text("Transcribing…")
         case .refining: Text("Tidying up…")
         case .inserting: Text("Inserting…")
-        case .failed(let message): Text(message)
+        case .copied(let message), .failed(let message): Text(message)
         }
     }
 
