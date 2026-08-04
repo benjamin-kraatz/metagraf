@@ -317,6 +317,10 @@ struct RefinerRegistryTests {
         var availability: RefinerAvailability
         var transform: @Sendable (String) throws -> String
 
+        func availability(for locale: Locale) async -> RefinerAvailability {
+            availability
+        }
+
         func refine(_ text: String, context: RefinementContext) async throws -> String {
             try transform(text)
         }
@@ -392,6 +396,60 @@ struct RefinerRegistryTests {
         ])
         let result = await registry.refine("um hello there", context: RefinementContext(style: .notes))
         #expect(result == "um hello there")
+    }
+
+    @Test("An empty model response leaves the original transcript")
+    func emptyModelOutputFallsBack() async {
+        let registry = RefinerRegistry(modelRefiners: [
+            StubRefiner(availability: .available) { _ in "  \n " }
+        ])
+        let result = await registry.refine("keep this", context: RefinementContext(style: .cleanup))
+        #expect(result == "keep this")
+    }
+
+    @Test("Availability is checked for the selected locale")
+    func availabilityUsesSelectedLocale() async {
+        struct LocaleRefiner: TextRefiner {
+            let identifier = RefinerID(rawValue: "locale")
+
+            func availability(for locale: Locale) async -> RefinerAvailability {
+                locale.language.languageCode == .german
+                    ? .available
+                    : .unavailable("unsupported locale")
+            }
+
+            func refine(_ text: String, context: RefinementContext) async throws -> String { text }
+        }
+
+        let registry = RefinerRegistry(modelRefiners: [LocaleRefiner()])
+        #expect(await registry.languageModelAvailability(for: Locale(identifier: "de-DE")) == .available)
+        #expect(
+            await registry.languageModelAvailability(for: Locale(identifier: "en-US"))
+                == .unavailable("unsupported locale")
+        )
+    }
+
+    @Test("Prewarming is forwarded only for an AI-backed style")
+    func prewarmIsForwarded() async {
+        actor Probe {
+            private(set) var count = 0
+            func record() { count += 1 }
+        }
+        struct PrewarmRefiner: TextRefiner {
+            let identifier = RefinerID(rawValue: "prewarm")
+            let probe: Probe
+
+            func availability(for locale: Locale) async -> RefinerAvailability { .available }
+            func prewarm(context: RefinementContext) async { await probe.record() }
+            func refine(_ text: String, context: RefinementContext) async throws -> String { text }
+        }
+
+        let probe = Probe()
+        let registry = RefinerRegistry(modelRefiners: [PrewarmRefiner(probe: probe)])
+        await registry.prewarm(context: RefinementContext(style: .raw))
+        #expect(await probe.count == 0)
+        await registry.prewarm(context: RefinementContext(style: .email))
+        #expect(await probe.count == 1)
     }
 
     @Test("The first available model in the chain wins")

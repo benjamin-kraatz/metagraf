@@ -1,0 +1,96 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Delete" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen"
+          }
+        }
+      }
+    },
+    "Dictate in the Metagraf app and it will show up here." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diktiere in der Metagraf-App. Der Text erscheint dann hier."
+          }
+        }
+      }
+    },
+    "Inserts this text" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fügt diesen Text ein"
+          }
+        }
+      }
+    },
+    "Metagraf" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metagraf"
+          }
+        }
+      }
+    },
+    "Metagraf needs Full Access" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metagraf benötigt Vollzugriff"
+          }
+        }
+      }
+    },
+    "Nothing dictated yet" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch nichts diktiert"
+          }
+        }
+      }
+    },
+    "Remove" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entfernen"
+          }
+        }
+      }
+    },
+    "Switch keyboard" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tastatur wechseln"
+          }
+        }
+      }
+    },
+    "Turn on Allow Full Access in Settings → General → Keyboard → Keyboards → Metagraf. It is what lets this keyboard read what you dictated in the app." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktiviere „Vollzugriff erlauben“ unter Einstellungen → Allgemein → Tastatur → Tastaturen → Metagraf. Dadurch kann diese Tastatur lesen, was du in der App diktiert hast."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

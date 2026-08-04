@@ -76,6 +76,7 @@ public final class DictationSession {
 
     private var pumpTask: Task<Void, Never>?
     private var updatesTask: Task<Void, Never>?
+    private var prewarmTask: Task<Void, Never>?
     private var levelsTask: Task<Void, Never>?
     private var recoveryTask: Task<Void, Never>?
 
@@ -100,6 +101,7 @@ public final class DictationSession {
         levelsTask?.cancel()
         pumpTask?.cancel()
         updatesTask?.cancel()
+        prewarmTask?.cancel()
         recoveryTask?.cancel()
     }
 
@@ -139,6 +141,12 @@ public final class DictationSession {
 
             phase = .recording
             recordingStartedAt = .now
+
+            let refinement = refinement
+            let refiners = refiners
+            prewarmTask = Task {
+                await refiners.prewarm(context: refinement)
+            }
 
             pumpTask = Task { [engine] in
                 for await chunk in audio {
@@ -180,6 +188,7 @@ public final class DictationSession {
             let heard = try await engine.finish()
             updatesTask?.cancel()
             updatesTask = nil
+            prewarmTask = nil
 
             lastRawTranscript = heard
 
@@ -218,6 +227,8 @@ public final class DictationSession {
         pumpTask = nil
         updatesTask?.cancel()
         updatesTask = nil
+        prewarmTask?.cancel()
+        prewarmTask = nil
         await engine.cancel()
 
         liveText = ""
@@ -246,6 +257,8 @@ public final class DictationSession {
         pumpTask = nil
         updatesTask?.cancel()
         updatesTask = nil
+        prewarmTask?.cancel()
+        prewarmTask = nil
         recordingStartedAt = nil
         phase = .failed(message)
 

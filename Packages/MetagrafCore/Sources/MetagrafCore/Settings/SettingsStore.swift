@@ -170,6 +170,19 @@ public final class SettingsStore {
         vocabulary.map(\.term).filter { !$0.isEmpty }
     }
 
+    /// Builds the portable refinement context used where focused-field context
+    /// is unavailable, including the iOS app.
+    public func portableRefinementContext(usesLanguageModel: Bool = true) -> RefinementContext {
+        RefinementContext(
+            style: refinementStyle,
+            persona: refinementPersona,
+            personaAdaptation: personaAdaptation,
+            locale: effectiveLocale,
+            vocabulary: vocabulary,
+            usesLanguageModel: usesLanguageModel
+        )
+    }
+
     /// The insertion strategy for a given app, honouring any rule for it.
     public func insertion(forBundleIdentifier bundleID: String?) -> InsertionStrategy {
         guard
